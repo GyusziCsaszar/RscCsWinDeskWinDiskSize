@@ -17,7 +17,6 @@ namespace WinDiskSizeEx
         protected string            m_sMdbPath;
 
         protected OleDbConnection   m_conn;
-        protected DataSet           m_dataSet;
 
         public MyMdb(String sMdbTemplatePath)
         : base()
@@ -68,12 +67,6 @@ namespace WinDiskSizeEx
 
             m_sMdbPath = "";
 
-            if (m_dataSet != null)
-            {
-                m_dataSet.Clear();
-                m_dataSet = null;
-            }
-
             if (m_conn != null)
             {
                 m_conn.Close();
@@ -109,15 +102,27 @@ namespace WinDiskSizeEx
                 var conn = new OleDbConnection(sConnectString);
                 conn.Open();
 
-                OleDbCommand cmd1 = new OleDbCommand("INSERT INTO Task (Version, Status, Program, VersionString, Label, StorageSize, StorageFree, Machine, StartDate)" 
+                OleDbCommand cmd1 = new OleDbCommand("SELECT ID FROM Task WHERE Version = 100 AND Status = " + iStatus.ToString()
+                                            + " AND Program = 'WinDiskSize' AND VersionString = 'CS2010EXPRESS.100'"
+                                            + " AND Label = '" + sLabel + "'", conn);
+
+                object oTaskID = cmd1.ExecuteScalar();
+
+                if (oTaskID != null)
+                {
+                    m_sLastError = "Task with Label \"" + sLabel + "\" already exists!";
+                    return -1;
+                }
+
+                OleDbCommand cmd2 = new OleDbCommand("INSERT INTO Task (Version, Status, Program, VersionString, Label, StorageSize, StorageFree, Machine, StartDate)" 
                                             + " VALUES (100, " + iStatus.ToString() + ", 'WinDiskSize', 'CS2010EXPRESS.100', '"
                                             + sLabel + "', NULL, NULL, '" + Environment.MachineName + "', Now())", conn);
 
-                cmd1.ExecuteNonQuery();
+                cmd2.ExecuteNonQuery();
 
-                OleDbCommand cmd2 = new OleDbCommand("SELECT @@IDENTITY", conn);
+                OleDbCommand cmd3 = new OleDbCommand("SELECT @@IDENTITY", conn);
 
-                int iTaskID = (int)cmd2.ExecuteScalar();
+                int iTaskID = (int) cmd3.ExecuteScalar();
 
                 conn.Close();
 
@@ -131,7 +136,7 @@ namespace WinDiskSizeEx
             }
         }
 
-        public override int AddTaskIfNotExists(int iStatus, string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree, string sMachine, string sStartDate, string sEndDate)
+        public override int AddReportSubTaskIfNotExists(int iStatus, string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree, string sMachine, string sStartDate, string sEndDate)
         {
             if (!IsReady)
             {
@@ -371,24 +376,28 @@ namespace WinDiskSizeEx
             }
         }
 
-        public override bool EndTask()
+        public override bool EndTask(int iTaskID, int iStatus)
         {
             if (!IsReady)
             {
                 m_sLastError = "Is not Ready!";
                 return false;
             }
+
+            //Changed to support Report Task!
+            /*
             if (m_iTaskID <= 0)
             {
                 m_sLastError = "BeginTask() not called!";
                 return false;
             }
+            */
 
             try
             {
                 OpenIfNotOpen();
 
-                OleDbCommand cmd1 = new OleDbCommand("UPDATE Task SET EndDate = Now(), Status = 3 WHERE ID=" + m_iTaskID.ToString(), m_conn);
+                OleDbCommand cmd1 = new OleDbCommand("UPDATE Task SET EndDate = Now(), Status = " + iStatus.ToString() + " WHERE ID=" + /*m_iTaskID*/ iTaskID.ToString(), m_conn);
 
                 cmd1.ExecuteNonQuery();
 
@@ -511,40 +520,6 @@ namespace WinDiskSizeEx
 
                 return false;
             }
-        }
-
-        public override int RowCount()
-        {
-            if (m_dataSet == null)
-            {
-                return -1;
-            }
-
-            return m_dataSet.Tables[0].Rows.Count;
-        }
-
-        public override String FieldAsString(int iRow, String sFieldName)
-        {
-            if (m_dataSet == null)
-            {
-                return null;
-            }
-
-            int iCol = m_dataSet.Tables[0].Columns[sFieldName].Ordinal;
-
-            return m_dataSet.Tables[0].Rows[iRow][iCol].ToString();
-        }
-
-        public override int FieldAsInt(int iRow, String sFieldName)
-        {
-            if (m_dataSet == null)
-            {
-                return -1;
-            }
-
-            int iCol = m_dataSet.Tables[0].Columns[sFieldName].Ordinal;
-
-            return (int) m_dataSet.Tables[0].Rows[iRow][iCol];
         }
 
     }

@@ -78,12 +78,30 @@
             this.btnAddToReport = new System.Windows.Forms.Button();
             this.btnOpenUpdatedReport = new System.Windows.Forms.Button();
             this.btnPrintReport = new System.Windows.Forms.Button();
+            this.btnSourceSqlServer = new System.Windows.Forms.Button();
+            this.lblSourceSqlServer = new System.Windows.Forms.Label();
+            this.viewSourceSqlServer = new System.Windows.Forms.TabPage();
+            this.lblTabCaptionSourceSqlServer = new System.Windows.Forms.Label();
+            this.lblSourceSqlServerInstance = new System.Windows.Forms.Label();
+            this.tbSourceSqlServerInstance = new System.Windows.Forms.TextBox();
+            this.lblSourceSqlServerDb = new System.Windows.Forms.Label();
+            this.tbSourceSqlServerDb = new System.Windows.Forms.TextBox();
+            this.lblSourceSqlServerUser = new System.Windows.Forms.Label();
+            this.tbSourceSqlServerUser = new System.Windows.Forms.TextBox();
+            this.lblSourceSqlServerPw = new System.Windows.Forms.Label();
+            this.tbSourceSqlServerPw = new System.Windows.Forms.TextBox();
+            this.btnSourceSqlServerTestConnect = new System.Windows.Forms.Button();
+            this.chbSourceSqlServerSavePw = new System.Windows.Forms.CheckBox();
+            this.lblTaskNew = new System.Windows.Forms.Label();
+            this.tbTaskNew = new System.Windows.Forms.TextBox();
+            this.btnTaskNew = new System.Windows.Forms.Button();
             this.Views.SuspendLayout();
             this.viewMain.SuspendLayout();
             this.viewSource.SuspendLayout();
             this.viewSourceMdb.SuspendLayout();
             this.viewTasks.SuspendLayout();
             this.viewCompare.SuspendLayout();
+            this.viewSourceSqlServer.SuspendLayout();
             this.SuspendLayout();
             // 
             // Views
@@ -94,6 +112,7 @@
             this.Views.Controls.Add(this.viewMain);
             this.Views.Controls.Add(this.viewSource);
             this.Views.Controls.Add(this.viewSourceMdb);
+            this.Views.Controls.Add(this.viewSourceSqlServer);
             this.Views.Controls.Add(this.viewTasks);
             this.Views.Controls.Add(this.viewCompare);
             this.Views.Location = new System.Drawing.Point(12, 56);
@@ -175,6 +194,8 @@
             // viewSource
             // 
             this.viewSource.BackColor = System.Drawing.SystemColors.Window;
+            this.viewSource.Controls.Add(this.lblSourceSqlServer);
+            this.viewSource.Controls.Add(this.btnSourceSqlServer);
             this.viewSource.Controls.Add(this.lblTabCaptionSource);
             this.viewSource.Controls.Add(this.lblSourceMdb);
             this.viewSource.Controls.Add(this.btnSourceMdb);
@@ -214,6 +235,7 @@
             this.btnSourceMdb.Size = new System.Drawing.Size(132, 23);
             this.btnSourceMdb.TabIndex = 0;
             this.btnSourceMdb.Text = "MDB";
+            this.btnSourceMdb.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSourceMdb.UseVisualStyleBackColor = true;
             this.btnSourceMdb.Click += new System.EventHandler(this.btnSourceMdb_Click);
             // 
@@ -337,6 +359,9 @@
             // viewTasks
             // 
             this.viewTasks.BackColor = System.Drawing.SystemColors.Window;
+            this.viewTasks.Controls.Add(this.btnTaskNew);
+            this.viewTasks.Controls.Add(this.tbTaskNew);
+            this.viewTasks.Controls.Add(this.lblTaskNew);
             this.viewTasks.Controls.Add(this.lblTabCaptionTasks);
             this.viewTasks.Controls.Add(this.lvTaskList);
             this.viewTasks.Controls.Add(this.lblTaskList);
@@ -694,6 +719,188 @@
             this.btnPrintReport.UseVisualStyleBackColor = true;
             this.btnPrintReport.Click += new System.EventHandler(this.btnPrintReport_Click);
             // 
+            // btnSourceSqlServer
+            // 
+            this.btnSourceSqlServer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSourceSqlServer.Location = new System.Drawing.Point(73, 152);
+            this.btnSourceSqlServer.Name = "btnSourceSqlServer";
+            this.btnSourceSqlServer.Size = new System.Drawing.Size(132, 23);
+            this.btnSourceSqlServer.TabIndex = 5;
+            this.btnSourceSqlServer.Text = "SQL Server";
+            this.btnSourceSqlServer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnSourceSqlServer.UseVisualStyleBackColor = true;
+            this.btnSourceSqlServer.Click += new System.EventHandler(this.btnSourceSqlServer_Click);
+            // 
+            // lblSourceSqlServer
+            // 
+            this.lblSourceSqlServer.AutoSize = true;
+            this.lblSourceSqlServer.Location = new System.Drawing.Point(235, 157);
+            this.lblSourceSqlServer.Name = "lblSourceSqlServer";
+            this.lblSourceSqlServer.Size = new System.Drawing.Size(227, 13);
+            this.lblSourceSqlServer.TabIndex = 6;
+            this.lblSourceSqlServer.Text = "Open existing Microsoft SQL Server Database.";
+            // 
+            // viewSourceSqlServer
+            // 
+            this.viewSourceSqlServer.BackColor = System.Drawing.SystemColors.Window;
+            this.viewSourceSqlServer.Controls.Add(this.chbSourceSqlServerSavePw);
+            this.viewSourceSqlServer.Controls.Add(this.btnSourceSqlServerTestConnect);
+            this.viewSourceSqlServer.Controls.Add(this.tbSourceSqlServerPw);
+            this.viewSourceSqlServer.Controls.Add(this.lblSourceSqlServerPw);
+            this.viewSourceSqlServer.Controls.Add(this.tbSourceSqlServerUser);
+            this.viewSourceSqlServer.Controls.Add(this.lblSourceSqlServerUser);
+            this.viewSourceSqlServer.Controls.Add(this.tbSourceSqlServerDb);
+            this.viewSourceSqlServer.Controls.Add(this.lblSourceSqlServerDb);
+            this.viewSourceSqlServer.Controls.Add(this.tbSourceSqlServerInstance);
+            this.viewSourceSqlServer.Controls.Add(this.lblSourceSqlServerInstance);
+            this.viewSourceSqlServer.Controls.Add(this.lblTabCaptionSourceSqlServer);
+            this.viewSourceSqlServer.Location = new System.Drawing.Point(4, 22);
+            this.viewSourceSqlServer.Name = "viewSourceSqlServer";
+            this.viewSourceSqlServer.Padding = new System.Windows.Forms.Padding(3);
+            this.viewSourceSqlServer.Size = new System.Drawing.Size(667, 358);
+            this.viewSourceSqlServer.TabIndex = 5;
+            this.viewSourceSqlServer.Text = "Source (SQL Server)";
+            this.viewSourceSqlServer.Enter += new System.EventHandler(this.viewAny_Enter);
+            // 
+            // lblTabCaptionSourceSqlServer
+            // 
+            this.lblTabCaptionSourceSqlServer.AutoSize = true;
+            this.lblTabCaptionSourceSqlServer.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionSourceSqlServer.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionSourceSqlServer.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionSourceSqlServer.Name = "lblTabCaptionSourceSqlServer";
+            this.lblTabCaptionSourceSqlServer.Size = new System.Drawing.Size(301, 25);
+            this.lblTabCaptionSourceSqlServer.TabIndex = 6;
+            this.lblTabCaptionSourceSqlServer.Text = "Connect to Database Instance";
+            // 
+            // lblSourceSqlServerInstance
+            // 
+            this.lblSourceSqlServerInstance.AutoSize = true;
+            this.lblSourceSqlServerInstance.Location = new System.Drawing.Point(70, 116);
+            this.lblSourceSqlServerInstance.Name = "lblSourceSqlServerInstance";
+            this.lblSourceSqlServerInstance.Size = new System.Drawing.Size(111, 13);
+            this.lblSourceSqlServerInstance.TabIndex = 7;
+            this.lblSourceSqlServerInstance.Text = "SQL Server\\Instance:";
+            this.lblSourceSqlServerInstance.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // tbSourceSqlServerInstance
+            // 
+            this.tbSourceSqlServerInstance.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbSourceSqlServerInstance.Location = new System.Drawing.Point(187, 113);
+            this.tbSourceSqlServerInstance.Name = "tbSourceSqlServerInstance";
+            this.tbSourceSqlServerInstance.Size = new System.Drawing.Size(304, 20);
+            this.tbSourceSqlServerInstance.TabIndex = 8;
+            // 
+            // lblSourceSqlServerDb
+            // 
+            this.lblSourceSqlServerDb.AutoSize = true;
+            this.lblSourceSqlServerDb.Location = new System.Drawing.Point(123, 145);
+            this.lblSourceSqlServerDb.Name = "lblSourceSqlServerDb";
+            this.lblSourceSqlServerDb.Size = new System.Drawing.Size(56, 13);
+            this.lblSourceSqlServerDb.TabIndex = 9;
+            this.lblSourceSqlServerDb.Text = "Database:";
+            this.lblSourceSqlServerDb.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // tbSourceSqlServerDb
+            // 
+            this.tbSourceSqlServerDb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbSourceSqlServerDb.Location = new System.Drawing.Point(187, 143);
+            this.tbSourceSqlServerDb.Name = "tbSourceSqlServerDb";
+            this.tbSourceSqlServerDb.Size = new System.Drawing.Size(184, 20);
+            this.tbSourceSqlServerDb.TabIndex = 10;
+            this.tbSourceSqlServerDb.Text = "WinDiskSize";
+            // 
+            // lblSourceSqlServerUser
+            // 
+            this.lblSourceSqlServerUser.AutoSize = true;
+            this.lblSourceSqlServerUser.Location = new System.Drawing.Point(147, 177);
+            this.lblSourceSqlServerUser.Name = "lblSourceSqlServerUser";
+            this.lblSourceSqlServerUser.Size = new System.Drawing.Size(32, 13);
+            this.lblSourceSqlServerUser.TabIndex = 11;
+            this.lblSourceSqlServerUser.Text = "User:";
+            this.lblSourceSqlServerUser.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // tbSourceSqlServerUser
+            // 
+            this.tbSourceSqlServerUser.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbSourceSqlServerUser.Location = new System.Drawing.Point(187, 175);
+            this.tbSourceSqlServerUser.Name = "tbSourceSqlServerUser";
+            this.tbSourceSqlServerUser.Size = new System.Drawing.Size(110, 20);
+            this.tbSourceSqlServerUser.TabIndex = 12;
+            // 
+            // lblSourceSqlServerPw
+            // 
+            this.lblSourceSqlServerPw.AutoSize = true;
+            this.lblSourceSqlServerPw.Location = new System.Drawing.Point(123, 208);
+            this.lblSourceSqlServerPw.Name = "lblSourceSqlServerPw";
+            this.lblSourceSqlServerPw.Size = new System.Drawing.Size(56, 13);
+            this.lblSourceSqlServerPw.TabIndex = 13;
+            this.lblSourceSqlServerPw.Text = "Password:";
+            this.lblSourceSqlServerPw.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // tbSourceSqlServerPw
+            // 
+            this.tbSourceSqlServerPw.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbSourceSqlServerPw.Location = new System.Drawing.Point(187, 206);
+            this.tbSourceSqlServerPw.Name = "tbSourceSqlServerPw";
+            this.tbSourceSqlServerPw.PasswordChar = '*';
+            this.tbSourceSqlServerPw.Size = new System.Drawing.Size(110, 20);
+            this.tbSourceSqlServerPw.TabIndex = 14;
+            // 
+            // btnSourceSqlServerTestConnect
+            // 
+            this.btnSourceSqlServerTestConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSourceSqlServerTestConnect.Location = new System.Drawing.Point(187, 274);
+            this.btnSourceSqlServerTestConnect.Name = "btnSourceSqlServerTestConnect";
+            this.btnSourceSqlServerTestConnect.Size = new System.Drawing.Size(184, 23);
+            this.btnSourceSqlServerTestConnect.TabIndex = 15;
+            this.btnSourceSqlServerTestConnect.Text = "Test Connection and Connect";
+            this.btnSourceSqlServerTestConnect.UseVisualStyleBackColor = true;
+            this.btnSourceSqlServerTestConnect.Click += new System.EventHandler(this.btnSourceSqlServerTestConnect_Click);
+            // 
+            // chbSourceSqlServerSavePw
+            // 
+            this.chbSourceSqlServerSavePw.AutoSize = true;
+            this.chbSourceSqlServerSavePw.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chbSourceSqlServerSavePw.Location = new System.Drawing.Point(187, 232);
+            this.chbSourceSqlServerSavePw.Name = "chbSourceSqlServerSavePw";
+            this.chbSourceSqlServerSavePw.Size = new System.Drawing.Size(125, 17);
+            this.chbSourceSqlServerSavePw.TabIndex = 16;
+            this.chbSourceSqlServerSavePw.Text = "Remember password!";
+            this.chbSourceSqlServerSavePw.UseVisualStyleBackColor = true;
+            this.chbSourceSqlServerSavePw.CheckedChanged += new System.EventHandler(this.chbSourceSqlServerSavePw_CheckedChanged);
+            // 
+            // lblTaskNew
+            // 
+            this.lblTaskNew.AutoSize = true;
+            this.lblTaskNew.Location = new System.Drawing.Point(73, 79);
+            this.lblTaskNew.Name = "lblTaskNew";
+            this.lblTaskNew.Size = new System.Drawing.Size(98, 13);
+            this.lblTaskNew.TabIndex = 7;
+            this.lblTaskNew.Text = "Label of new Task:";
+            // 
+            // tbTaskNew
+            // 
+            this.tbTaskNew.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbTaskNew.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbTaskNew.Location = new System.Drawing.Point(177, 76);
+            this.tbTaskNew.Name = "tbTaskNew";
+            this.tbTaskNew.Size = new System.Drawing.Size(388, 20);
+            this.tbTaskNew.TabIndex = 8;
+            // 
+            // btnTaskNew
+            // 
+            this.btnTaskNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTaskNew.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTaskNew.Location = new System.Drawing.Point(580, 74);
+            this.btnTaskNew.Name = "btnTaskNew";
+            this.btnTaskNew.Size = new System.Drawing.Size(60, 23);
+            this.btnTaskNew.TabIndex = 9;
+            this.btnTaskNew.Text = "Create";
+            this.btnTaskNew.UseVisualStyleBackColor = true;
+            this.btnTaskNew.Click += new System.EventHandler(this.btnTaskNew_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -728,6 +935,8 @@
             this.viewTasks.PerformLayout();
             this.viewCompare.ResumeLayout(false);
             this.viewCompare.PerformLayout();
+            this.viewSourceSqlServer.ResumeLayout(false);
+            this.viewSourceSqlServer.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -785,6 +994,23 @@
         private System.Windows.Forms.Label lblSourceMdbNewTitle;
         private System.Windows.Forms.Button btnOpenUpdatedReport;
         private System.Windows.Forms.Button btnPrintReport;
+        private System.Windows.Forms.Label lblSourceSqlServer;
+        private System.Windows.Forms.Button btnSourceSqlServer;
+        private System.Windows.Forms.TabPage viewSourceSqlServer;
+        private System.Windows.Forms.Label lblTabCaptionSourceSqlServer;
+        private System.Windows.Forms.Label lblSourceSqlServerInstance;
+        private System.Windows.Forms.Button btnSourceSqlServerTestConnect;
+        private System.Windows.Forms.TextBox tbSourceSqlServerPw;
+        private System.Windows.Forms.Label lblSourceSqlServerPw;
+        private System.Windows.Forms.TextBox tbSourceSqlServerUser;
+        private System.Windows.Forms.Label lblSourceSqlServerUser;
+        private System.Windows.Forms.TextBox tbSourceSqlServerDb;
+        private System.Windows.Forms.Label lblSourceSqlServerDb;
+        private System.Windows.Forms.TextBox tbSourceSqlServerInstance;
+        private System.Windows.Forms.CheckBox chbSourceSqlServerSavePw;
+        private System.Windows.Forms.Button btnTaskNew;
+        private System.Windows.Forms.TextBox tbTaskNew;
+        private System.Windows.Forms.Label lblTaskNew;
     }
 }
 

@@ -15,7 +15,7 @@ namespace WinDiskSizeEx
     public partial class FormMain : Form
     {
 
-        protected const string csAPP_TITLE = "Win Disk Size Ex v1.14";
+        protected const string csAPP_TITLE = "Win Disk Size Ex v1.15";
 
         protected const string csVIEW_TITLE_COMPARE = "Disk Map";
         protected const string csVIEW_TITLE_REPORT  = "Disk Map Report";
@@ -25,21 +25,25 @@ namespace WinDiskSizeEx
         protected const int ciCOMPARE_COL_SIZE  = 2;
         protected const int ciCOMPARE_COL_COUNT = 6;
 
-        protected const int ciTASK_STATUS_REPORT = 4;
+        protected const int ciTASK_STATUS_PLANNED       = 1;
+        protected const int ciTASK_STATUS_STARTED       = 2;
+        protected const int ciTASK_STATUS_COMPLETED     = 3;
+        protected const int ciTASK_STATUS_REPORT        = 4;
 
         protected const String csMDB_TEMPLATE   = "WinDiskSize_Template.mdb";
 
         protected const String csMDB_MAP_PREFIX = "WinDiskSizeMap";
         protected const String csMDB_RPT_PREFIX = "WinDiskSizeRpt";
 
-        protected const String csARG_TAG_DO     = "DO";
-        protected const String csARG_TAG_OPEN   = "OPEN";
-        protected const String csARG_TAG_SAVE   = "SAVE";
-        protected const String csARG_TAG_MAP    = "MAP";
-        protected const String csARG_TAG_REPORT = "RPT";
-        protected const String csARG_TAG_DB     = "DB";
-        protected const String csARG_TAG_DB_MDB = "MDB";
-        protected const String csARG_TAG_TASK   = "Task";
+        protected const String csARG_TAG_DO             = "DO";
+        protected const String csARG_TAG_OPEN           = "OPEN";
+        protected const String csARG_TAG_SAVE           = "SAVE";
+        protected const String csARG_TAG_MAP            = "MAP";
+        protected const String csARG_TAG_REPORT         = "RPT";
+        protected const String csARG_TAG_DB             = "DB";
+        protected const String csARG_TAG_DB_MDB         = "MDB";
+        protected const String csARG_TAG_DB_SQLSERVER   = "SQLSERVER";
+        protected const String csARG_TAG_TASK           = "Task";
 
         protected List<TabPage> m_ViewStack     = new List<TabPage>();
 
@@ -137,6 +141,12 @@ namespace WinDiskSizeEx
             this.Top = Math.Max(0, RegistryRead("Main_Top", this.Top));
             this.Width = Math.Max(800, RegistryRead("Main_Width", this.Width));
             this.Height = Math.Max(500, RegistryRead("Main_Height", this.Height));
+
+            tbSourceSqlServerInstance.Text = RegistryRead("Last SQL Server", tbSourceSqlServerInstance.Text);
+            tbSourceSqlServerDb.Text = RegistryRead("Last SQL Db", tbSourceSqlServerDb.Text);
+            tbSourceSqlServerUser.Text = RegistryRead("Last SQL User", tbSourceSqlServerUser.Text);
+            tbSourceSqlServerPw.Text = RegistryRead("Last SQL Pw", tbSourceSqlServerPw.Text);
+            chbSourceSqlServerSavePw.Checked = (tbSourceSqlServerPw.Text.Length > 0);
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -323,6 +333,22 @@ namespace WinDiskSizeEx
                     return mdb;
                 }
             }
+            else if (asArgs[1] == csARG_TAG_DB_SQLSERVER)
+            {
+                MySqlServer sqlsvr = new MySqlServer();
+                if (!sqlsvr.TestConnect(tbSourceSqlServerInstance.Text, tbSourceSqlServerDb.Text, tbSourceSqlServerUser.Text, tbSourceSqlServerPw.Text))
+                {
+                    MessageBox.Show("SQL Server Error: " + sqlsvr.LastError, csAPP_TITLE);
+
+                    sqlsvr.Close();
+
+                    return null;
+                }
+                else
+                {
+                    return sqlsvr;
+                }
+            }
             else
             {
                 MessageBox.Show("Unexpected source type \"" + asArgs[1] + "\"!", csAPP_TITLE);
@@ -420,16 +446,16 @@ namespace WinDiskSizeEx
                 String sStatus = "<unknown>";
                 switch (iStatus)
                 {
-                    case 1:
+                    case ciTASK_STATUS_PLANNED:
                         sStatus = "Planned";
                         break;
-                    case 2:
+                    case ciTASK_STATUS_STARTED:
                         sStatus = "Started";
                         break;
-                    case 3:
+                    case ciTASK_STATUS_COMPLETED:
                         sStatus = "Completed";
                         break;
-                    case 4:
+                    case ciTASK_STATUS_REPORT:
                         sStatus = "REPORT";
                         break;
                 }
@@ -478,10 +504,14 @@ namespace WinDiskSizeEx
             db.Close();
             db = null;
 
-            if (lvTaskList.Items.Count == 1)
+            string sDbType = InterTabArgumentsReverseByName(csARG_TAG_DB, 1);
+            if (sDbType != csARG_TAG_DB_SQLSERVER)
             {
-                lvTaskList.Items[0].Selected = true;
-                btnNext.PerformClick();
+                if (lvTaskList.Items.Count == 1)
+                {
+                    lvTaskList.Items[0].Selected = true;
+                    btnNext.PerformClick();
+                }
             }
         }
 
@@ -806,7 +836,7 @@ namespace WinDiskSizeEx
                 {
                     MyTask tsk = m_Tasks[i];
 
-                    int iTaskID_inReport = db.AddTaskIfNotExists(tsk.m_iStatus, tsk.m_sType, tsk.m_sPath, tsk.m_sLabel, tsk.m_sTotalSize, tsk.m_sFreeSpace, tsk.m_sMachine, tsk.m_sStarted, tsk.m_sCompleted);
+                    int iTaskID_inReport = db.AddReportSubTaskIfNotExists(tsk.m_iStatus, tsk.m_sType, tsk.m_sPath, tsk.m_sLabel, tsk.m_sTotalSize, tsk.m_sFreeSpace, tsk.m_sMachine, tsk.m_sStarted, tsk.m_sCompleted);
                     if (iTaskID_inReport < 0)
                     {
                         MessageBox.Show(db.LastError, csAPP_TITLE);
@@ -917,6 +947,8 @@ namespace WinDiskSizeEx
                         }
                     }
                 }
+
+                db.EndTask(myTask.m_iTaskID, ciTASK_STATUS_REPORT);
 
                 lblPrsMain.Visible = false;
                 lblPrsMain.Text = "N/A";
@@ -2377,6 +2409,50 @@ namespace WinDiskSizeEx
             }
         }
 
+        private void btnSourceSqlServer_Click(object sender, EventArgs e)
+        {
+            m_ViewStack.Add(Views.SelectedTab);
+            Views.SelectedTab = viewSourceSqlServer;
+        }
+
+        private void btnSourceSqlServerTestConnect_Click(object sender, EventArgs e)
+        {
+            RegistryWrite("Last SQL Server", tbSourceSqlServerInstance.Text);
+            RegistryWrite("Last SQL Db", tbSourceSqlServerDb.Text);
+            RegistryWrite("Last SQL User", tbSourceSqlServerUser.Text);
+
+            if (chbSourceSqlServerSavePw.Checked)
+            {
+                RegistryWrite("Last SQL Pw", tbSourceSqlServerPw.Text);
+            }
+
+            MySqlServer sqlsvr = new MySqlServer();
+            if (!sqlsvr.TestConnect(tbSourceSqlServerInstance.Text, tbSourceSqlServerDb.Text, tbSourceSqlServerUser.Text, tbSourceSqlServerPw.Text))
+            {
+                MessageBox.Show("SQL Server Error: " + sqlsvr.LastError, csAPP_TITLE);
+
+                sqlsvr.Close();
+            }
+            else
+            {
+                sqlsvr.Close();
+
+                InterTabArgumentsReverseRemoveUntil(csARG_TAG_DB, csARG_TAG_DO);
+
+                m_InterTabArgs.Add(csARG_TAG_DB);
+                m_InterTabArgs.Add(csARG_TAG_DB_SQLSERVER);
+                m_InterTabArgs.Add(tbSourceSqlServerInstance.Text);
+                m_InterTabArgs.Add(tbSourceSqlServerDb.Text);
+                m_InterTabArgs.Add(tbSourceSqlServerUser.Text);
+                m_InterTabArgs.Add(tbSourceSqlServerPw.Text);
+
+                m_ViewStack.Add(Views.SelectedTab);
+                Views.SelectedTab = viewTasks;
+
+                btnRefresh.PerformClick();
+            }
+        }
+
         private void btnSourceMdbFolder_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
@@ -2400,6 +2476,7 @@ namespace WinDiskSizeEx
             if (tbSourceMdbNewTitle.Text.Length == 0)
             {
                 MessageBox.Show("Type a title first!", csAPP_TITLE);
+                return;
             }
 
             string sType = InterTabArgumentsReverseByName(csARG_TAG_DO, 2);
@@ -2466,6 +2543,64 @@ namespace WinDiskSizeEx
 
             m_ViewStack.Add(Views.SelectedTab);
             Views.SelectedTab = viewTasks;
+
+            btnRefresh.PerformClick();
+        }
+
+        private void btnTaskNew_Click(object sender, EventArgs e)
+        {
+            if (tbTaskNew.Text.Length == 0)
+            {
+                MessageBox.Show("Type a task label first!", csAPP_TITLE);
+                return;
+            }
+
+            string sType = InterTabArgumentsReverseByName(csARG_TAG_DO, 2);
+
+            string sDbType = InterTabArgumentsReverseByName(csARG_TAG_DB, 1);
+            if (sDbType == csARG_TAG_DB_SQLSERVER)
+            {
+                MyDb db = ConnectToDb(InterTabArgumentsAsString(csARG_TAG_DB));
+                if (db == null)
+                {
+                    return;
+                }
+
+                int iTaskStatus;
+                if (sType == csARG_TAG_MAP)
+                {
+                    iTaskStatus = ciTASK_STATUS_PLANNED;
+
+                    MessageBox.Show("Create is not supported!", csAPP_TITLE);
+
+                    db.Close();
+                    return;
+                }
+                else
+                {
+                    iTaskStatus = ciTASK_STATUS_REPORT;
+                }
+
+                DateTime dt = DateTime.Now;
+                string sTmp = tbTaskNew.Text + " (" + dt.ToShortDateString() + ")";
+
+                if (db.AddTask(iTaskStatus, sTmp) == -1)
+                {
+                    MessageBox.Show(db.LastError, csAPP_TITLE);
+
+                    db.Close();
+                    return;
+                }
+
+                tbTaskNew.Text = "";
+
+                db.Close();
+            }
+            else
+            {
+                MessageBox.Show("Unexpected Database Type: \"" + sDbType + "\"!");
+                return;
+            }
 
             btnRefresh.PerformClick();
         }
@@ -2609,6 +2744,16 @@ namespace WinDiskSizeEx
                 }
                 else
                 {
+                    if (   lvTaskList.SelectedItems[0].SubItems[6].Text != "Completed"
+                        && lvTaskList.SelectedItems[0].SubItems[6].Text != "REPORT")
+                    {
+                        if (DialogResult.Yes != MessageBox.Show("WARNING!!! The selected Task is not Completed!!!\n\nFolder list is likely INCOMPLETE!!!"
+                            + "\n\nDo you want to open Task?", csAPP_TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Warning))
+                        {
+                            return;
+                        }
+                    }
+
                     string sType = InterTabArgumentsReverseByName(csARG_TAG_DO, 2);
                     if (sType == csARG_TAG_MAP)
                     {
@@ -3082,6 +3227,20 @@ namespace WinDiskSizeEx
             */
 
             ListFoldersOfTask(iTaskIdx);
+        }
+
+        private void chbSourceSqlServerSavePw_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chbSourceSqlServerSavePw.Checked)
+            {
+                chbSourceSqlServerSavePw.ForeColor = Color.Red;
+            }
+            else
+            {
+                chbSourceSqlServerSavePw.ForeColor = Color.Black;
+
+                RegistryWrite("Last SQL Pw", "");
+            }
         }
     }
 }

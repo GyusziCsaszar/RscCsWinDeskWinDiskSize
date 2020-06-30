@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using System.Data;
+using System.Data.OleDb;
 using System.Data.SqlClient;
 
 namespace WinDiskSizeEx
@@ -15,6 +17,8 @@ namespace WinDiskSizeEx
         protected bool m_bIsReady;
 
         protected int m_iTaskID = -1;
+
+        protected DataSet m_dataSet;
 
         public MyDb()
         {
@@ -60,6 +64,12 @@ namespace WinDiskSizeEx
             m_bIsReady = false;
 
             m_iTaskID = -1;
+
+            if (m_dataSet != null)
+            {
+                m_dataSet.Clear();
+                m_dataSet = null;
+            }
         }
 
         public virtual void OpenIfNotOpen()
@@ -74,12 +84,12 @@ namespace WinDiskSizeEx
                 return -1;
             }
 
-            m_sLastError = "AddReportTask is not implemented!";
+            m_sLastError = "AddTask is not implemented!";
 
             return -1;
         }
 
-        public virtual int AddTaskIfNotExists(int iStatus, string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree, string sMachine, string sStartDate, string sEndDate)
+        public virtual int AddReportSubTaskIfNotExists(int iStatus, string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree, string sMachine, string sStartDate, string sEndDate)
         {
             if (!IsReady)
             {
@@ -87,7 +97,7 @@ namespace WinDiskSizeEx
                 return -1;
             }
 
-            m_sLastError = "AddReportTask is not implemented!";
+            m_sLastError = "AddReportSubTaskIfNotExists is not implemented!";
 
             return -1;
         }
@@ -114,13 +124,8 @@ namespace WinDiskSizeEx
                 m_sLastError = "Is not Ready!";
                 return false;
             }
-            if (m_iTaskID <= 0)
-            {
-                m_sLastError = "BeginTask() not called!";
-                return false;
-            }
 
-            m_sLastError = "AddFolderRAW is not implemented!";
+            m_sLastError = "AddReportFolderRAWIfNotExists is not implemented!";
 
             return false;
         }
@@ -143,7 +148,7 @@ namespace WinDiskSizeEx
             return false;
         }
 
-        public virtual bool EndTask()
+        public virtual bool EndTask(int iTaskID, int iStatus)
         {
             if (!IsReady)
             {
@@ -169,7 +174,7 @@ namespace WinDiskSizeEx
                 return false;
             }
 
-            m_sLastError = "Query is not implemented!";
+            m_sLastError = "QueryTasks is not implemented!";
 
             return false;
         }
@@ -182,32 +187,43 @@ namespace WinDiskSizeEx
                 return false;
             }
 
-            m_sLastError = "Query is not implemented!";
+            m_sLastError = "QueryFolders is not implemented!";
 
             return false;
         }
 
         public virtual int RowCount()
         {
-            if (!IsReady)
+            if (m_dataSet == null)
             {
-                m_sLastError = "Is not Ready!";
                 return -1;
             }
 
-            m_sLastError = "Query is not implemented!";
-
-            return -1;
+            return m_dataSet.Tables[0].Rows.Count;
         }
 
         public virtual String FieldAsString(int iRow, String sFieldName)
         {
-            return null;
+            if (m_dataSet == null)
+            {
+                return null;
+            }
+
+            int iCol = m_dataSet.Tables[0].Columns[sFieldName].Ordinal;
+
+            return m_dataSet.Tables[0].Rows[iRow][iCol].ToString();
         }
 
         public virtual int FieldAsInt(int iRow, String sFieldName)
         {
-            return -1;
+            if (m_dataSet == null)
+            {
+                return -1;
+            }
+
+            int iCol = m_dataSet.Tables[0].Columns[sFieldName].Ordinal;
+
+            return (int)m_dataSet.Tables[0].Rows[iRow][iCol];
         }
 
     }
