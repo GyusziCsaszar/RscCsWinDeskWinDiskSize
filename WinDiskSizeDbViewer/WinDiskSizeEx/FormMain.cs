@@ -15,7 +15,7 @@ namespace WinDiskSizeEx
     public partial class FormMain : Form
     {
 
-        protected const string csAPP_TITLE = "Win Disk Size Ex v1.15";
+        protected const string csAPP_TITLE = "Win Disk Size Ex v1.16";
 
         protected const string csVIEW_TITLE_COMPARE = "Disk Map";
         protected const string csVIEW_TITLE_REPORT  = "Disk Map Report";
