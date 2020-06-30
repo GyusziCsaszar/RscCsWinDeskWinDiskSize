@@ -26,6 +26,8 @@ namespace WinDiskSize
         StatusBarPanel sbPanelLb;
         StatusBarPanel sbPanelLevel;
 
+        protected MySqlServer m_sqlsvr = new MySqlServer();
+
         public FormMain()
         {
             InitializeComponent();
@@ -197,6 +199,33 @@ namespace WinDiskSize
         {
             if (tmrWalk.Enabled) return;
 
+            string sFolderType = "";
+            string sFolderPath = "";
+            if (this.cbDrive.SelectedIndex >= 0)
+            {
+                sFolderType = "Drive";
+                sFolderPath = cbDrive.Text;
+            }
+            else
+            {
+                sFolderType = "Folder";
+                sFolderPath = tbStartFolder.Text;
+            }
+            if (sFolderPath.Length == 0) return;
+
+            if (m_sqlsvr.IsReady)
+            {
+                if (!m_sqlsvr.BeginTask(sFolderType, sFolderPath))
+                {
+                    MessageBox.Show(m_sqlsvr.LastError);
+                    return;
+                }
+                else
+                {
+                    tbTaskID.Text = m_sqlsvr.TaskID.ToString();
+                }
+            }
+
             btnStop.Enabled = false;
             btnParse.Enabled = false;
             m_bStop = false;
@@ -207,16 +236,7 @@ namespace WinDiskSize
 
             aDi.Clear();
 
-            String sStartFolder;
-            if (cbDrive.SelectedIndex >= 0)
-            {
-                sStartFolder = cbDrive.Text + "\\"; // "C:\";
-            }
-            else
-            {
-                sStartFolder = tbStartFolder.Text + "\\";
-            }
-            if (sStartFolder.Length == 0) return;
+            String sStartFolder = sFolderPath + "\\";
 
             MyDirInfo di = new MyDirInfo();
             di.sStartFolder = sStartFolder; //ATTN: Cosmetic only!!!
@@ -244,24 +264,6 @@ namespace WinDiskSize
             lblPercent.ForeColor = Color.Green;
 
             tmrWalk.Start();
-
-            /*
-            for (int i = 1; i <= 1000; i++)
-            {
-                int iIdx = -1;
-                foreach (MyDirInfo di in aDi)
-                {
-                    iIdx++;
-                    if (di.bParsed) continue;
-
-                    EnumFolder(di, iIdx);
-
-                    break;
-                }
-
-                ListBoxRefresh();
-            }
-            */
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -287,18 +289,6 @@ namespace WinDiskSize
 
             myEnum.ThrowIOException = false; //ATTN!!!
 
-            /*
-            myEnum.ReturnStringType = true;
-            int iCount = 0;
-            foreach (string strFileName in myEnum)
-            {
-                lbDirList.Items.Add(strFileName);
-                // LOOK ! , you can interrupt freely
-                if ((iCount++) > 10)
-                    break;
-            }
-            */
-
             myEnum.SearchForFile = false;
             myEnum.SearchForDirectory = true;
             myEnum.ReturnStringType = false;
@@ -306,6 +296,29 @@ namespace WinDiskSize
             int iSubIdx = iDirInfoIdx;
             foreach (System.IO.DirectoryInfo dir in myEnum)
             {
+                if (chbExcludeSysFolders.Checked)
+                {
+                    if (
+                            ((!di.bShow83) && (di.sPathLong.Substring(   di.sStartFolder.Length - 1) == "\\")) ||
+                            (  di.bShow83  && (di.sPathShort83.Substring(di.sStartFolder.Length - 1) == "\\"))
+                       )
+                    {
+                        string sNameSm = dir.Name.ToLower();
+
+                        if ( (sNameSm == "windows") ||
+                             (sNameSm == "program files") ||
+                             (sNameSm == "program files (x86)") ||
+                             (sNameSm == "programdata") ||
+                             (sNameSm == "users") ||
+                             (sNameSm == "system volume information") ||
+                             (sNameSm == "$recycle.bin")
+                           )
+                        {
+                            continue;
+                        }
+                    }
+                }
+
                 iSubIdx++;
 
                 MyDirInfo diSub = new MyDirInfo();
@@ -572,6 +585,143 @@ namespace WinDiskSize
         private void chbShort83_Click(object sender, EventArgs e)
         {
             ListBoxRefresh();
+        }
+
+        private void btnSqlSvr_Click(object sender, EventArgs e)
+        {
+
+            tbTaskID.Text = "";
+            btnCopyToSqlServer.Enabled = false;
+
+            if (!m_sqlsvr.TestConnect(tbServer.Text, tbDb.Text, tbUser.Text, tbPw.Text))
+            {
+                MessageBox.Show(m_sqlsvr.LastError);
+            }
+            else
+            {
+                btnCopyToSqlServer.Enabled = true;
+            }
+
+        }
+
+        private void chbExcludeSysFolders_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chbExcludeSysFolders.Checked)
+            {
+                chbExcludeSysFolders.ForeColor = Color.Red;
+            }
+            else
+            {
+                chbExcludeSysFolders.ForeColor = Color.Black;
+            }
+        }
+
+        private void btnCopyToSqlServer_Click(object sender, EventArgs e)
+        {
+            if (aDi == null) return;
+            if (aDi.Count == 0) return;
+            if (!m_sqlsvr.IsReady) return;
+
+            prsSqlSvr.Visible = true;
+            prsSqlSvr.Minimum = 0;
+            prsSqlSvr.Maximum = aDi.Count;
+            prsSqlSvr.Value = 0;
+            prsSqlSvr.Update();
+
+            long lCnt = -1;
+            foreach (MyDirInfo di in aDi)
+            {
+                lCnt++;
+
+                prsSqlSvr.Value = prsSqlSvr.Value + 1;
+                prsSqlSvr.Update();
+
+                String sNameShort83 = "";
+                String sPathShort83 = "";
+                String sNameLong    = "";
+                String sPathLong    = "";
+                if (di.sPathLong != "files_in_StartFolder")
+                {
+                    if (di.sStartFolder.Length > 0)
+                    {
+                        sPathShort83 = di.sPathShort83.Substring(di.sStartFolder.Length - 1);
+                    }
+                    else
+                    {
+                        sPathShort83 = di.sPathShort83;
+                    }
+
+                    if (sPathShort83 == "\\")
+                        sNameShort83 = ""; //"\\";
+                    else
+                        sNameShort83 = di.sNameShort83;
+
+                    if (di.sStartFolder.Length > 0)
+                    {
+                        sPathLong = di.sPathLong.Substring(di.sStartFolder.Length - 1);
+                    }
+                    else
+                    {
+                        sPathLong = di.sPathLong;
+                    }
+
+                    if (sPathLong == "\\")
+                        sNameLong = ""; //"\\";
+                    else
+                        sNameLong = di.sNameLong;
+                }
+
+                string sYoungestFileDate = "";
+                if (di.dtYoungestFile_Valid)
+                {
+                    sYoungestFileDate = "'";
+                    sYoungestFileDate += di.dtYoungestFile.Year.ToString();
+
+                    if (di.dtYoungestFile.Month < 10)
+                        sYoungestFileDate += "0" + di.dtYoungestFile.Month.ToString();
+                    else
+                        sYoungestFileDate += di.dtYoungestFile.Month.ToString();
+
+                    if (di.dtYoungestFile.Day < 10)
+                        sYoungestFileDate += "0" + di.dtYoungestFile.Day.ToString();
+                    else
+                        sYoungestFileDate += di.dtYoungestFile.Day.ToString();
+
+                    sYoungestFileDate += " ";
+                    sYoungestFileDate += di.dtYoungestFile.ToLongTimeString();
+
+                    sYoungestFileDate += "'";
+                }
+                else
+                {
+                    sYoungestFileDate = "NULL";
+                }
+
+                if (!m_sqlsvr.AddFolderRAW(di.GetSizeSum().ToString(), sYoungestFileDate, sNameShort83, sPathShort83, sNameLong, sPathLong))
+                {
+                    break;
+                }
+            }
+
+            prsSqlSvr.Visible = false;
+            prsSqlSvr.Update();
+
+            if (m_sqlsvr.HasLastError)
+            {
+                MessageBox.Show(m_sqlsvr.LastError);
+                return;
+            }
+
+            if (m_sqlsvr.EndTask())
+            {
+                MessageBox.Show("Unfiltered Folder List has been successfully transferred to SQL Server Database!\n\nItem Count: " + lCnt.ToString());
+            }
+            else
+            {
+                MessageBox.Show(m_sqlsvr.LastError);
+            }
+
+
         }
 
     }
