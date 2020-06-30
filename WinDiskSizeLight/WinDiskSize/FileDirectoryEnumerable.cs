@@ -27,6 +27,340 @@ namespace EnumerateFile
     /// System.Console.ReadLine();
     /// 
     ///</remarks>
+
+    public class LongFileInfo : System.IO.FileSystemInfo
+    {
+
+        //BUG: Unable to open pagefile.sys!!!
+        /*
+        [System.Runtime.InteropServices.DllImport
+         ("kernel32.dll",
+         CharSet = System.Runtime.InteropServices.CharSet.Auto,
+         SetLastError = true)]
+        static extern bool GetFileSizeEx(IntPtr hFile, out long lpFileSize);
+
+        [System.Runtime.InteropServices.DllImport
+         ("kernel32.dll",
+         CharSet = System.Runtime.InteropServices.CharSet.Auto,
+         SetLastError = true)]
+        //NOT WORKS!!!
+        /*
+        private static extern IntPtr CreateFile(string pFileName, long dwDesiredAccess, long dwShareMode, IntPtr lpSecurityAttributes,
+            long dwCreationDisposition, long dwFlagsAndAttributes, IntPtr hTemplateFile);
+        *
+        //SRC: https://www.pinvoke.net/default.aspx/kernel32.CreateFile
+        public static extern IntPtr CreateFile(
+             [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPTStr)] string filename,
+             [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)] uint uiAccess, //FileAccess access,
+             [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)] uint uiShare, //FileShare share,
+             IntPtr securityAttributes, // optional SECURITY_ATTRIBUTES struct or IntPtr.Zero
+             [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)] uint uiFileMode, //FileMode creationDisposition,
+             [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)] uint uiFlags, //FileAttributes flagsAndAttributes,
+             IntPtr templateFile);
+
+
+        [System.Runtime.InteropServices.DllImport
+         ("kernel32.dll",
+         CharSet = System.Runtime.InteropServices.CharSet.Auto,
+         SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr hHandle);
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct FILETIME
+        {
+            public uint dwLowDateTime;
+            public uint dwHighDateTime;
+        }
+
+        [System.Runtime.InteropServices.DllImport
+         ("kernel32.dll",
+         CharSet = System.Runtime.InteropServices.CharSet.Auto,
+         SetLastError = true)]
+        private static extern bool GetFileTime(IntPtr hFile, ref FILETIME lpCreationTime,
+           ref FILETIME lpLastAccessTime, ref FILETIME lpLastWriteTime);
+        */
+
+        [Serializable,
+        System.Runtime.InteropServices.StructLayout
+        (System.Runtime.InteropServices.LayoutKind.Sequential,
+        CharSet = System.Runtime.InteropServices.CharSet.Auto
+        ),
+        System.Runtime.InteropServices.BestFitMapping(false)]
+        private struct WIN32_FIND_DATA
+        {
+            public int dwFileAttributes;
+            public int ftCreationTime_dwLowDateTime;
+            public int ftCreationTime_dwHighDateTime;
+            public int ftLastAccessTime_dwLowDateTime;
+            public int ftLastAccessTime_dwHighDateTime;
+            public int ftLastWriteTime_dwLowDateTime;
+            public int ftLastWriteTime_dwHighDateTime;
+            public int nFileSizeHigh;
+            public int nFileSizeLow;
+            public int dwReserved0;
+            public int dwReserved1;
+            [System.Runtime.InteropServices.MarshalAs
+            (System.Runtime.InteropServices.UnmanagedType.ByValTStr,
+            SizeConst = 260)]
+            public string cFileName;
+            [System.Runtime.InteropServices.MarshalAs
+            (System.Runtime.InteropServices.UnmanagedType.ByValTStr,
+            SizeConst = 14)]
+            public string cAlternateFileName;
+        }
+        [System.Runtime.InteropServices.DllImport
+        ("kernel32.dll",
+        CharSet = System.Runtime.InteropServices.CharSet.Auto,
+        SetLastError = true)]
+        private static extern IntPtr FindFirstFile(string pFileName,
+            ref WIN32_FIND_DATA pFindFileData);
+        [System.Runtime.InteropServices.DllImport
+        ("kernel32.dll",
+        CharSet = System.Runtime.InteropServices.CharSet.Auto,
+        SetLastError = true)]
+        private static extern bool FindNextFile(IntPtr hndFindFile,
+            ref WIN32_FIND_DATA lpFindFileData);
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool FindClose(IntPtr hndFindFile);
+        private static long ToLong(int height, int low)
+        {
+            long v = (uint)height;
+            v = v << 0x20;
+            v = v | ((uint)low);
+            return v;
+        }
+
+        protected string m_sPath;
+
+        protected bool m_bExists;
+        protected DateTime m_dtCreateTime;
+        protected DateTime m_dtLastWriteTime;
+        protected long m_lFileSize;
+
+        public LongFileInfo(string sPath)
+
+            : base()
+        {
+
+            m_sPath = sPath;
+
+            m_bExists = false;
+            m_lFileSize = 0;
+            m_dtCreateTime = DateTime.MinValue;
+            m_dtLastWriteTime = DateTime.MinValue;
+
+            IntPtr handle = IntPtr.Zero;
+            try
+            {
+                WIN32_FIND_DATA myData = new WIN32_FIND_DATA();
+
+                String sSdkPath = "\\\\?\\" + m_sPath;
+                handle = FindFirstFile(sSdkPath, ref myData);
+                if (handle.ToInt32() == -1 /*INVALID_HANDLE_VALUE*/)
+                {
+                    //System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(System.Runtime.InteropServices.Marshal.GetHRForLastWin32Error());
+                    m_bExists = false;
+                }
+                else
+                {
+                    m_bExists = true;
+
+                    m_lFileSize = ToLong(myData.nFileSizeHigh,
+                        myData.nFileSizeLow);
+
+                    long timeCreation = ToLong(myData.ftCreationTime_dwHighDateTime,
+                        myData.ftCreationTime_dwLowDateTime);
+                    //ATTN: Not GMT, Local Time instead!!!
+                  //m_dtCreateTime = System.DateTime.FromFileTimeUtc(timeCreation);
+                    m_dtCreateTime = System.DateTime.FromFileTime(timeCreation);
+
+                    long timeLastWrite = ToLong(myData.ftLastWriteTime_dwHighDateTime,
+                        myData.ftLastWriteTime_dwLowDateTime);
+                    //ATTN: Not GMT, Local Time instead!!!
+                  //m_dtLastWriteTime = System.DateTime.FromFileTimeUtc(timeLastWrite);
+                    m_dtLastWriteTime = System.DateTime.FromFileTime(timeLastWrite);
+
+                }
+            }
+            catch (Exception e)
+            {
+                throw (e);
+            }
+            finally
+            {
+                if (handle != IntPtr.Zero && handle.ToInt32() != -1 /*INVALID_HANDLE_VALUE*/)
+                {
+                    FindClose(handle);
+                }
+            }
+
+        }
+
+        public override string Name
+        {
+
+            get { return m_sPath; }
+
+        }
+
+        public override bool Exists
+        {
+
+            get
+            {
+
+                return m_bExists;
+
+            }
+
+        }
+
+        public long Length
+        {
+
+            get
+            {
+
+                //BUG: Unable to open pagefile.sys!!!
+                /*
+                String sPath = "\\\\?\\" + m_sPath;
+                IntPtr handle = CreateFile(sPath, (uint) 0x80000000L /*GENERIC_READ*, 1 /*FILE_SHARE_READ*, IntPtr.Zero, 3 /*OPEN_EXISTING*, 1 /*FILE_ATTRIBUTE_READONLY*, IntPtr.Zero);
+                if (handle == IntPtr.Zero || handle.ToInt32() == -1 /*INVALID_HANDLE_VALUE*)
+                {
+                    return 0;
+                }
+
+                long fileSize;
+                bool result = GetFileSizeEx(handle, out fileSize);
+                if (!result)
+                {
+                    return 0;
+                }
+
+                if (handle != IntPtr.Zero && handle.ToInt32() != -1 /*INVALID_HANDLE_VALUE*)
+                {
+                    CloseHandle(handle);
+                }
+                */
+
+                return m_lFileSize;
+            }
+
+        }
+
+        public DateTime CreationTime
+        {
+
+            get
+            {
+
+                //BUG: Unable to open pagefile.sys!!!
+                /*
+                DateTime dtCreationTime = DateTime.MinValue;
+                DateTime dtLastAccessTime = DateTime.MinValue;
+                DateTime dtLastWriteTime = DateTime.MinValue;
+                IntPtr handle = IntPtr.Zero;
+                FILETIME ftCreationTime = new FILETIME();
+                FILETIME ftLastAccessTime = new FILETIME();
+                FILETIME ftLastWriteTime = new FILETIME();
+                try
+                {
+                    String sPath = "\\\\?\\" + m_sPath;
+                    handle = CreateFile(sPath, (uint)0x80000000L /*GENERIC_READ*, 1 /*FILE_SHARE_READ*, IntPtr.Zero, 3 /*OPEN_EXISTING*, 1 /*FILE_ATTRIBUTE_READONLY*, IntPtr.Zero);
+                    if (handle.ToInt32() == -1 /*INVALID_HANDLE_VALUE*)
+                    {
+                        System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(System.Runtime.InteropServices.Marshal.GetHRForLastWin32Error());
+                    }
+
+                    if (GetFileTime(handle, ref ftCreationTime, ref ftLastAccessTime, ref ftLastWriteTime) != true)
+                    {
+                        System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(System.Runtime.InteropServices.Marshal.GetHRForLastWin32Error());
+                    }
+
+                    dtCreationTime = DateTime.FromFileTimeUtc((((long)ftCreationTime.dwHighDateTime) << 32) | ((uint)ftCreationTime.dwLowDateTime));
+                    dtLastAccessTime = DateTime.FromFileTimeUtc((((long)ftLastAccessTime.dwHighDateTime) << 32) | ((uint)ftLastAccessTime.dwLowDateTime));
+                    dtLastWriteTime = DateTime.FromFileTimeUtc((((long)ftLastWriteTime.dwHighDateTime) << 32) | ((uint)ftLastWriteTime.dwLowDateTime));
+                }
+                catch (Exception e)
+                {
+                    throw (e);
+                }
+                finally
+                {
+                    if (handle != IntPtr.Zero && handle.ToInt32() != -1 /*INVALID_HANDLE_VALUE*)
+                    {
+                        CloseHandle(handle);
+                    }
+                }
+                return dtCreationTime;
+                */
+
+                return m_dtCreateTime;
+            }
+
+        }
+
+        public DateTime LastWriteTime
+        {
+
+            get
+            {
+
+                //BUG: Unable to open pagefile.sys!!!
+                /*
+                DateTime dtCreationTime = DateTime.MinValue;
+                DateTime dtLastAccessTime = DateTime.MinValue;
+                DateTime dtLastWriteTime = DateTime.MinValue;
+                IntPtr handle = IntPtr.Zero;
+                FILETIME ftCreationTime = new FILETIME();
+                FILETIME ftLastAccessTime = new FILETIME();
+                FILETIME ftLastWriteTime = new FILETIME();
+                try
+                {
+                    String sPath = "\\\\?\\" + m_sPath;
+                    handle = CreateFile(sPath, (uint)0x80000000L /*GENERIC_READ*, 1 /*FILE_SHARE_READ*, IntPtr.Zero, 3 /*OPEN_EXISTING*, 1 /*FILE_ATTRIBUTE_READONLY*, IntPtr.Zero);
+                    if (handle.ToInt32() == -1 /*INVALID_HANDLE_VALUE*)
+                    {
+                        System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(System.Runtime.InteropServices.Marshal.GetHRForLastWin32Error());
+                    }
+
+                    if (GetFileTime(handle, ref ftCreationTime, ref ftLastAccessTime, ref ftLastWriteTime) != true)
+                    {
+                        System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(System.Runtime.InteropServices.Marshal.GetHRForLastWin32Error());
+                    }
+
+                    dtCreationTime = DateTime.FromFileTimeUtc((((long)ftCreationTime.dwHighDateTime) << 32) | ((uint)ftCreationTime.dwLowDateTime));
+                    dtLastAccessTime = DateTime.FromFileTimeUtc((((long)ftLastAccessTime.dwHighDateTime) << 32) | ((uint)ftLastAccessTime.dwLowDateTime));
+                    dtLastWriteTime = DateTime.FromFileTimeUtc((((long)ftLastWriteTime.dwHighDateTime) << 32) | ((uint)ftLastWriteTime.dwLowDateTime));
+                }
+                catch (Exception e)
+                {
+                    throw (e);
+                }
+                finally
+                {
+                    if (handle != IntPtr.Zero && handle.ToInt32() != -1 /*INVALID_HANDLE_VALUE*)
+                    {
+                        CloseHandle(handle);
+                    }
+                }
+                return ftLastWriteTime;
+                */
+
+                return m_dtLastWriteTime;
+            }
+
+        }
+
+        public override void Delete()
+        {
+
+            throw new NotImplementedException();
+
+        }
+
+    }
+
     public class FileDirectoryEnumerable : System.Collections.IEnumerable
     {
         private bool bolReturnStringType = true;
@@ -141,6 +475,7 @@ namespace EnumerateFile
         /// <summary>
         /// ????
         /// </summary>
+        private string sCurrentShortFileName = "";
         private object objCurrentObject = null;
         private bool bolIsEmpty = false;
         /// <summary>
@@ -177,7 +512,7 @@ namespace EnumerateFile
         /// <summary>
         /// ???????
         /// </summary>
-        public string Name
+        public string NameLong
         {
             get
             {
@@ -187,6 +522,20 @@ namespace EnumerateFile
                         return (string)this.objCurrentObject;
                     else
                         return ((System.IO.FileSystemInfo)this.objCurrentObject).Name;
+                }
+                return null;
+            }
+        }
+        /// <summary>
+        /// ???????
+        /// </summary>
+        public string NameShort83
+        {
+            get
+            {
+                if (this.objCurrentObject != null)
+                {
+                    return this.sCurrentShortFileName;
                 }
                 return null;
             }
@@ -473,9 +822,13 @@ namespace EnumerateFile
             bolIsEmpty = false;
             objCurrentObject = null;
             intLastErrorCode = 0;
-            string strPath = System.IO.Path.Combine(strSearchPath, this.strSearchPattern);
+
+            //NOT NEEDED!!!
+            //string strPath = System.IO.Path.Combine(strSearchPath, this.strSearchPattern);
+            string strPath = strSearchPath + this.strSearchPattern;
+
             this.CloseHandler();
-            intSearchHandler = FindFirstFile(strPath, ref myData);
+            intSearchHandler = FindFirstFile( "\\\\?\\" + strPath, ref myData);
             if (intSearchHandler == INVALID_HANDLE_VALUE)
             {
                 intLastErrorCode = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
@@ -550,18 +903,43 @@ namespace EnumerateFile
             }
             if (Result)
             {
+                string sFileName;
+
+                //sFileName = myData.cFileName; //Long Name
+
+                sFileName = myData.cAlternateFileName; //Short Name (8+3 format)
+                if (sFileName.Length == 0) sFileName = myData.cFileName;
+
                 if (this.bolReturnStringType)
-                    this.objCurrentObject = myData.cFileName;
+                {
+                    this.sCurrentShortFileName = sFileName;
+                    this.objCurrentObject = sFileName; //myData.cFileName;
+                }
                 else
                 {
-                    string p = System.IO.Path.Combine(this.strSearchPath, myData.cFileName);
+                    this.sCurrentShortFileName = sFileName;
+
+                    //NOT NEEDED
+                    //string p = System.IO.Path.Combine(this.strSearchPath, sFileName); //myData.cFileName);
+
+                    //WinXHome FIX: Do not use Short File Name for files!!!
+                    //string sPath = this.strSearchPath + sFileName;
+
+                    string sPath;
                     if (this.bolIsFile)
                     {
-                        this.objCurrentObject = new System.IO.FileInfo(p);
+                        //WinXHome FIX: Do not use Short File Name for files!!!
+                        //sPath = this.strSearchPath + sFileName;
+                        sPath = this.strSearchPath + myData.cFileName;
+
+                        //WinXHome FIX
+                        //this.objCurrentObject = new System.IO.FileInfo(sPath);
+                        this.objCurrentObject = new LongFileInfo(sPath);
                     }
                     else
                     {
-                        this.objCurrentObject = new System.IO.DirectoryInfo(p);
+                        sPath = this.strSearchPath + sFileName; //ATTN: 8+3 Short File Name!!!
+                        this.objCurrentObject = new System.IO.DirectoryInfo(sPath);
                     }
                 }
                 this.intSearchedCount++;

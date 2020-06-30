@@ -50,13 +50,14 @@
             this.label5 = new System.Windows.Forms.Label();
             this.btnStartFolder = new System.Windows.Forms.Button();
             this.tbStartFolder = new System.Windows.Forms.TextBox();
+            this.chbShort83 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(296, 424);
+            this.label1.Location = new System.Drawing.Point(295, 429);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(61, 13);
             this.label1.TabIndex = 0;
@@ -71,7 +72,7 @@
             this.lbDirList.FormattingEnabled = true;
             this.lbDirList.Location = new System.Drawing.Point(15, 103);
             this.lbDirList.Name = "lbDirList";
-            this.lbDirList.Size = new System.Drawing.Size(647, 303);
+            this.lbDirList.Size = new System.Drawing.Size(647, 316);
             this.lbDirList.TabIndex = 1;
             // 
             // btnList
@@ -99,7 +100,7 @@
             // btnDecLevel
             // 
             this.btnDecLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDecLevel.Location = new System.Drawing.Point(360, 420);
+            this.btnDecLevel.Location = new System.Drawing.Point(359, 425);
             this.btnDecLevel.Name = "btnDecLevel";
             this.btnDecLevel.Size = new System.Drawing.Size(24, 23);
             this.btnDecLevel.TabIndex = 5;
@@ -111,7 +112,7 @@
             // 
             this.txLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txLevel.ForeColor = System.Drawing.Color.Red;
-            this.txLevel.Location = new System.Drawing.Point(390, 422);
+            this.txLevel.Location = new System.Drawing.Point(389, 427);
             this.txLevel.Name = "txLevel";
             this.txLevel.ReadOnly = true;
             this.txLevel.Size = new System.Drawing.Size(18, 20);
@@ -122,7 +123,7 @@
             // btnIncLevel
             // 
             this.btnIncLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnIncLevel.Location = new System.Drawing.Point(414, 420);
+            this.btnIncLevel.Location = new System.Drawing.Point(413, 425);
             this.btnIncLevel.Name = "btnIncLevel";
             this.btnIncLevel.Size = new System.Drawing.Size(23, 23);
             this.btnIncLevel.TabIndex = 7;
@@ -135,7 +136,7 @@
             this.lblPercent.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblPercent.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.lblPercent.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.lblPercent.Location = new System.Drawing.Point(240, 18);
+            this.lblPercent.Location = new System.Drawing.Point(240, 29);
             this.lblPercent.Name = "lblPercent";
             this.lblPercent.Size = new System.Drawing.Size(347, 16);
             this.lblPercent.TabIndex = 8;
@@ -170,7 +171,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(99, 425);
+            this.label2.Location = new System.Drawing.Point(98, 430);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(55, 13);
             this.label2.TabIndex = 11;
@@ -180,7 +181,7 @@
             // 
             this.tbFilterValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.tbFilterValue.ForeColor = System.Drawing.Color.Red;
-            this.tbFilterValue.Location = new System.Drawing.Point(160, 422);
+            this.tbFilterValue.Location = new System.Drawing.Point(159, 427);
             this.tbFilterValue.MaxLength = 4;
             this.tbFilterValue.Name = "tbFilterValue";
             this.tbFilterValue.Size = new System.Drawing.Size(59, 20);
@@ -201,7 +202,7 @@
             "MB",
             "GB",
             "TB"});
-            this.cbUnit.Location = new System.Drawing.Point(225, 422);
+            this.cbUnit.Location = new System.Drawing.Point(224, 427);
             this.cbUnit.Name = "cbUnit";
             this.cbUnit.Size = new System.Drawing.Size(54, 21);
             this.cbUnit.TabIndex = 13;
@@ -211,7 +212,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(498, 424);
+            this.label3.Location = new System.Drawing.Point(497, 429);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(73, 13);
             this.label3.TabIndex = 14;
@@ -228,7 +229,7 @@
             "2500",
             "5000",
             "9999"});
-            this.cbFreez.Location = new System.Drawing.Point(577, 421);
+            this.cbFreez.Location = new System.Drawing.Point(576, 426);
             this.cbFreez.Name = "cbFreez";
             this.cbFreez.Size = new System.Drawing.Size(60, 21);
             this.cbFreez.TabIndex = 15;
@@ -238,7 +239,7 @@
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(643, 424);
+            this.label4.Location = new System.Drawing.Point(642, 429);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(20, 13);
             this.label4.TabIndex = 16;
@@ -247,7 +248,7 @@
             // btnClearFilters
             // 
             this.btnClearFilters.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClearFilters.Location = new System.Drawing.Point(15, 419);
+            this.btnClearFilters.Location = new System.Drawing.Point(14, 424);
             this.btnClearFilters.Name = "btnClearFilters";
             this.btnClearFilters.Size = new System.Drawing.Size(75, 23);
             this.btnClearFilters.TabIndex = 17;
@@ -337,11 +338,27 @@
             this.tbStartFolder.TabIndex = 22;
             this.tbStartFolder.TabStop = false;
             // 
+            // chbShort83
+            // 
+            this.chbShort83.AutoSize = true;
+            this.chbShort83.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.chbShort83.ForeColor = System.Drawing.Color.Goldenrod;
+            this.chbShort83.Location = new System.Drawing.Point(239, 7);
+            this.chbShort83.Name = "chbShort83";
+            this.chbShort83.Size = new System.Drawing.Size(647, 17);
+            this.chbShort83.TabIndex = 23;
+            this.chbShort83.Text = "Parse and/or Show Short Names (8 + 3 format) //NOTE: On WinX the core system crea" +
+                "tes Long Pathes (32K)";
+            this.chbShort83.UseVisualStyleBackColor = true;
+            this.chbShort83.Click += new System.EventHandler(this.chbShort83_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(674, 449);
+            this.ClientSize = new System.Drawing.Size(674, 477);
+            this.Controls.Add(this.btnStop);
+            this.Controls.Add(this.chbShort83);
             this.Controls.Add(this.tbStartFolder);
             this.Controls.Add(this.btnStartFolder);
             this.Controls.Add(this.label5);
@@ -355,7 +372,6 @@
             this.Controls.Add(this.tbFilterValue);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.btnCopy);
-            this.Controls.Add(this.btnStop);
             this.Controls.Add(this.lblPercent);
             this.Controls.Add(this.btnIncLevel);
             this.Controls.Add(this.txLevel);
@@ -395,6 +411,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnStartFolder;
         private System.Windows.Forms.TextBox tbStartFolder;
+        private System.Windows.Forms.CheckBox chbShort83;
     }
 }
 

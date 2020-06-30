@@ -22,9 +22,32 @@ namespace WinDiskSize
         protected int m_iFilterValue;
         protected int m_iFreez;
 
+        StatusBar mainStatusBar;
+        StatusBarPanel sbPanelLb;
+        StatusBarPanel sbPanelLevel;
+
         public FormMain()
         {
             InitializeComponent();
+
+            mainStatusBar = new StatusBar();
+            //
+            sbPanelLb = new StatusBarPanel();
+            sbPanelLb.BorderStyle = StatusBarPanelBorderStyle.Sunken;
+            sbPanelLb.Text = "Item Count: 0";
+            sbPanelLb.ToolTipText = "ListBox's item count";
+            sbPanelLb.AutoSize = StatusBarPanelAutoSize.Spring;
+            mainStatusBar.Panels.Add(sbPanelLb);
+            //
+            sbPanelLevel = new StatusBarPanel();
+            sbPanelLevel.BorderStyle = StatusBarPanelBorderStyle.Raised;
+            sbPanelLevel.Text = "Max Level: N/A";
+            sbPanelLevel.ToolTipText = "Maximum level (depth) parsed";
+            sbPanelLevel.AutoSize = StatusBarPanelAutoSize.Contents;
+            mainStatusBar.Panels.Add(sbPanelLevel);
+            //
+            mainStatusBar.ShowPanels = true;
+            Controls.Add(mainStatusBar);
 
             cbDrive.SelectedIndex = 2;
 
@@ -33,6 +56,8 @@ namespace WinDiskSize
             cbFreez.SelectedIndex = 0;
 
             lblPercent.Text = "";
+            sbPanelLb.Text = "Item Count: 0";
+            sbPanelLevel.Text = "Max Level: N/A";
 
             m_iFilterValue = 100;
             tbFilterValue.Text = m_iFilterValue.ToString();
@@ -91,8 +116,12 @@ namespace WinDiskSize
 
                     MyDirInfo di = new MyDirInfo();
                     di.sStartFolder = "";
-                    di.sPath = "files_in_StartFolder"; // + diDrive.sName.Substring(0, 1);
-                    di.sName = "files_in_StartFolder"; // + diDrive.sName.Substring(0, 1);
+
+                    di.sNameLong = "files_in_StartFolder"; // + diDrive.sName.Substring(0, 1);
+                    di.sNameShort83 = "files_in_StartFolder"; // + diDrive.sName.Substring(0, 1);
+                    di.sPathLong = "files_in_StartFolder"; // + diDrive.sName.Substring(0, 1);
+                    di.sPathShort83 = "files_in_StartFolder"; // + diDrive.sName.Substring(0, 1);
+
                     di.AddFileLength(diDrive.GetSizeSum());
                     diDrive.CopyChangeDateTo(di);
                     di.bParsed = true;  //ATTN: Without this duplicated parsing occures!!!
@@ -118,7 +147,7 @@ namespace WinDiskSize
                     continue;
                 }
             }
-            String sPercent = iCntParsed.ToString() + " of " + iCnt.ToString() + " files";
+            String sPercent = iCntParsed.ToString() + " of " + iCnt.ToString() + " folder(s)";
             Double d = 0.0;
             if (iCnt > 0)
             {
@@ -173,6 +202,8 @@ namespace WinDiskSize
             m_bStop = false;
 
             lblPercent.Text = "";
+            sbPanelLb.Text = "Item Count: 0";
+            sbPanelLevel.Text = "Max Level: N/A";
 
             aDi.Clear();
 
@@ -189,8 +220,10 @@ namespace WinDiskSize
 
             MyDirInfo di = new MyDirInfo();
             di.sStartFolder = sStartFolder; //ATTN: Cosmetic only!!!
-            di.sPath        = sStartFolder;
-            di.sName        = sStartFolder;
+            di.sNameLong    = sStartFolder;
+            di.sNameShort83 = sStartFolder;
+            di.sPathLong    = sStartFolder;
+            di.sPathShort83 = sStartFolder;
             aDi.Add(di);
 
             lbDirList.BackColor = Color.LightYellow;
@@ -240,7 +273,16 @@ namespace WinDiskSize
         {
 
             FileDirectoryEnumerable myEnum = new FileDirectoryEnumerable();
-            myEnum.SearchPath    = di.sPath; //ATTN!!! HAS TO BE ENDED WITH \!!! Otherwise default directory of the drive will be the start direcotry!!!
+
+            if (chbShort83.Checked)
+            {
+                myEnum.SearchPath    = di.sPathShort83; //ATTN!!! HAS TO BE ENDED WITH \!!! Otherwise default directory of the drive will be the start direcotry!!!
+            }
+            else
+            {
+                myEnum.SearchPath    = di.sPathLong;
+            }
+
             myEnum.SearchPattern = "*.*";
 
             myEnum.ThrowIOException = false; //ATTN!!!
@@ -270,8 +312,27 @@ namespace WinDiskSize
                 diSub.diParent = di;
                 diSub.iLevel = di.iLevel + 1;
                 diSub.sStartFolder = di.sStartFolder;
-                diSub.sPath = di.sPath + "\\" + dir.Name;
-                diSub.sName = dir.Name;
+
+                diSub.sNameLong = dir.Name;
+
+                diSub.sNameShort83 = "";
+                String s = dir.ToString();
+                int i = s.LastIndexOf('\\');
+                if (i >= 0)
+                {
+                    diSub.sNameShort83 = s.Substring(i + 1);
+                }
+                else
+                {
+                    diSub.sNameShort83 = dir.Name; //Not to fail!!!
+                }
+
+                //FIX
+                //diSub.sPathLong = di.sPathLong + "\\" + diSub.sNameLong;
+                //diSub.sPathShort83 = di.sPathShort83 + "\\" + diSub.sNameShort83;
+                diSub.sPathLong = di.sPathLong + diSub.sNameLong + "\\";
+                diSub.sPathShort83 = di.sPathShort83 + diSub.sNameShort83 + "\\";
+
                 aDi.Insert(iSubIdx, diSub);
             }
 
@@ -279,7 +340,9 @@ namespace WinDiskSize
             myEnum.SearchForDirectory = false;
             myEnum.ReturnStringType = false;
             myEnum.SearchPattern = "*.*";
-            foreach (System.IO.FileInfo file in myEnum)
+            //WinXHome FIX
+            //foreach (System.IO.FileInfo file in myEnum)
+            foreach (LongFileInfo file in myEnum)
             {
                 di.AddFileLength(file.Length);
                 //lbDirList.Items.Add(file.Name + "\tLength:" + file.Length + " bytes ");
@@ -295,7 +358,7 @@ namespace WinDiskSize
 
         private void ListBoxRefresh()
         {
-            int iMaxLevel = Int32.Parse(txLevel.Text);
+            int iMaxLevelFilter = Int32.Parse(txLevel.Text);
 
             Int64 i64SizeFilter = 0;
             if (m_iFilterValue > 0)
@@ -308,23 +371,35 @@ namespace WinDiskSize
                 }
             }
 
+            int iMaxLevel = -1;
+
+            lbDirList.BeginUpdate();
+
             lbDirList.Items.Clear();
             if (aDi != null)
             {
                 bool bFirst = true;
                 foreach (MyDirInfo di in aDi)
                 {
-                    if (bFirst || /*(!di.bParsed) ||*/ (di.iLevel <= iMaxLevel || iMaxLevel == 0))
+                    if (bFirst || /*(!di.bParsed) ||*/ (di.iLevel <= iMaxLevelFilter || iMaxLevelFilter == 0))
                     {
                         if (bFirst || (!di.bParsed) || di.GetSizeSum() >= i64SizeFilter)
                         {
+                            di.bShow83 = chbShort83.Checked;
                             lbDirList.Items.Add(di);
                         }
                     }
 
+                    iMaxLevel = Math.Max(iMaxLevel, di.iLevel);
+
                     bFirst = false;
                 }
             }
+
+            lbDirList.EndUpdate();
+
+            sbPanelLb.Text = "Item Count: " + lbDirList.Items.Count.ToString();
+            sbPanelLevel.Text = "Max Level: " + iMaxLevel.ToString();
         }
 
         private void btnDecLevel_Click(object sender, EventArgs e)
@@ -466,6 +541,8 @@ namespace WinDiskSize
             m_bStop = false;
 
             lblPercent.Text = "";
+            sbPanelLb.Text = "Item Count: 0";
+            sbPanelLevel.Text = "Max Level: N/A";
 
             if (aDi != null)
             {
@@ -490,6 +567,11 @@ namespace WinDiskSize
 
                 btnList_Click(null, EventArgs.Empty);
             }
+        }
+
+        private void chbShort83_Click(object sender, EventArgs e)
+        {
+            ListBoxRefresh();
         }
 
     }

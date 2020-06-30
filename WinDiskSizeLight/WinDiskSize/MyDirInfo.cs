@@ -14,8 +14,13 @@ namespace WinDiskSize
 
         public String sStartFolder; //Optional, Cosmetic: To make reported pathes relative. (To make comparation easier in cases.)
 
-        public String sPath;
-        public String sName;
+        public String sNameLong;
+        public String sNameShort83;
+
+        public String sPathLong;
+        public String sPathShort83;
+
+        public bool bShow83;
 
         public bool bParsed;
 
@@ -32,8 +37,13 @@ namespace WinDiskSize
 
             iLevel = 0;
 
-            sPath = "";
-            sName = "";
+            sNameLong = "";
+            sNameShort83 = "";
+
+            sPathLong = "";
+            sPathShort83 = "";
+
+            bShow83 = false;
 
             bParsed = false;
 
@@ -146,13 +156,27 @@ namespace WinDiskSize
 
             s += "\t";
 
-            if (sStartFolder.Length > 0)
+            if (bShow83)
             {
-                s += "." + sPath.Substring(sStartFolder.Length);
+                if (sStartFolder.Length > 0)
+                {
+                    s += "." + sPathShort83.Substring(sStartFolder.Length - 1);
+                }
+                else
+                {
+                    s += sPathShort83;
+                }
             }
             else
             {
-                s += sPath;
+                if (sStartFolder.Length > 0)
+                {
+                    s += "." + sPathLong.Substring(sStartFolder.Length - 1);
+                }
+                else
+                {
+                    s += sPathLong;
+                }
             }
 
             return s;
