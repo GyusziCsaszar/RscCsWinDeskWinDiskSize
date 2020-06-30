@@ -54,8 +54,12 @@ namespace WinDiskSizeEx
         public int              m_iLevel;
         public String           m_sCount;
         public Int64            m_i64Count;
+        public String           m_sCountSUM;
+        public Int64            m_i64CountSUM;
         public String           m_sSize;
         public Int64            m_i64Size;
+        public String           m_sSizeSUM;
+        public Int64            m_i64SizeSUM;
         public String           m_sName;
         public String           m_sPath;
         public String           m_sFileDateTimeMin;
@@ -71,14 +75,25 @@ namespace WinDiskSizeEx
         public MyFolderState    m_State;
         public bool             m_bSizeMissMatch;
 
-        public MyFolder         m_Twin;
+        public int              m_iIndex_TEMP;
+        public Int64[]          m_ai64CountSUM_DBLCHK;
+        public Int64[]          m_ai64SizeSUM_DBLCHK;
+        public bool[]           m_bMissMatch;
+
+        public MyFolderState    m_StateBranch_TEMP;
 
         public MyFolder()
         {
-            m_iTaskIndex        = -1;
-            m_State             = MyFolderState.Unknown;
-            m_bSizeMissMatch    = false;
-            m_Twin              = null;
+            m_iTaskIndex          = -1;
+            m_State               = MyFolderState.Unknown;
+            m_bSizeMissMatch      = false;
+
+            m_iIndex_TEMP         = -1;
+            m_ai64CountSUM_DBLCHK = new Int64[2];
+            m_ai64SizeSUM_DBLCHK  = new Int64[2];
+            m_bMissMatch          = new bool[2];
+
+            m_StateBranch_TEMP    = MyFolderState.Unknown;
         }
 
         public string CountAsString
@@ -99,11 +114,29 @@ namespace WinDiskSizeEx
             }
         }
 
+        public string CountSUMAsString
+        {
+            get
+            {
+                return m_i64CountSUM.ToString();
+            }
+            set
+            {
+                m_sCountSUM = value;
+
+                m_i64CountSUM = 0;
+                if (m_sCountSUM.Length > 0)
+                {
+                    Int64.TryParse(m_sCountSUM, out m_i64CountSUM);
+                }
+            }
+        }
+
         public string SizeAsString
         {
             get
             {
-                return ToShortSizeString();
+                return ToShortSizeString(m_i64Size);
             }
             set
             {
@@ -117,7 +150,25 @@ namespace WinDiskSizeEx
             }
         }
 
-        public String ToShortSizeString()
+        public string SizeSUMAsString
+        {
+            get
+            {
+                return ToShortSizeString(m_i64SizeSUM);
+            }
+            set
+            {
+                m_sSizeSUM = value;
+
+                m_i64SizeSUM = 0;
+                if (m_sSizeSUM.Length > 0)
+                {
+                    Int64.TryParse(m_sSizeSUM, out m_i64SizeSUM);
+                }
+            }
+        }
+
+        public String ToShortSizeString(Int64 i64)
         {
             Int64 i64Div = 1;
             Int64 i64DivNext = 1024;
@@ -126,9 +177,9 @@ namespace WinDiskSizeEx
             for (; ; )
             {
                 iCnt++;
-                if (m_i64Size < i64DivNext)
+                if (i64 < i64DivNext)
                 {
-                    Int64 i64Res = (m_i64Size * 10) / i64Div;
+                    Int64 i64Res = (i64 * 10) / i64Div;
                     String sRes = i64Res.ToString();
                     if (i64Res > 0)
                     {

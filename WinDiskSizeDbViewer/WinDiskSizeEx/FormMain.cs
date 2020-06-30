@@ -15,6 +15,9 @@ namespace WinDiskSizeEx
     public partial class FormMain : Form
     {
 
+        protected const int ciCOMPARE_COL_SIZE  = 2;
+        protected const int ciCOMPARE_COL_COUNT = 6;
+
         protected const String csMDB_TEMPLATE = "WinDiskSize_Template.mdb";
 
         protected List<TabPage> m_ViewStack = new List<TabPage>();
@@ -29,9 +32,10 @@ namespace WinDiskSizeEx
 
         // Settings
         protected bool m_bSetting_CompareFileDateTime           = false;
-        protected bool m_bSetting_CompareFileDateOnly           = true;
+        protected bool m_bSetting_CompareFileDateOnly           = false;
         protected bool m_bSetting_HideChildrenOfMissingFolder   = true;
         protected bool m_bSetting_HideChildrenOfEqualFolder     = true;
+        protected bool m_bSetting_DoubleCheck                   = true;
 
         public FormMain()
         {
@@ -211,6 +215,7 @@ namespace WinDiskSizeEx
                 return;
             }
 
+            lvTaskList.Columns.Add("Task ID"); lvTaskList.Columns[lvTaskList.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
             lvTaskList.Columns.Add("Machine");
             lvTaskList.Columns.Add("Status");
             lvTaskList.Columns.Add("Started");
@@ -263,8 +268,9 @@ namespace WinDiskSizeEx
                         break;
                 }
 
-                lvTaskList.Items.Add(db.FieldAsString(iRow, "Machine"));
+                lvTaskList.Items.Add(iTaskID.ToString());
 
+                lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "Machine"));
                 lvTaskList.Items[iRow].SubItems.Add(sStatus);
                 lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "StartDate"));
                 lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "EndDate"));
@@ -310,9 +316,11 @@ namespace WinDiskSizeEx
             {
                 lvCompare.Columns.Add("#"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
                 lvCompare.Columns.Add("Size"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompare.Columns.Add("Size SUM"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
                 lvCompare.Columns.Add("Level"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
                 lvCompare.Columns.Add("Folder");
                 lvCompare.Columns.Add("File Count"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompare.Columns.Add("File Count SUM"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
                 lvCompare.Columns.Add("File Date (MIN)");
                 lvCompare.Columns.Add("File Date (MAX)");
                 lvCompare.Columns.Add("Path");
@@ -485,10 +493,12 @@ namespace WinDiskSizeEx
                     fldrNew.m_iTaskIndex = 0;
                 }
 
-                fldrNew.m_iLevel        = db.FieldAsInt(   iRow, "TreeLevel");
-                fldrNew.SizeAsString    = db.FieldAsString(iRow, "SizeSUM");
-                fldrNew.CountAsString   = db.FieldAsString(iRow, "CountSUM");
-                fldrNew.m_sName         = db.FieldAsString(iRow, "NameLong");
+                fldrNew.m_iLevel           = db.FieldAsInt(   iRow, "TreeLevel");
+                fldrNew.CountAsString      = db.FieldAsString(iRow, "FileCountSelf");
+                fldrNew.CountSUMAsString   = db.FieldAsString(iRow, "FileCountSUM");
+                fldrNew.SizeAsString       = db.FieldAsString(iRow, "FileSizeSelf");
+                fldrNew.SizeSUMAsString    = db.FieldAsString(iRow, "FileSizeSUM");
+                fldrNew.m_sName            = db.FieldAsString(iRow, "NameLong");
 
                 myTask.m_iMaxLevel = Math.Max(myTask.m_iMaxLevel, fldrNew.m_iLevel);
 
@@ -524,18 +534,6 @@ namespace WinDiskSizeEx
                     iLevelNext = db.FieldAsInt(iRow + 1, "TreeLevel");
                 }
 
-                // ROLLED BACK!!!
-                /*
-                fldrNew.m_bHasChildren = false;
-                if (iLevelNext >= 0)
-                {
-                    if (iLevelNext >= fldrNew.m_iLevel)
-                    {
-                        fldrNew.m_bHasChildren = true;
-                    }
-                }
-                */
-
                 sIndent = "";
                 for (int i = 0; i < fldrNew.m_iLevel; i++)
                 {
@@ -557,10 +555,14 @@ namespace WinDiskSizeEx
                     lvCompare.Items.Add((fldrNew.m_iTaskIndex + 1).ToString());
 
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.SizeAsString);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.SizeSUMAsString);
+
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.m_iLevel.ToString());
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sIndent + fldrNew.m_sName);
 
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.CountAsString);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.CountSUMAsString);
+
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateTimeMin);
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateTimeMax);
 
@@ -571,6 +573,8 @@ namespace WinDiskSizeEx
                 }
             }
 
+            int iMaxLevel = 0;
+
             string sCnt = "";
             string sLvl = "";
             foreach (MyTask tsk in m_Tasks)
@@ -580,6 +584,8 @@ namespace WinDiskSizeEx
 
                 if (sLvl.Length > 0) sLvl += " vs. ";
                 sLvl += tsk.m_iMaxLevel.ToString();
+
+                iMaxLevel = Math.Max(iMaxLevel, tsk.m_iMaxLevel);
             }
             sbPanelLb.Text = "Folder Count: " + sCnt;
             sbPanelLevel.Text = "Max Level: " + sLvl;
@@ -637,6 +643,8 @@ namespace WinDiskSizeEx
                             {
                                 myTask.Folders[j].m_State = MyFolderState.MissingOther;
 
+                                //myTaskRes.Folders.Add(myTask.Folders[j]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+
                                 myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[j]);
 
                                 //
@@ -644,10 +652,14 @@ namespace WinDiskSizeEx
                                 lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[j].m_iTaskIndex + 1).ToString());
 
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].SizeAsString);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].SizeSUMAsString);
+
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_iLevel.ToString());
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
 
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountSUMAsString);
+
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateTimeMin);
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateTimeMax);
 
@@ -710,11 +722,11 @@ namespace WinDiskSizeEx
 
                     if (iCmp == 0)
                     {
-                        if ( (myTaskOrig.Folders[iFldrOrig].m_sCount != myTask.Folders[iFldr].m_sCount)
+                        if ( (myTaskOrig.Folders[iFldrOrig].m_sCountSUM != myTask.Folders[iFldr].m_sCountSUM)
                             
                              ||
                              
-                             (myTaskOrig.Folders[iFldrOrig].m_sSize != myTask.Folders[iFldr].m_sSize)
+                             (myTaskOrig.Folders[iFldrOrig].m_sSizeSUM != myTask.Folders[iFldr].m_sSizeSUM)
                              
                              ||
 
@@ -732,12 +744,12 @@ namespace WinDiskSizeEx
                             myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.DiffersOne;
                             myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
 
-                            myTaskOrig.Folders[iFldrOrig].m_bSizeMissMatch = (myTaskOrig.Folders[iFldrOrig].m_sSize != myTask.Folders[iFldr].m_sSize);
+                            myTaskOrig.Folders[iFldrOrig].m_bSizeMissMatch = (myTaskOrig.Folders[iFldrOrig].m_sSizeSUM != myTask.Folders[iFldr].m_sSizeSUM);
                             myTask.Folders[iFldr].m_bSizeMissMatch = myTaskOrig.Folders[iFldrOrig].m_bSizeMissMatch;
 
                             if (myTaskOrig.Folders[iFldrOrig].m_bSizeMissMatch)
                             {
-                                lvCompare.Items[iFldrOrig].SubItems[1].Text = myTaskOrig.Folders[iFldrOrig].m_i64Size.ToString() + " B";
+                                lvCompare.Items[iFldrOrig].SubItems[ciCOMPARE_COL_SIZE].Text = myTaskOrig.Folders[iFldrOrig].m_i64SizeSUM.ToString() + " B";
                             }
 
                             lvCompare.Items[iFldrOrig].BackColor = Color.PaleTurquoise;
@@ -753,19 +765,22 @@ namespace WinDiskSizeEx
 
                             lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[iFldr].m_iTaskIndex + 1).ToString());
 
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
                             if (myTask.Folders[iFldr].m_bSizeMissMatch)
                             {
-                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_i64Size.ToString() + " B");
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_i64SizeSUM.ToString() + " B");
                             }
                             else
                             {
-                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeSUMAsString);
                             }
 
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_iLevel.ToString());
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
 
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountSUMAsString);
+
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateTimeMin);
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateTimeMax);
 
@@ -784,14 +799,13 @@ namespace WinDiskSizeEx
 
                             myTask.Folders[iFldr].m_State = MyFolderState.Equals;
 
-                            myTaskOrig.Folders[iFldrOrig].m_Twin = myTask.Folders[iFldr];
-
                             lvCompare.Items[iFldrOrig].BackColor = Color.LightGreen;
 
                             if (m_bSetting_HideChildrenOfEqualFolder && (iFldrOrig > 0))
                             {
                                 if ( (myTaskOrig.Folders[iFldrOrig - 1].m_State == MyFolderState.Equals) &&
-                                     (myTaskOrig.Folders[iFldrOrig - 1].m_iLevel < myTaskOrig.Folders[iFldrOrig].m_iLevel))
+                                     (myTaskOrig.Folders[iFldrOrig - 1].m_iLevel < myTaskOrig.Folders[iFldrOrig].m_iLevel) &&
+                                     (myTaskOrig.Folders[iFldrOrig].m_iLevel > 1) )
                                 {
                                     myTask.Folders[iFldr].m_State = MyFolderState.Equals_HIDDEN;
                                     myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.Equals_HIDDEN;
@@ -807,42 +821,6 @@ namespace WinDiskSizeEx
                         iFldrOrig++;
                         iFldr++;
                     }
-
-                    // IN QUESTION!!!
-                    /*
-                    else if ((iCmp > 0) && (!myTask.Folders[iFldr].m_bHasChildren))
-                    {
-                        myTask.Folders[iFldr].m_State = MyFolderState.MissingOther;
-                        
-                        myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[iFldr]);
-
-                        //
-
-                        lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[iFldr].m_iTaskIndex + 1).ToString());
-
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_iLevel.ToString());
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
-
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMin);
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMax);
-
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath);
-
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName83);
-                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath83);
-
-                        lvCompare.Items[iFldrOrig].BackColor = Color.LightPink;
-
-                        //
-
-                        iFldrOrig++;
-
-                        iFldr++;
-                    }
-                    */
-
                     else if (iCmp > 0)
                     {
                         bool bSolved = false;
@@ -857,10 +835,15 @@ namespace WinDiskSizeEx
                                 //Compare only on the same level!!!
                                 continue;
                             }
+
+                            // WRONG-WRONG-WRONG-WRONG!!!
+                            /*
                             else if (myTaskOrig.Folders[iFldrOrig].m_iLevel > myTask.Folders[i].m_iLevel) // FINE-TUNE!!!
                             {
                                 iCmp2 = 0; // Let it go!
                             }
+                            */
+
                             else
                             {
                                 iCmp2 = myTaskOrig.Folders[iFldrOrig].m_sPath.CompareTo(myTask.Folders[i].m_sPath);
@@ -895,10 +878,14 @@ namespace WinDiskSizeEx
                                         lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[j].m_iTaskIndex + 1).ToString());
 
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].SizeAsString);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].SizeSUMAsString);
+
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_iLevel.ToString());
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
 
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountSUMAsString);
+
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateTimeMin);
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateTimeMax);
 
@@ -984,6 +971,9 @@ namespace WinDiskSizeEx
                                 //Compare only on the same level!!!
                                 continue;
                             }
+
+                            // WRONG-WRONG-WRONG-WRONG!!!
+                            /*
                             else if (myTaskOrig.Folders[i].m_iLevel < myTask.Folders[iFldr].m_iLevel) // FINE-TUNE!!!
                             {
                                 iCmp2 = 0; // Let it go!
@@ -992,6 +982,8 @@ namespace WinDiskSizeEx
                                 //iFldr++;
 
                             }
+                            */
+
                             else
                             {
                                 iCmp2 = myTaskOrig.Folders[i].m_sPath.CompareTo(myTask.Folders[iFldr].m_sPath);
@@ -1043,48 +1035,88 @@ namespace WinDiskSizeEx
 
                         if (!bSolved)
                         {
-                            if (iFldrOrig < myTaskOrig.Folders.Count - 1 /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */)
-                            {
-                                if (m_bSetting_HideChildrenOfMissingFolder)
-                                {
-                                    if ((lvCompare.Items[iFldrOrig - 1].BackColor == Color.Orange) &&
-                                         (myTaskOrig.Folders[iFldrOrig - 1].m_iLevel < myTaskOrig.Folders[iFldrOrig].m_iLevel))
-                                    {
-                                        lvCompare.Items.RemoveAt(iFldrOrig);
-                                        myTaskOrig.Folders.RemoveAt(iFldrOrig);
 
-                                        iFldrOrig--; // Will be incremented!!!
-                                    }
-                                    else
-                                    {
-                                        lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
-                                    }
+                            // WORKS BAD (the commented out if)!!!
+                            /*
+                            if (m_bSetting_HideChildrenOfMissingFolder)
+                            {
+                                if ( (myTask.Folders[iFldr].m_iLevel > 1) && 
+                                     ( (myTask.Folders[iFldr - 1].m_State == MyFolderState.MissingOther) ||
+                                       (myTask.Folders[iFldr - 1].m_State == MyFolderState.MissingOther_HIDDEN) ) &&
+                                     (myTask.Folders[iFldr - 1].m_iLevel == (myTask.Folders[iFldr].m_iLevel - 1)) &&
+                                     myTask.Folders[iFldr].m_sPath.IndexOf(myTask.Folders[iFldr - 1].m_sPath) == 0) //Parent of this...
+                                {
+                                */
+                                    myTask.Folders[iFldr].m_State = MyFolderState.MissingOther;
+
+                                    //myTaskRes.Folders.Add(myTask.Folders[iFldr]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+
+                                    myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[iFldr]);
+
+                                    //
+
+                                    lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[iFldr].m_iTaskIndex + 1).ToString());
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeSUMAsString);
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_iLevel.ToString());
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountSUMAsString);
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateTimeMin);
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateTimeMax);
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath);
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName83);
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath83);
+
+                                    lvCompare.Items[iFldrOrig].BackColor = Color.LightPink;
+
+                                    //
+
+                                    iFldrOrig++;
+
+                                /*
                                 }
                                 else
                                 {
-                                    lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
+                                    myTask.Folders[iFldr].m_State = MyFolderState.MissingOther_HIDDEN;
                                 }
                             }
+                            else
+                            {
+                                myTask.Folders[iFldr].m_State = MyFolderState.MissingOther_HIDDEN;
+                            }
+                            */
 
-                            iFldrOrig++;
+                            iFldr++;
                         }
                     }
                 }
 
-                /*
-                if (m_bSetting_HideChildrenOfEqualFolder)
+                if (m_bSetting_HideChildrenOfMissingFolder)
                 {
+                    MyFolder[] fldrStack = new MyFolder[iMaxLevel + 1];
+                    int fldrStackIndex = -1;
 
-                    lblPrsMain.Text = "Hiding equal subfolders...";
+                    lblPrsMain.Text = "Hideing missing whole branches...";
                     lblPrsMain.Update();
                     prsMain.Minimum = 0;
                     prsMain.Maximum = myTaskOrig.Folders.Count;
                     prsMain.Value = 0;
                     prsMain.Update();
 
-                    iFldrOrig = 0;
+                    MyFolder fldrPrev = null;
+                    MyFolder fldr;
+                    iFldrOrig = -1;
                     for (; ; )
                     {
+                        iFldrOrig++;
+
                         if (iFldrOrig >= myTaskOrig.Folders.Count)
                         {
                             break;
@@ -1093,29 +1125,196 @@ namespace WinDiskSizeEx
                         prsMain.Value = Math.Min(prsMain.Maximum, prsMain.Value + 1);
                         prsMain.Update();
 
-                        if ( (myTaskOrig.Folders[iFldrOrig].m_iLevel > 1) &&
-                             (lvCompare.Items[iFldrOrig].BackColor == Color.LightGreen) &&
-                             (lvCompare.Items[iFldrOrig - 1].BackColor == Color.LightGreen) &&  // Prior Folder is Equal
-                             (myTaskOrig.Folders[iFldrOrig - 1].m_iLevel == 1 ))                // Prior Folder is in Root
+                        fldr = myTaskOrig.Folders[iFldrOrig];
+
+                        if (fldrPrev != null)
                         {
-
-                            if (myTaskOrig.Folders[iFldrOrig].m_Twin != null)
+                            if (fldr.m_iLevel > fldrPrev.m_iLevel)
                             {
-                                myTaskOrig.Folders[iFldrOrig].m_Twin.m_State = MyFolderState.Equals_HIDDEN;
-                            }
-                            myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.Equals_HIDDEN;
+                                //Push
+                                fldrStackIndex++;
+                                fldrStack[fldrStackIndex] = fldrPrev;
 
-                            myTaskOrig.Folders.RemoveAt(iFldrOrig);
-                            lvCompare.Items.RemoveAt(iFldrOrig);
+                                fldrPrev.m_iIndex_TEMP      = iFldrOrig;
+                                fldrPrev.m_StateBranch_TEMP = fldrPrev.m_State;
+                            }
+                            else if (fldr.m_iLevel < fldrPrev.m_iLevel)
+                            {
+                                for (; ; )
+                                {
+                                    if (fldrStack[fldrStackIndex].m_iLevel < fldr.m_iLevel)
+                                    {
+                                        break;
+                                    }
+
+                                    if (fldrStack[fldrStackIndex].m_iLevel > 0 && fldrStack[fldrStackIndex].m_StateBranch_TEMP != MyFolderState.Unknown)
+                                    {
+                                        switch (fldrStack[fldrStackIndex].m_StateBranch_TEMP)
+                                        {
+                                            case MyFolderState.MissingOther:
+                                            {
+                                                while ((iFldrOrig - 1) >= fldrStack[fldrStackIndex].m_iIndex_TEMP)
+                                                {
+                                                    myTaskOrig.Folders[iFldrOrig - 1].m_State = MyFolderState.MissingOther_HIDDEN;
+                                                    myTaskOrig.Folders.RemoveAt(iFldrOrig - 1);
+
+                                                    lvCompare.Items.RemoveAt(iFldrOrig - 1);
+
+                                                    iFldrOrig--;
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    //Pop
+                                    fldrStackIndex--;
+
+                                    if (fldrStackIndex <= 0)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (fldrStackIndex >= 0)
+                            {
+                                if (fldr.m_State != fldrStack[fldrStackIndex].m_StateBranch_TEMP)
+                                {
+                                    for (int i = 0; i <= fldrStackIndex; i++)
+                                    {
+                                        fldrStack[i].m_StateBranch_TEMP = MyFolderState.Unknown;
+                                    }
+                                }
+                            }
                         }
-                        else
+
+                        fldrPrev = fldr;
+                        fldrPrev.m_iIndex_TEMP = iFldrOrig;
+                    }
+                }
+
+                if (m_bSetting_DoubleCheck)
+                {
+                    bool bMissMatch = false;
+
+                    for (int iTaskIndex = 0; iTaskIndex <= 1; iTaskIndex++)
+                    {
+                        MyFolder[] fldrStack = new MyFolder[iMaxLevel + 1];
+                        int fldrStackIndex = -1;
+
+                        lblPrsMain.Text = "Checking consistency of Task #" + (iTaskIndex + 1).ToString() + "...";
+                        lblPrsMain.Update();
+                        prsMain.Minimum = 0;
+                        prsMain.Maximum = myTaskOrig.Folders.Count;
+                        prsMain.Value = 0;
+                        prsMain.Update();
+
+                        MyFolder fldrPrev = null;
+                        MyFolder fldr;
+                        iFldrOrig = -1;
+                        for (; ; )
                         {
                             iFldrOrig++;
+
+                            if (iFldrOrig >= myTaskOrig.Folders.Count)
+                            {
+                                break;
+                            }
+
+                            prsMain.Value = Math.Min(prsMain.Maximum, prsMain.Value + 1);
+                            prsMain.Update();
+
+                            fldr = myTaskOrig.Folders[iFldrOrig];
+                            if ((fldr.m_iTaskIndex != iTaskIndex) && (fldr.m_State != MyFolderState.Equals) && (fldr.m_State != MyFolderState.Equals_HIDDEN))
+                            {
+                                continue;
+                            }
+
+                            if (fldrPrev != null)
+                            {
+                                if (fldr.m_iLevel > fldrPrev.m_iLevel)
+                                {
+                                    //Push
+                                    fldrStackIndex++;
+                                    fldrStack[fldrStackIndex] = fldrPrev;
+
+                                    //fldrPrev.m_ai64CountSUM_DBLCHK[iTaskIndex] += fldrPrev.m_i64Count;
+                                    //fldrPrev.m_ai64SizeSUM_DBLCHK[iTaskIndex] += fldrPrev.m_i64Size;
+
+                                    for (int i = fldrStackIndex; i >= 0; i--)
+                                    {
+                                        fldrStack[i].m_ai64CountSUM_DBLCHK[iTaskIndex] += fldrPrev.m_i64Count;
+                                        fldrStack[i].m_ai64SizeSUM_DBLCHK[iTaskIndex] += fldrPrev.m_i64Size;
+                                    }
+                                }
+                                else
+                                {
+                                    // List item representing files in the root
+                                    if ((fldr.m_iLevel == 0) && (fldrStackIndex >= 0))
+                                    {
+                                        fldrStack[0].m_ai64CountSUM_DBLCHK[iTaskIndex] += fldr.m_i64CountSUM;
+                                        fldrStack[0].m_ai64SizeSUM_DBLCHK[iTaskIndex] += fldr.m_i64SizeSUM;
+                                    }
+
+                                    for (int i = fldrStackIndex; i >= 0; i--)
+                                    {
+                                        fldrStack[i].m_ai64CountSUM_DBLCHK[iTaskIndex] += fldrPrev.m_i64CountSUM;
+                                        fldrStack[i].m_ai64SizeSUM_DBLCHK[iTaskIndex] += fldrPrev.m_i64SizeSUM;
+                                    }
+                                }
+
+                                if (fldr.m_iLevel < fldrPrev.m_iLevel)
+                                {
+                                    for (; ; )
+                                    {
+                                        if (fldrStack[fldrStackIndex].m_iLevel < fldr.m_iLevel)
+                                        {
+                                            break;
+                                        }
+
+                                        if (fldrStack[fldrStackIndex].m_i64CountSUM != fldrStack[fldrStackIndex].m_ai64CountSUM_DBLCHK[iTaskIndex])
+                                        {
+                                            lvCompare.Items[fldrStack[fldrStackIndex].m_iIndex_TEMP].SubItems[ciCOMPARE_COL_COUNT].Text += " vs. (" + (iTaskIndex + 1).ToString() + ") " + fldrStack[fldrStackIndex].m_ai64CountSUM_DBLCHK[iTaskIndex].ToString();
+                                            lvCompare.Items[fldrStack[fldrStackIndex].m_iIndex_TEMP].BackColor = Color.Yellow;
+
+                                            fldrStack[fldrStackIndex].m_bMissMatch[iTaskIndex] = true;
+
+                                            bMissMatch = true;
+                                        }
+
+                                        if (fldrStack[fldrStackIndex].m_i64SizeSUM != fldrStack[fldrStackIndex].m_ai64SizeSUM_DBLCHK[iTaskIndex])
+                                        {
+                                            lvCompare.Items[fldrStack[fldrStackIndex].m_iIndex_TEMP].SubItems[ciCOMPARE_COL_SIZE].Text = fldrStack[fldrStackIndex].m_i64SizeSUM.ToString() + " B";
+
+                                            lvCompare.Items[fldrStack[fldrStackIndex].m_iIndex_TEMP].SubItems[ciCOMPARE_COL_SIZE].Text += " vs. (" + (iTaskIndex + 1).ToString() + ") " + fldrStack[fldrStackIndex].m_ai64SizeSUM_DBLCHK[iTaskIndex].ToString() + " B";
+                                            lvCompare.Items[fldrStack[fldrStackIndex].m_iIndex_TEMP].BackColor = Color.Yellow;
+
+                                            fldrStack[fldrStackIndex].m_bMissMatch[iTaskIndex] = true;
+
+                                            bMissMatch = true;
+                                        }
+
+                                        //Pop
+                                        fldrStackIndex--;
+
+                                        if (fldrStackIndex <= 0)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            fldrPrev = fldr;
+                            fldrPrev.m_iIndex_TEMP = iFldrOrig;
                         }
                     }
 
+                    if (bMissMatch)
+                    {
+                        MessageBox.Show("Double check found missmatches!\n\nSee yellow (state: Unknown (ERROR)) items for more information!");
+                    }
                 }
-                */
 
                 //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
                 List<MyFolder> FoldersTemp = myTaskOrig.Folders;
@@ -1136,13 +1335,13 @@ namespace WinDiskSizeEx
             db = null;
         }
 
-        private void ListFoldersOfTask(int iTask)
+        private void ListFoldersOfTask(int iTaskIndex)
         {
-            MyTask myTask = m_Tasks[iTask];
+            MyTask myTask = m_Tasks[iTaskIndex];
 
             for (int i = 0; i < m_Tasks.Count; i++)
             {
-                if (i == iTask)
+                if (i == iTaskIndex)
                 {
                     lvCompareTask.Items[i].Text = ">>";
                 }
@@ -1172,21 +1371,24 @@ namespace WinDiskSizeEx
 
                 MyFolder fldr = myTask.Folders[iFldr];
 
-                lvCompare.Items.Add(fldr.m_iTaskIndex.ToString());
+                lvCompare.Items.Add((fldr.m_iTaskIndex + 1).ToString());
 
+                lvCompare.Items[iFldr].SubItems.Add(fldr.SizeAsString);
                 if (fldr.m_bSizeMissMatch)
                 {
-                    lvCompare.Items[iFldr].SubItems.Add(fldr.m_i64Size.ToString() + " B");
+                    lvCompare.Items[iFldr].SubItems.Add(fldr.m_i64SizeSUM.ToString() + " B");
                 }
                 else
                 {
-                    lvCompare.Items[iFldr].SubItems.Add(fldr.SizeAsString);
+                    lvCompare.Items[iFldr].SubItems.Add(fldr.SizeSUMAsString);
                 }
 
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_iLevel.ToString());
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_sIndent + fldr.m_sName);
 
                 lvCompare.Items[iFldr].SubItems.Add(fldr.CountAsString);
+                lvCompare.Items[iFldr].SubItems.Add(fldr.CountSUMAsString);
+
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_sFileDateTimeMin);
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_sFileDateTimeMax);
 
@@ -1195,44 +1397,87 @@ namespace WinDiskSizeEx
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_sIndent + fldr.m_sName83);
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_sPath83);
 
-                switch (fldr.m_State)
+                if ((fldr.m_bMissMatch[0] || fldr.m_bMissMatch[1]) && (iTaskIndex == 2))
                 {
+                    lvCompare.Items[iFldr].BackColor = Color.Yellow;
 
-                    case MyFolderState.Unknown :
-                        lvCompare.Items[iFldr].BackColor = Color.Yellow;
-                        break;
+                    bool bSizeMissMatch = false;
 
-                    case MyFolderState.Equals :
-                        lvCompare.Items[iFldr].BackColor = Color.LightGreen;
-                        break;
+                    if (iTaskIndex != 1 && fldr.m_bMissMatch[0])
+                    {
+                        if (fldr.m_i64CountSUM != fldr.m_ai64CountSUM_DBLCHK[0])
+                        {
+                            lvCompare.Items[iFldr].SubItems[ciCOMPARE_COL_COUNT].Text += " vs. (1) " + fldr.m_ai64CountSUM_DBLCHK[0].ToString();
+                        }
 
-                    case MyFolderState.Equals_HIDDEN :
-                        lvCompare.Items[iFldr].BackColor = Color.Turquoise;
-                        break;
+                        if (fldr.m_i64SizeSUM != fldr.m_ai64SizeSUM_DBLCHK[0])
+                        {
+                            lvCompare.Items[iFldr].SubItems[ciCOMPARE_COL_SIZE].Text = fldr.m_i64SizeSUM.ToString() + " B";
+                            lvCompare.Items[iFldr].SubItems[ciCOMPARE_COL_SIZE].Text += " vs. (1) " + fldr.m_ai64SizeSUM_DBLCHK[0].ToString() + " B";
 
-                    case MyFolderState.DiffersOne :
-                        lvCompare.Items[iFldr].BackColor = Color.PaleTurquoise;
-                        break;
+                            bSizeMissMatch = true;
+                        }
+                    }
 
-                    case MyFolderState.DiffersOther :
-                        lvCompare.Items[iFldr].BackColor = Color.LightBlue;
-                        break;
+                    if (iTaskIndex != 0 && fldr.m_bMissMatch[1])
+                    {
+                        if (fldr.m_i64CountSUM != fldr.m_ai64CountSUM_DBLCHK[1])
+                        {
+                            lvCompare.Items[iFldr].SubItems[ciCOMPARE_COL_COUNT].Text += " vs. (2) " + fldr.m_ai64CountSUM_DBLCHK[1].ToString();
+                        }
 
-                    case MyFolderState.MissingOne :
-                        lvCompare.Items[iFldr].BackColor = Color.Orange;
-                        break;
+                        if (fldr.m_i64SizeSUM != fldr.m_ai64SizeSUM_DBLCHK[1])
+                        {
+                            if (!bSizeMissMatch)
+                            {
+                                lvCompare.Items[iFldr].SubItems[ciCOMPARE_COL_SIZE].Text = fldr.m_i64SizeSUM.ToString() + " B";
+                            }
 
-                    case MyFolderState.MissingOne_HIDDEN:
-                        lvCompare.Items[iFldr].BackColor = Color.Goldenrod;
-                        break;
+                            lvCompare.Items[iFldr].SubItems[ciCOMPARE_COL_SIZE].Text += " vs. (2) " + fldr.m_ai64SizeSUM_DBLCHK[1].ToString() + " B";
+                        }
+                    }
+                }
+                else
+                {
+                    switch (fldr.m_State)
+                    {
 
-                    case MyFolderState.MissingOther :
-                        lvCompare.Items[iFldr].BackColor = Color.LightPink;
-                        break;
+                        case MyFolderState.Unknown:
+                            lvCompare.Items[iFldr].BackColor = Color.Yellow;
+                            break;
 
-                    case MyFolderState.MissingOther_HIDDEN :
-                        lvCompare.Items[iFldr].BackColor = Color.Red;
-                        break;
+                        case MyFolderState.Equals:
+                            lvCompare.Items[iFldr].BackColor = Color.LightGreen;
+                            break;
+
+                        case MyFolderState.Equals_HIDDEN:
+                            lvCompare.Items[iFldr].BackColor = Color.Turquoise;
+                            break;
+
+                        case MyFolderState.DiffersOne:
+                            lvCompare.Items[iFldr].BackColor = Color.PaleTurquoise;
+                            break;
+
+                        case MyFolderState.DiffersOther:
+                            lvCompare.Items[iFldr].BackColor = Color.LightBlue;
+                            break;
+
+                        case MyFolderState.MissingOne:
+                            lvCompare.Items[iFldr].BackColor = Color.Orange;
+                            break;
+
+                        case MyFolderState.MissingOne_HIDDEN:
+                            lvCompare.Items[iFldr].BackColor = Color.Goldenrod;
+                            break;
+
+                        case MyFolderState.MissingOther:
+                            lvCompare.Items[iFldr].BackColor = Color.LightPink;
+                            break;
+
+                        case MyFolderState.MissingOther_HIDDEN:
+                            lvCompare.Items[iFldr].BackColor = Color.Red;
+                            break;
+                    }
                 }
             }
 
@@ -1445,12 +1690,12 @@ namespace WinDiskSizeEx
                     foreach (MyTask myTask in m_Tasks)
                     {
                         if (myTask.m_iTaskID    != (int)lvTaskList.SelectedItems[0].Tag) continue;
-                        if (myTask.m_sMachine   != lvTaskList.SelectedItems[0].Text) continue;
-                        if (myTask.m_sStatus    != lvTaskList.SelectedItems[0].SubItems[1].Text) continue;
-                        if (myTask.m_sStarted   != lvTaskList.SelectedItems[0].SubItems[2].Text) continue;
-                        if (myTask.m_sCompleted != lvTaskList.SelectedItems[0].SubItems[3].Text) continue;
-                        if (myTask.m_sType      != lvTaskList.SelectedItems[0].SubItems[4].Text) continue;
-                        if (myTask.m_sPath      != lvTaskList.SelectedItems[0].SubItems[5].Text) continue;
+                        if (myTask.m_sMachine   != lvTaskList.SelectedItems[0].SubItems[1].Text) continue;
+                        if (myTask.m_sStatus    != lvTaskList.SelectedItems[0].SubItems[2].Text) continue;
+                        if (myTask.m_sStarted   != lvTaskList.SelectedItems[0].SubItems[3].Text) continue;
+                        if (myTask.m_sCompleted != lvTaskList.SelectedItems[0].SubItems[4].Text) continue;
+                        if (myTask.m_sType      != lvTaskList.SelectedItems[0].SubItems[5].Text) continue;
+                        if (myTask.m_sPath      != lvTaskList.SelectedItems[0].SubItems[6].Text) continue;
 
                         MessageBox.Show("Task has been already added!");
                         return;
@@ -1463,12 +1708,12 @@ namespace WinDiskSizeEx
                     }
                     if (m_sInterTabArguments.Length > 0) m_sInterTabArguments += ";";
                     m_sInterTabArguments += "TaskID;" + ((int)lvTaskList.SelectedItems[0].Tag).ToString();
-                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].Text;
                     m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[1].Text;
                     m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[2].Text;
                     m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[3].Text;
                     m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[4].Text;
                     m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[5].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[6].Text;
 
                     GoBackAndRefresh();
                 }
