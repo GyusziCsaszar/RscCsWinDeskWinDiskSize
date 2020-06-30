@@ -1,0 +1,4 @@
+
+Parser SRC from:
+
+	https://www.codeproject.com/Articles/19688/In-C-Use-Win-API-to-Enumerate-File-and-Directory 
