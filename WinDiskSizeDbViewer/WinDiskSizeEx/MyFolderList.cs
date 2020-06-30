@@ -36,9 +36,13 @@ namespace WinDiskSizeEx
         Unknown,
 
         Equals,
+        Equals_HIDDEN,
 
         DiffersOne,
         DiffersOther,
+
+        MissingOne,
+        MissingOne_HIDDEN,
 
         MissingOther,
         MissingOther_HIDDEN

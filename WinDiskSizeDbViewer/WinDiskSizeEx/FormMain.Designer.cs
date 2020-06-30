@@ -45,6 +45,15 @@
             this.lvTaskList = new System.Windows.Forms.ListView();
             this.lblTaskList = new System.Windows.Forms.Label();
             this.viewCompare = new System.Windows.Forms.TabPage();
+            this.lblDiffClrMissOtherHdn = new System.Windows.Forms.Label();
+            this.lblDiffClrMissOther = new System.Windows.Forms.Label();
+            this.lblDiffClrMissOneHdn = new System.Windows.Forms.Label();
+            this.lblDiffClrMissOne = new System.Windows.Forms.Label();
+            this.lblDiffClrDiffOther = new System.Windows.Forms.Label();
+            this.lblDiffClrDiffOne = new System.Windows.Forms.Label();
+            this.lblDiffClrEqu = new System.Windows.Forms.Label();
+            this.lblDiffClrs = new System.Windows.Forms.Label();
+            this.lblDiffClrUnk = new System.Windows.Forms.Label();
             this.lvCompareTask = new System.Windows.Forms.ListView();
             this.lvCompare = new System.Windows.Forms.ListView();
             this.btnRefresh = new System.Windows.Forms.Button();
@@ -55,15 +64,7 @@
             this.prsMain = new System.Windows.Forms.ProgressBar();
             this.btnAdd = new System.Windows.Forms.Button();
             this.lblPrsMain = new System.Windows.Forms.Label();
-            this.lblDiffClrUnk = new System.Windows.Forms.Label();
-            this.lblDiffClrs = new System.Windows.Forms.Label();
-            this.lblDiffClrEqu = new System.Windows.Forms.Label();
-            this.lblDiffClrDiffOne = new System.Windows.Forms.Label();
-            this.lblDiffClrDiffOther = new System.Windows.Forms.Label();
-            this.lblDiffClrMissOne = new System.Windows.Forms.Label();
-            this.lblDiffClrMissOneHdn = new System.Windows.Forms.Label();
-            this.lblDiffClrMissOther = new System.Windows.Forms.Label();
-            this.lblDiffClrMissOtherHdn = new System.Windows.Forms.Label();
+            this.lblDiffClrEquHnd = new System.Windows.Forms.Label();
             this.Views.SuspendLayout();
             this.viewMain.SuspendLayout();
             this.viewSource.SuspendLayout();
@@ -263,6 +264,7 @@
             // viewCompare
             // 
             this.viewCompare.BackColor = System.Drawing.SystemColors.Window;
+            this.viewCompare.Controls.Add(this.lblDiffClrEquHnd);
             this.viewCompare.Controls.Add(this.lblDiffClrMissOtherHdn);
             this.viewCompare.Controls.Add(this.lblDiffClrMissOther);
             this.viewCompare.Controls.Add(this.lblDiffClrMissOneHdn);
@@ -281,6 +283,112 @@
             this.viewCompare.TabIndex = 0;
             this.viewCompare.Text = "Compare";
             this.viewCompare.Enter += new System.EventHandler(this.viewAny_Enter);
+            // 
+            // lblDiffClrMissOtherHdn
+            // 
+            this.lblDiffClrMissOtherHdn.AutoSize = true;
+            this.lblDiffClrMissOtherHdn.BackColor = System.Drawing.Color.Red;
+            this.lblDiffClrMissOtherHdn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrMissOtherHdn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrMissOtherHdn.Location = new System.Drawing.Point(485, 92);
+            this.lblDiffClrMissOtherHdn.Name = "lblDiffClrMissOtherHdn";
+            this.lblDiffClrMissOtherHdn.Size = new System.Drawing.Size(80, 15);
+            this.lblDiffClrMissOtherHdn.TabIndex = 11;
+            this.lblDiffClrMissOtherHdn.Text = "Miss. 2 HDN";
+            // 
+            // lblDiffClrMissOther
+            // 
+            this.lblDiffClrMissOther.AutoSize = true;
+            this.lblDiffClrMissOther.BackColor = System.Drawing.Color.LightPink;
+            this.lblDiffClrMissOther.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrMissOther.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrMissOther.Location = new System.Drawing.Point(430, 92);
+            this.lblDiffClrMissOther.Name = "lblDiffClrMissOther";
+            this.lblDiffClrMissOther.Size = new System.Drawing.Size(49, 15);
+            this.lblDiffClrMissOther.TabIndex = 10;
+            this.lblDiffClrMissOther.Text = "Miss. 2";
+            // 
+            // lblDiffClrMissOneHdn
+            // 
+            this.lblDiffClrMissOneHdn.AutoSize = true;
+            this.lblDiffClrMissOneHdn.BackColor = System.Drawing.Color.Goldenrod;
+            this.lblDiffClrMissOneHdn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrMissOneHdn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrMissOneHdn.Location = new System.Drawing.Point(335, 92);
+            this.lblDiffClrMissOneHdn.Name = "lblDiffClrMissOneHdn";
+            this.lblDiffClrMissOneHdn.Size = new System.Drawing.Size(80, 15);
+            this.lblDiffClrMissOneHdn.TabIndex = 9;
+            this.lblDiffClrMissOneHdn.Text = "Miss. 1 HDN";
+            // 
+            // lblDiffClrMissOne
+            // 
+            this.lblDiffClrMissOne.AutoSize = true;
+            this.lblDiffClrMissOne.BackColor = System.Drawing.Color.Orange;
+            this.lblDiffClrMissOne.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrMissOne.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrMissOne.Location = new System.Drawing.Point(280, 92);
+            this.lblDiffClrMissOne.Name = "lblDiffClrMissOne";
+            this.lblDiffClrMissOne.Size = new System.Drawing.Size(49, 15);
+            this.lblDiffClrMissOne.TabIndex = 8;
+            this.lblDiffClrMissOne.Text = "Miss. 1";
+            // 
+            // lblDiffClrDiffOther
+            // 
+            this.lblDiffClrDiffOther.AutoSize = true;
+            this.lblDiffClrDiffOther.BackColor = System.Drawing.Color.LightBlue;
+            this.lblDiffClrDiffOther.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrDiffOther.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrDiffOther.Location = new System.Drawing.Point(221, 92);
+            this.lblDiffClrDiffOther.Name = "lblDiffClrDiffOther";
+            this.lblDiffClrDiffOther.Size = new System.Drawing.Size(44, 15);
+            this.lblDiffClrDiffOther.TabIndex = 7;
+            this.lblDiffClrDiffOther.Text = "Diff. 2";
+            // 
+            // lblDiffClrDiffOne
+            // 
+            this.lblDiffClrDiffOne.AutoSize = true;
+            this.lblDiffClrDiffOne.BackColor = System.Drawing.Color.PaleTurquoise;
+            this.lblDiffClrDiffOne.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrDiffOne.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrDiffOne.Location = new System.Drawing.Point(171, 92);
+            this.lblDiffClrDiffOne.Name = "lblDiffClrDiffOne";
+            this.lblDiffClrDiffOne.Size = new System.Drawing.Size(44, 15);
+            this.lblDiffClrDiffOne.TabIndex = 6;
+            this.lblDiffClrDiffOne.Text = "Diff. 1";
+            // 
+            // lblDiffClrEqu
+            // 
+            this.lblDiffClrEqu.AutoSize = true;
+            this.lblDiffClrEqu.BackColor = System.Drawing.Color.LightGreen;
+            this.lblDiffClrEqu.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrEqu.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrEqu.Location = new System.Drawing.Point(51, 92);
+            this.lblDiffClrEqu.Name = "lblDiffClrEqu";
+            this.lblDiffClrEqu.Size = new System.Drawing.Size(35, 15);
+            this.lblDiffClrEqu.TabIndex = 5;
+            this.lblDiffClrEqu.Text = "Equ.";
+            // 
+            // lblDiffClrs
+            // 
+            this.lblDiffClrs.AutoSize = true;
+            this.lblDiffClrs.Location = new System.Drawing.Point(6, 92);
+            this.lblDiffClrs.Name = "lblDiffClrs";
+            this.lblDiffClrs.Size = new System.Drawing.Size(39, 13);
+            this.lblDiffClrs.TabIndex = 4;
+            this.lblDiffClrs.Text = "Colors:";
+            // 
+            // lblDiffClrUnk
+            // 
+            this.lblDiffClrUnk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblDiffClrUnk.AutoSize = true;
+            this.lblDiffClrUnk.BackColor = System.Drawing.Color.Yellow;
+            this.lblDiffClrUnk.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrUnk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrUnk.Location = new System.Drawing.Point(580, 92);
+            this.lblDiffClrUnk.Name = "lblDiffClrUnk";
+            this.lblDiffClrUnk.Size = new System.Drawing.Size(78, 15);
+            this.lblDiffClrUnk.TabIndex = 3;
+            this.lblDiffClrUnk.Text = "Unk. (ERR.)";
             // 
             // lvCompareTask
             // 
@@ -403,111 +511,17 @@
             this.lblPrsMain.Text = "N/A";
             this.lblPrsMain.Visible = false;
             // 
-            // lblDiffClrUnk
+            // lblDiffClrEquHnd
             // 
-            this.lblDiffClrUnk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblDiffClrUnk.AutoSize = true;
-            this.lblDiffClrUnk.BackColor = System.Drawing.Color.LightGray;
-            this.lblDiffClrUnk.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrUnk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrUnk.Location = new System.Drawing.Point(580, 92);
-            this.lblDiffClrUnk.Name = "lblDiffClrUnk";
-            this.lblDiffClrUnk.Size = new System.Drawing.Size(78, 15);
-            this.lblDiffClrUnk.TabIndex = 3;
-            this.lblDiffClrUnk.Text = "Unk. (ERR.)";
-            // 
-            // lblDiffClrs
-            // 
-            this.lblDiffClrs.AutoSize = true;
-            this.lblDiffClrs.Location = new System.Drawing.Point(6, 92);
-            this.lblDiffClrs.Name = "lblDiffClrs";
-            this.lblDiffClrs.Size = new System.Drawing.Size(39, 13);
-            this.lblDiffClrs.TabIndex = 4;
-            this.lblDiffClrs.Text = "Colors:";
-            // 
-            // lblDiffClrEqu
-            // 
-            this.lblDiffClrEqu.AutoSize = true;
-            this.lblDiffClrEqu.BackColor = System.Drawing.Color.LightGreen;
-            this.lblDiffClrEqu.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrEqu.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrEqu.Location = new System.Drawing.Point(51, 92);
-            this.lblDiffClrEqu.Name = "lblDiffClrEqu";
-            this.lblDiffClrEqu.Size = new System.Drawing.Size(35, 15);
-            this.lblDiffClrEqu.TabIndex = 5;
-            this.lblDiffClrEqu.Text = "Equ.";
-            // 
-            // lblDiffClrDiffOne
-            // 
-            this.lblDiffClrDiffOne.AutoSize = true;
-            this.lblDiffClrDiffOne.BackColor = System.Drawing.Color.White;
-            this.lblDiffClrDiffOne.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrDiffOne.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrDiffOne.Location = new System.Drawing.Point(102, 92);
-            this.lblDiffClrDiffOne.Name = "lblDiffClrDiffOne";
-            this.lblDiffClrDiffOne.Size = new System.Drawing.Size(52, 15);
-            this.lblDiffClrDiffOne.TabIndex = 6;
-            this.lblDiffClrDiffOne.Text = "Diff. (1)";
-            // 
-            // lblDiffClrDiffOther
-            // 
-            this.lblDiffClrDiffOther.AutoSize = true;
-            this.lblDiffClrDiffOther.BackColor = System.Drawing.Color.LightBlue;
-            this.lblDiffClrDiffOther.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrDiffOther.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrDiffOther.Location = new System.Drawing.Point(160, 92);
-            this.lblDiffClrDiffOther.Name = "lblDiffClrDiffOther";
-            this.lblDiffClrDiffOther.Size = new System.Drawing.Size(52, 15);
-            this.lblDiffClrDiffOther.TabIndex = 7;
-            this.lblDiffClrDiffOther.Text = "Diff. (2)";
-            // 
-            // lblDiffClrMissOne
-            // 
-            this.lblDiffClrMissOne.AutoSize = true;
-            this.lblDiffClrMissOne.BackColor = System.Drawing.Color.Orange;
-            this.lblDiffClrMissOne.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrMissOne.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrMissOne.Location = new System.Drawing.Point(227, 92);
-            this.lblDiffClrMissOne.Name = "lblDiffClrMissOne";
-            this.lblDiffClrMissOne.Size = new System.Drawing.Size(57, 15);
-            this.lblDiffClrMissOne.TabIndex = 8;
-            this.lblDiffClrMissOne.Text = "Miss. (1)";
-            // 
-            // lblDiffClrMissOneHdn
-            // 
-            this.lblDiffClrMissOneHdn.AutoSize = true;
-            this.lblDiffClrMissOneHdn.BackColor = System.Drawing.Color.Goldenrod;
-            this.lblDiffClrMissOneHdn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrMissOneHdn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrMissOneHdn.Location = new System.Drawing.Point(290, 92);
-            this.lblDiffClrMissOneHdn.Name = "lblDiffClrMissOneHdn";
-            this.lblDiffClrMissOneHdn.Size = new System.Drawing.Size(92, 15);
-            this.lblDiffClrMissOneHdn.TabIndex = 9;
-            this.lblDiffClrMissOneHdn.Text = "Miss. (1, HDN)";
-            // 
-            // lblDiffClrMissOther
-            // 
-            this.lblDiffClrMissOther.AutoSize = true;
-            this.lblDiffClrMissOther.BackColor = System.Drawing.Color.LightPink;
-            this.lblDiffClrMissOther.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrMissOther.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrMissOther.Location = new System.Drawing.Point(398, 92);
-            this.lblDiffClrMissOther.Name = "lblDiffClrMissOther";
-            this.lblDiffClrMissOther.Size = new System.Drawing.Size(57, 15);
-            this.lblDiffClrMissOther.TabIndex = 10;
-            this.lblDiffClrMissOther.Text = "Miss. (2)";
-            // 
-            // lblDiffClrMissOtherHdn
-            // 
-            this.lblDiffClrMissOtherHdn.AutoSize = true;
-            this.lblDiffClrMissOtherHdn.BackColor = System.Drawing.Color.Red;
-            this.lblDiffClrMissOtherHdn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrMissOtherHdn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrMissOtherHdn.Location = new System.Drawing.Point(461, 92);
-            this.lblDiffClrMissOtherHdn.Name = "lblDiffClrMissOtherHdn";
-            this.lblDiffClrMissOtherHdn.Size = new System.Drawing.Size(92, 15);
-            this.lblDiffClrMissOtherHdn.TabIndex = 11;
-            this.lblDiffClrMissOtherHdn.Text = "Miss. (2, HDN)";
+            this.lblDiffClrEquHnd.AutoSize = true;
+            this.lblDiffClrEquHnd.BackColor = System.Drawing.Color.Turquoise;
+            this.lblDiffClrEquHnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrEquHnd.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrEquHnd.Location = new System.Drawing.Point(92, 92);
+            this.lblDiffClrEquHnd.Name = "lblDiffClrEquHnd";
+            this.lblDiffClrEquHnd.Size = new System.Drawing.Size(66, 15);
+            this.lblDiffClrEquHnd.TabIndex = 12;
+            this.lblDiffClrEquHnd.Text = "Equ. HDN";
             // 
             // FormMain
             // 
@@ -581,6 +595,7 @@
         private System.Windows.Forms.Label lblDiffClrMissOther;
         private System.Windows.Forms.Label lblDiffClrMissOneHdn;
         private System.Windows.Forms.Label lblDiffClrMissOne;
+        private System.Windows.Forms.Label lblDiffClrEquHnd;
     }
 }
 

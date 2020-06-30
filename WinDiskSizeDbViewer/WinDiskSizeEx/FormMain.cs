@@ -296,6 +296,7 @@ namespace WinDiskSizeEx
             {
                 lvCompare.Columns.Add("#"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
                 lvCompare.Columns.Add("Size"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompare.Columns.Add("Level"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
                 lvCompare.Columns.Add("Folder");
                 lvCompare.Columns.Add("File Count"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
                 lvCompare.Columns.Add("File Date (MIN)");
@@ -538,6 +539,7 @@ namespace WinDiskSizeEx
                     lvCompare.Items.Add((fldrNew.m_iTaskIndex + 1).ToString());
 
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.SizeAsString);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_iLevel.ToString());
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sIndent + fldrNew.m_sName);
 
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.CountAsString);
@@ -604,6 +606,7 @@ namespace WinDiskSizeEx
                                 lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[j].m_iTaskIndex + 1).ToString());
 
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].SizeAsString);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_iLevel.ToString());
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
 
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
@@ -676,6 +679,7 @@ namespace WinDiskSizeEx
                              (myTaskOrig.Folders[iFldrOrig].m_sFileDateMax != myTask.Folders[iFldr].m_sFileDateMax) ) ) )
                         {
                             myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.DiffersOne;
+                            lvCompare.Items[iFldrOrig].BackColor = Color.PaleTurquoise;
                             iFldrOrig++;
 
                             //
@@ -688,6 +692,7 @@ namespace WinDiskSizeEx
                             lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[iFldr].m_iTaskIndex + 1).ToString());
 
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_iLevel.ToString());
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
 
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
@@ -727,6 +732,7 @@ namespace WinDiskSizeEx
                         lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[iFldr].m_iTaskIndex + 1).ToString());
 
                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_iLevel.ToString());
                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
 
                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
@@ -826,6 +832,7 @@ namespace WinDiskSizeEx
                                         lvCompare.Items.Insert(iIns, (myTask.Folders[j].m_iTaskIndex + 1).ToString());
 
                                         lvCompare.Items[iIns].SubItems.Add(myTask.Folders[j].SizeAsString);
+                                        lvCompare.Items[iIns].SubItems.Add(myTask.Folders[j].m_iLevel.ToString());
                                         lvCompare.Items[iIns].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
 
                                         lvCompare.Items[iIns].SubItems.Add(myTask.Folders[j].CountAsString);
@@ -894,6 +901,7 @@ namespace WinDiskSizeEx
                                         lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[iFldr].m_iTaskIndex + 1).ToString());
 
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_iLevel.ToString());
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
 
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
@@ -1000,6 +1008,7 @@ namespace WinDiskSizeEx
 
                                 if (m_bSetting_HideChildrenOfMissingFolder)
                                 {
+                                    myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.MissingOne;
                                     lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
 
                                     iFldrOrig++;
@@ -1014,6 +1023,7 @@ namespace WinDiskSizeEx
                                 {
                                     for (int j = iFldrOrig; j < i; j++)
                                     {
+                                        myTaskOrig.Folders[j].m_State = MyFolderState.MissingOne;
                                         lvCompare.Items[j].BackColor = Color.Orange;
                                     }
 
@@ -1150,6 +1160,7 @@ namespace WinDiskSizeEx
                 lvCompare.Items.Add(fldr.m_iTaskIndex.ToString());
 
                 lvCompare.Items[iFldr].SubItems.Add(fldr.SizeAsString);
+                lvCompare.Items[iFldr].SubItems.Add(fldr.m_iLevel.ToString());
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_sIndent + fldr.m_sName);
 
                 lvCompare.Items[iFldr].SubItems.Add(fldr.CountAsString);
@@ -1165,19 +1176,31 @@ namespace WinDiskSizeEx
                 {
 
                     case MyFolderState.Unknown :
-                        lvCompare.Items[iFldr].BackColor = Color.LightGray;
+                        lvCompare.Items[iFldr].BackColor = Color.Yellow;
                         break;
 
                     case MyFolderState.Equals :
                         lvCompare.Items[iFldr].BackColor = Color.LightGreen;
                         break;
 
+                    case MyFolderState.Equals_HIDDEN :
+                        lvCompare.Items[iFldr].BackColor = Color.Turquoise;
+                        break;
+
                     case MyFolderState.DiffersOne :
-                        lvCompare.Items[iFldr].BackColor = Color.White;
+                        lvCompare.Items[iFldr].BackColor = Color.PaleTurquoise;
                         break;
 
                     case MyFolderState.DiffersOther :
                         lvCompare.Items[iFldr].BackColor = Color.LightBlue;
+                        break;
+
+                    case MyFolderState.MissingOne :
+                        lvCompare.Items[iFldr].BackColor = Color.Orange;
+                        break;
+
+                    case MyFolderState.MissingOne_HIDDEN:
+                        lvCompare.Items[iFldr].BackColor = Color.Goldenrod;
                         break;
 
                     case MyFolderState.MissingOther :
