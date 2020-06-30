@@ -288,9 +288,7 @@ namespace WinDiskSizeEx
                 }
             }
 
-          //lvCompareTask.Items.Clear();
-            lvCompare.Items.Clear();
-
+            bool bAddingToCompare = false;
             MyTask myTask = null;
             if (m_Tasks.Count == 0)
             {
@@ -312,12 +310,20 @@ namespace WinDiskSizeEx
                     }
                     else
                     {
+                        bAddingToCompare = true;
+
                         myTask = new MyTask();
                         m_Tasks.Add(myTask);
 
                         myTask.m_sInterTabArguments = m_sInterTabArguments;
                     }
                 }
+            }
+
+            if (!bAddingToCompare)
+            {
+                //lvCompareTask.Items.Clear();
+                lvCompare.Items.Clear();
             }
 
             MyDb db = ConnectToDb(myTask.m_sInterTabArguments);
@@ -335,7 +341,7 @@ namespace WinDiskSizeEx
                     {
                         if (Int32.TryParse(asArgs[i + 1], out myTask.m_iTaskID))
                         {
-                            lvCompareTask.Items.Add("1");
+                            lvCompareTask.Items.Add((lvCompareTask.Items.Count + 1).ToString());
                             for (int j = i + 2; j < asArgs.Length; j++)
                             {
                                 lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(asArgs[j]);
@@ -447,8 +453,6 @@ namespace WinDiskSizeEx
                     iLevelNext = db.FieldAsInt(iRow + 1, "TreeLevel");
                 }
 
-                lvCompare.Items.Add("1");
-
                 sIndent = "";
                 for (int i = 0; i < fldrNew.m_iLevel; i++)
                 {
@@ -463,17 +467,226 @@ namespace WinDiskSizeEx
                         sIndent += " |  ";
                     }
                 }
-                lvCompare.Items[iRow].SubItems.Add(fldrNew.SizeAsString);
-                lvCompare.Items[iRow].SubItems.Add(sIndent + fldrNew.m_sName);
+                fldrNew.m_sIndent = sIndent;
 
-                lvCompare.Items[iRow].SubItems.Add(fldrNew.CountAsString);
-                lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateMin);
-                lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateMax);
+                if (!bAddingToCompare)
+                {
+                    lvCompare.Items.Add("1");
 
-                lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sPath);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.SizeAsString);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sIndent + fldrNew.m_sName);
 
-                lvCompare.Items[iRow].SubItems.Add(sIndent + fldrNew.m_sName83);
-                lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sPath83);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.CountAsString);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateMin);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateMax);
+
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sPath);
+
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sIndent + fldrNew.m_sName83);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sPath83);
+                }
+            }
+
+            if (bAddingToCompare)
+            {
+                MyTask myTaskOrig = m_Tasks[0];
+
+                prsMain.Minimum = 0;
+                prsMain.Maximum = Math.Max(myTaskOrig.Folders.Count, myTask.Folders.Count);
+                prsMain.Value = 0;
+                prsMain.Update();
+
+                int iFldrOrig = 0;
+                int iFldr = 0;
+                for (; ; )
+                {
+                    prsMain.Value = prsMain.Value + 1;
+                    prsMain.Update();
+
+                    if (iFldrOrig >= myTaskOrig.Folders.Count && iFldr >= myTask.Folders.Count)
+                    {
+                        //Both list ended!!!
+                        break;
+                    }
+
+                    int iCmp = myTaskOrig.Folders[iFldrOrig].m_sPath.CompareTo(myTask.Folders[iFldr].m_sPath);
+
+                    if (iCmp == 0)
+                    {
+                        if ( (myTaskOrig.Folders[iFldrOrig].m_sCount != myTask.Folders[iFldr].m_sCount) ||
+                             (myTaskOrig.Folders[iFldrOrig].m_sSize != myTask.Folders[iFldr].m_sSize) ||
+                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateMin != myTask.Folders[iFldr].m_sFileDateMin) /* ||
+                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateMax != myTask.Folders[iFldr].m_sFileDateMax) */ )
+                        {
+                            iFldrOrig++;
+
+                            //
+
+                            myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[iFldr]);
+
+                            //
+
+                            lvCompare.Items.Insert(iFldrOrig, m_Tasks.Count.ToString());
+
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
+
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMin);
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMax);
+
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath);
+
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName83);
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath83);
+
+                            lvCompare.Items[iFldrOrig].BackColor = Color.LightBlue;
+                        }
+                        else
+                        {
+                            lvCompare.Items[iFldrOrig].BackColor = Color.LightGreen;
+                        }
+
+                        iFldrOrig++;
+                        iFldr++;
+                    }
+                    else if (iCmp > 0)
+                    {
+                        bool bSolved = false;
+
+                        for (int i = iFldr + 1; i < myTask.Folders.Count; i++)
+                        {
+                            int iCmp2;
+
+                          //if (myTaskOrig.Folders[iFldrOrig].m_iLevel != myTask.Folders[i].m_iLevel)
+                            if (myTaskOrig.Folders[iFldrOrig].m_iLevel <  myTask.Folders[i].m_iLevel)
+                            {
+                                //Compare only on the same level!!!
+                                continue;
+                            }
+                            else if (myTaskOrig.Folders[iFldrOrig].m_iLevel > myTask.Folders[i].m_iLevel)
+                            {
+                                iCmp2 = 0; // Let it go!
+                            }
+
+                            // IN QUESTION!!!
+                            else if (myTask.Folders[i].m_i64Size == 0)
+                            {
+                                iCmp2 = 0; // Let it go!
+                            }
+
+                            else
+                            {
+                                iCmp2 = myTaskOrig.Folders[iFldrOrig].m_sPath.CompareTo(myTask.Folders[i].m_sPath);
+                            }
+
+                            if (iCmp2 == 0)
+                            {
+                                for (int j = iFldr; j < i; j++)
+                                {
+                                    myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[j]);
+
+                                    //
+
+                                    lvCompare.Items.Insert(iFldrOrig, m_Tasks.Count.ToString());
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].SizeAsString);
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMin);
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMax);
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath);
+
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName83);
+                                    lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath83);
+
+                                    lvCompare.Items[iFldrOrig].BackColor = Color.LightPink;
+
+                                    //
+
+                                    iFldrOrig++;
+                                }
+
+                                iFldr = i;
+
+                                bSolved = true;
+                                break;
+                            }
+
+                            if (bSolved)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (!bSolved)
+                        {
+                            MessageBox.Show("UNEXPECTED DIFFERENCE (iCmp > 0)!!!");
+                            break;
+                        }
+                    }
+                    else if (iCmp < 0)
+                    {
+                        bool bSolved = false;
+
+                        for (int i = iFldrOrig + 1; i < myTaskOrig.Folders.Count; i++)
+                        {
+                            int iCmp2;
+
+                          //if (myTaskOrig.Folders[i].m_iLevel != myTask.Folders[iFldr].m_iLevel) // FINE-TUNE!!!
+                            if (myTaskOrig.Folders[i].m_iLevel >  myTask.Folders[iFldr].m_iLevel)
+                            {
+                                //Compare only on the same level!!!
+                                continue;
+                            }
+                            else if (myTaskOrig.Folders[i].m_iLevel < myTask.Folders[iFldr].m_iLevel) // FINE-TUNE!!!
+                            {
+                                iCmp2 = 0; // Let it go!
+
+                                iFldr++;
+                            }
+
+                            // IN QUESTION!!!
+                            else if (myTaskOrig.Folders[i].m_i64Size == 0) // FINE-TUNE!!!
+                            {
+                                iCmp2 = 0; // Let it go!
+
+                                iFldr++;
+                            }
+
+                            else
+                            {
+                                iCmp2 = myTaskOrig.Folders[i].m_sPath.CompareTo(myTask.Folders[iFldr].m_sPath);
+                            }
+
+                            if (iCmp2 == 0)
+                            {
+                                for (int j = iFldrOrig; j < i; j++)
+                                {
+                                    lvCompare.Items[j].BackColor = Color.Orange;
+                                }
+
+                                iFldrOrig = i;
+
+                                bSolved = true;
+                                break;
+                            }
+
+                            if (bSolved)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (!bSolved)
+                        {
+                            MessageBox.Show("UNEXPECTED DIFFERENCE (iCmp < 0)!!!");
+                            break;
+                        }
+                    }
+                }
             }
 
             prsMain.Visible = false;
