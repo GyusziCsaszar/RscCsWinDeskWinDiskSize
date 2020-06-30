@@ -64,13 +64,22 @@
             this.label10 = new System.Windows.Forms.Label();
             this.tbTaskID = new System.Windows.Forms.TextBox();
             this.prsSqlSvr = new System.Windows.Forms.ProgressBar();
+            this.label11 = new System.Windows.Forms.Label();
+            this.btnMdbPath = new System.Windows.Forms.Button();
+            this.tbMdbPath = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.btnClearStartFolder = new System.Windows.Forms.Button();
+            this.btnClearDrive = new System.Windows.Forms.Button();
+            this.label13 = new System.Windows.Forms.Label();
+            this.tbExcludedAlways = new System.Windows.Forms.TextBox();
+            this.tbExcludeSysFolders = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(295, 429);
+            this.label1.Location = new System.Drawing.Point(295, 420);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(61, 13);
             this.label1.TabIndex = 0;
@@ -82,18 +91,20 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbDirList.BackColor = System.Drawing.Color.LightYellow;
+            this.lbDirList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lbDirList.FormattingEnabled = true;
-            this.lbDirList.Location = new System.Drawing.Point(17, 171);
+            this.lbDirList.Location = new System.Drawing.Point(17, 200);
             this.lbDirList.Name = "lbDirList";
-            this.lbDirList.Size = new System.Drawing.Size(762, 238);
+            this.lbDirList.Size = new System.Drawing.Size(765, 197);
             this.lbDirList.TabIndex = 1;
             // 
             // btnList
             // 
+            this.btnList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnList.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.btnList.Location = new System.Drawing.Point(15, 23);
             this.btnList.Name = "btnList";
-            this.btnList.Size = new System.Drawing.Size(80, 28);
+            this.btnList.Size = new System.Drawing.Size(60, 28);
             this.btnList.TabIndex = 2;
             this.btnList.Text = "Start";
             this.btnList.UseVisualStyleBackColor = true;
@@ -103,9 +114,10 @@
             // 
             this.btnParse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnParse.Enabled = false;
-            this.btnParse.Location = new System.Drawing.Point(709, 49);
+            this.btnParse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnParse.Location = new System.Drawing.Point(651, 26);
             this.btnParse.Name = "btnParse";
-            this.btnParse.Size = new System.Drawing.Size(68, 23);
+            this.btnParse.Size = new System.Drawing.Size(70, 23);
             this.btnParse.TabIndex = 4;
             this.btnParse.Text = "Continue";
             this.btnParse.UseVisualStyleBackColor = true;
@@ -114,7 +126,8 @@
             // btnDecLevel
             // 
             this.btnDecLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDecLevel.Location = new System.Drawing.Point(359, 425);
+            this.btnDecLevel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDecLevel.Location = new System.Drawing.Point(359, 416);
             this.btnDecLevel.Name = "btnDecLevel";
             this.btnDecLevel.Size = new System.Drawing.Size(24, 23);
             this.btnDecLevel.TabIndex = 5;
@@ -125,8 +138,9 @@
             // txLevel
             // 
             this.txLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txLevel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txLevel.ForeColor = System.Drawing.Color.Red;
-            this.txLevel.Location = new System.Drawing.Point(389, 427);
+            this.txLevel.Location = new System.Drawing.Point(389, 418);
             this.txLevel.Name = "txLevel";
             this.txLevel.ReadOnly = true;
             this.txLevel.Size = new System.Drawing.Size(18, 20);
@@ -137,7 +151,8 @@
             // btnIncLevel
             // 
             this.btnIncLevel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnIncLevel.Location = new System.Drawing.Point(413, 425);
+            this.btnIncLevel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnIncLevel.Location = new System.Drawing.Point(413, 416);
             this.btnIncLevel.Name = "btnIncLevel";
             this.btnIncLevel.Size = new System.Drawing.Size(23, 23);
             this.btnIncLevel.TabIndex = 7;
@@ -147,12 +162,14 @@
             // 
             // lblPercent
             // 
-            this.lblPercent.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblPercent.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblPercent.BackColor = System.Drawing.SystemColors.Info;
             this.lblPercent.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.lblPercent.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.lblPercent.Location = new System.Drawing.Point(162, 29);
+            this.lblPercent.Location = new System.Drawing.Point(14, 4);
             this.lblPercent.Name = "lblPercent";
-            this.lblPercent.Size = new System.Drawing.Size(541, 16);
+            this.lblPercent.Size = new System.Drawing.Size(766, 16);
             this.lblPercent.TabIndex = 8;
             this.lblPercent.Text = "label2";
             this.lblPercent.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -161,10 +178,11 @@
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnStop.Enabled = false;
+            this.btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnStop.Location = new System.Drawing.Point(709, 23);
+            this.btnStop.Location = new System.Drawing.Point(727, 23);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(69, 23);
+            this.btnStop.Size = new System.Drawing.Size(54, 28);
             this.btnStop.TabIndex = 9;
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
@@ -172,10 +190,11 @@
             // 
             // btnCopy
             // 
+            this.btnCopy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCopy.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnCopy.Location = new System.Drawing.Point(17, 71);
+            this.btnCopy.Location = new System.Drawing.Point(14, 129);
             this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(72, 45);
+            this.btnCopy.Size = new System.Drawing.Size(111, 48);
             this.btnCopy.TabIndex = 10;
             this.btnCopy.Text = "Copy Result as Text";
             this.btnCopy.UseVisualStyleBackColor = true;
@@ -185,7 +204,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(98, 430);
+            this.label2.Location = new System.Drawing.Point(98, 421);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(55, 13);
             this.label2.TabIndex = 11;
@@ -194,8 +213,9 @@
             // tbFilterValue
             // 
             this.tbFilterValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbFilterValue.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbFilterValue.ForeColor = System.Drawing.Color.Red;
-            this.tbFilterValue.Location = new System.Drawing.Point(159, 427);
+            this.tbFilterValue.Location = new System.Drawing.Point(159, 418);
             this.tbFilterValue.MaxLength = 4;
             this.tbFilterValue.Name = "tbFilterValue";
             this.tbFilterValue.Size = new System.Drawing.Size(59, 20);
@@ -209,6 +229,8 @@
             // cbUnit
             // 
             this.cbUnit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cbUnit.BackColor = System.Drawing.SystemColors.Info;
+            this.cbUnit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbUnit.FormattingEnabled = true;
             this.cbUnit.Items.AddRange(new object[] {
             "B",
@@ -216,7 +238,7 @@
             "MB",
             "GB",
             "TB"});
-            this.cbUnit.Location = new System.Drawing.Point(224, 427);
+            this.cbUnit.Location = new System.Drawing.Point(224, 418);
             this.cbUnit.Name = "cbUnit";
             this.cbUnit.Size = new System.Drawing.Size(54, 21);
             this.cbUnit.TabIndex = 13;
@@ -226,7 +248,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(612, 429);
+            this.label3.Location = new System.Drawing.Point(615, 420);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(73, 13);
             this.label3.TabIndex = 14;
@@ -235,6 +257,8 @@
             // cbFreez
             // 
             this.cbFreez.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbFreez.BackColor = System.Drawing.SystemColors.Info;
+            this.cbFreez.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbFreez.FormattingEnabled = true;
             this.cbFreez.Items.AddRange(new object[] {
             "500",
@@ -243,7 +267,7 @@
             "2500",
             "5000",
             "9999"});
-            this.cbFreez.Location = new System.Drawing.Point(691, 426);
+            this.cbFreez.Location = new System.Drawing.Point(694, 417);
             this.cbFreez.Name = "cbFreez";
             this.cbFreez.Size = new System.Drawing.Size(60, 21);
             this.cbFreez.TabIndex = 15;
@@ -253,7 +277,7 @@
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(757, 429);
+            this.label4.Location = new System.Drawing.Point(760, 420);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(20, 13);
             this.label4.TabIndex = 16;
@@ -262,7 +286,8 @@
             // btnClearFilters
             // 
             this.btnClearFilters.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClearFilters.Location = new System.Drawing.Point(14, 424);
+            this.btnClearFilters.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClearFilters.Location = new System.Drawing.Point(14, 415);
             this.btnClearFilters.Name = "btnClearFilters";
             this.btnClearFilters.Size = new System.Drawing.Size(75, 23);
             this.btnClearFilters.TabIndex = 17;
@@ -272,36 +297,11 @@
             // 
             // cbDrive
             // 
+            this.cbDrive.BackColor = System.Drawing.SystemColors.Info;
+            this.cbDrive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbDrive.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.cbDrive.FormattingEnabled = true;
-            this.cbDrive.Items.AddRange(new object[] {
-            "A:",
-            "B:",
-            "C:",
-            "D:",
-            "E:",
-            "F:",
-            "G:",
-            "H:",
-            "I:",
-            "J:",
-            "K:",
-            "L:",
-            "M:",
-            "N:",
-            "O:",
-            "P:",
-            "Q:",
-            "R:",
-            "S:",
-            "T:",
-            "U:",
-            "V:",
-            "W:",
-            "X:",
-            "Y:",
-            "Z:"});
-            this.cbDrive.Location = new System.Drawing.Point(101, 23);
+            this.cbDrive.Location = new System.Drawing.Point(163, 23);
             this.cbDrive.Name = "cbDrive";
             this.cbDrive.Size = new System.Drawing.Size(55, 28);
             this.cbDrive.TabIndex = 18;
@@ -312,11 +312,12 @@
             this.tbCaption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbCaption.BackColor = System.Drawing.Color.Silver;
+            this.tbCaption.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbCaption.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.tbCaption.Location = new System.Drawing.Point(15, 155);
+            this.tbCaption.Location = new System.Drawing.Point(15, 180);
             this.tbCaption.Name = "tbCaption";
             this.tbCaption.ReadOnly = true;
-            this.tbCaption.Size = new System.Drawing.Size(764, 20);
+            this.tbCaption.Size = new System.Drawing.Size(767, 20);
             this.tbCaption.TabIndex = 19;
             this.tbCaption.TabStop = false;
             this.tbCaption.Text = "{Hierarchy Level} (SUM of FileSizes) [Most Recent File Creation/Modify (aka Chang" +
@@ -325,17 +326,19 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(100, 75);
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label5.Location = new System.Drawing.Point(79, 31);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(64, 13);
+            this.label5.Size = new System.Drawing.Size(75, 13);
             this.label5.TabIndex = 20;
-            this.label5.Text = "Start Folder:";
+            this.label5.Text = "select Drive";
             // 
             // btnStartFolder
             // 
-            this.btnStartFolder.Location = new System.Drawing.Point(101, 91);
+            this.btnStartFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStartFolder.Location = new System.Drawing.Point(345, 27);
             this.btnStartFolder.Name = "btnStartFolder";
-            this.btnStartFolder.Size = new System.Drawing.Size(55, 23);
+            this.btnStartFolder.Size = new System.Drawing.Size(28, 23);
             this.btnStartFolder.TabIndex = 21;
             this.btnStartFolder.Text = "...";
             this.btnStartFolder.UseVisualStyleBackColor = true;
@@ -345,21 +348,23 @@
             // 
             this.tbStartFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbStartFolder.Location = new System.Drawing.Point(174, 93);
+            this.tbStartFolder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbStartFolder.Location = new System.Drawing.Point(431, 29);
             this.tbStartFolder.Name = "tbStartFolder";
             this.tbStartFolder.ReadOnly = true;
-            this.tbStartFolder.Size = new System.Drawing.Size(603, 20);
+            this.tbStartFolder.Size = new System.Drawing.Size(202, 20);
             this.tbStartFolder.TabIndex = 22;
             this.tbStartFolder.TabStop = false;
             // 
             // chbShort83
             // 
             this.chbShort83.AutoSize = true;
+            this.chbShort83.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chbShort83.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.chbShort83.ForeColor = System.Drawing.Color.Goldenrod;
-            this.chbShort83.Location = new System.Drawing.Point(17, 55);
+            this.chbShort83.Location = new System.Drawing.Point(17, 105);
             this.chbShort83.Name = "chbShort83";
-            this.chbShort83.Size = new System.Drawing.Size(647, 17);
+            this.chbShort83.Size = new System.Drawing.Size(644, 17);
             this.chbShort83.TabIndex = 23;
             this.chbShort83.Text = "Parse and/or Show Short Names (8 + 3 format) //NOTE: On WinX the core system crea" +
     "tes Long Pathes (32K)";
@@ -368,49 +373,52 @@
             // 
             // btnSqlSvr
             // 
+            this.btnSqlSvr.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSqlSvr.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnSqlSvr.Location = new System.Drawing.Point(17, 117);
+            this.btnSqlSvr.Location = new System.Drawing.Point(147, 129);
             this.btnSqlSvr.Name = "btnSqlSvr";
-            this.btnSqlSvr.Size = new System.Drawing.Size(147, 32);
+            this.btnSqlSvr.Size = new System.Drawing.Size(109, 48);
             this.btnSqlSvr.TabIndex = 24;
-            this.btnSqlSvr.Text = "Connect to SQL Server";
+            this.btnSqlSvr.Text = "Connect to DB";
             this.btnSqlSvr.UseVisualStyleBackColor = true;
             this.btnSqlSvr.Click += new System.EventHandler(this.btnSqlSvr_Click);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(172, 120);
+            this.label6.Location = new System.Drawing.Point(262, 131);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(41, 13);
+            this.label6.Size = new System.Drawing.Size(65, 13);
             this.label6.TabIndex = 25;
-            this.label6.Text = "Server:";
+            this.label6.Text = "SQL Server:";
             // 
             // tbServer
             // 
-            this.tbServer.Location = new System.Drawing.Point(213, 117);
+            this.tbServer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbServer.Location = new System.Drawing.Point(327, 129);
             this.tbServer.Name = "tbServer";
             this.tbServer.Size = new System.Drawing.Size(66, 20);
             this.tbServer.TabIndex = 26;
-            this.tbServer.Text = "";
+            this.tbServer.TextChanged += new System.EventHandler(this.tbSqlAny_TextChanged);
             // 
             // chbExcludeSysFolders
             // 
             this.chbExcludeSysFolders.AutoSize = true;
+            this.chbExcludeSysFolders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chbExcludeSysFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.chbExcludeSysFolders.Location = new System.Drawing.Point(17, 3);
+            this.chbExcludeSysFolders.Location = new System.Drawing.Point(78, 83);
             this.chbExcludeSysFolders.Name = "chbExcludeSysFolders";
-            this.chbExcludeSysFolders.Size = new System.Drawing.Size(644, 17);
+            this.chbExcludeSysFolders.Size = new System.Drawing.Size(99, 17);
             this.chbExcludeSysFolders.TabIndex = 27;
-            this.chbExcludeSysFolders.Text = "Exclude System Folders on 1st level (Windows, Program Files, Program Files (x86)," +
-    " Users, ProgramData, etc.)";
+            this.chbExcludeSysFolders.Text = "Also exclude:";
+            this.chbExcludeSysFolders.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.chbExcludeSysFolders.UseVisualStyleBackColor = true;
             this.chbExcludeSysFolders.CheckedChanged += new System.EventHandler(this.chbExcludeSysFolders_CheckedChanged);
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(289, 120);
+            this.label7.Location = new System.Drawing.Point(403, 132);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(25, 13);
             this.label7.TabIndex = 28;
@@ -418,16 +426,18 @@
             // 
             // tbDb
             // 
-            this.tbDb.Location = new System.Drawing.Point(317, 117);
+            this.tbDb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbDb.Location = new System.Drawing.Point(431, 129);
             this.tbDb.Name = "tbDb";
             this.tbDb.Size = new System.Drawing.Size(100, 20);
             this.tbDb.TabIndex = 29;
             this.tbDb.Text = "WinDiskSize";
+            this.tbDb.TextChanged += new System.EventHandler(this.tbSqlAny_TextChanged);
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(427, 120);
+            this.label8.Location = new System.Drawing.Point(541, 132);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(32, 13);
             this.label8.TabIndex = 30;
@@ -435,16 +445,18 @@
             // 
             // tbUser
             // 
-            this.tbUser.Location = new System.Drawing.Point(460, 117);
+            this.tbUser.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbUser.Location = new System.Drawing.Point(574, 129);
             this.tbUser.Name = "tbUser";
             this.tbUser.Size = new System.Drawing.Size(68, 20);
             this.tbUser.TabIndex = 31;
             this.tbUser.Text = "";
+            this.tbUser.TextChanged += new System.EventHandler(this.tbSqlAny_TextChanged);
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(540, 119);
+            this.label9.Location = new System.Drawing.Point(654, 131);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(56, 13);
             this.label9.TabIndex = 32;
@@ -452,29 +464,29 @@
             // 
             // tbPw
             // 
-            this.tbPw.Location = new System.Drawing.Point(597, 117);
+            this.tbPw.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbPw.Location = new System.Drawing.Point(711, 129);
             this.tbPw.Name = "tbPw";
             this.tbPw.Size = new System.Drawing.Size(68, 20);
             this.tbPw.TabIndex = 33;
-            this.tbPw.Text = "";
             this.tbPw.UseSystemPasswordChar = true;
+            this.tbPw.TextChanged += new System.EventHandler(this.tbSqlAny_TextChanged);
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(673, 120);
+            this.label10.Location = new System.Drawing.Point(175, 131);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(48, 13);
+            this.label10.Size = new System.Drawing.Size(66, 13);
             this.label10.TabIndex = 35;
-            this.label10.Text = "Task ID:";
+            this.label10.Text = "DB Task ID:";
             // 
             // tbTaskID
             // 
-            this.tbTaskID.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbTaskID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbTaskID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.tbTaskID.ForeColor = System.Drawing.Color.Red;
-            this.tbTaskID.Location = new System.Drawing.Point(720, 116);
+            this.tbTaskID.Location = new System.Drawing.Point(178, 154);
             this.tbTaskID.Name = "tbTaskID";
             this.tbTaskID.ReadOnly = true;
             this.tbTaskID.Size = new System.Drawing.Size(58, 22);
@@ -484,17 +496,122 @@
             // 
             this.prsSqlSvr.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.prsSqlSvr.Location = new System.Drawing.Point(175, 137);
+            this.prsSqlSvr.BackColor = System.Drawing.SystemColors.Info;
+            this.prsSqlSvr.Location = new System.Drawing.Point(14, 2);
             this.prsSqlSvr.Name = "prsSqlSvr";
-            this.prsSqlSvr.Size = new System.Drawing.Size(602, 12);
+            this.prsSqlSvr.Size = new System.Drawing.Size(766, 17);
             this.prsSqlSvr.TabIndex = 37;
             this.prsSqlSvr.Visible = false;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(262, 158);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(59, 13);
+            this.label11.TabIndex = 38;
+            this.label11.Text = "MDB Path:";
+            // 
+            // btnMdbPath
+            // 
+            this.btnMdbPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMdbPath.Location = new System.Drawing.Point(327, 153);
+            this.btnMdbPath.Name = "btnMdbPath";
+            this.btnMdbPath.Size = new System.Drawing.Size(26, 23);
+            this.btnMdbPath.TabIndex = 39;
+            this.btnMdbPath.Text = "...";
+            this.btnMdbPath.UseVisualStyleBackColor = true;
+            this.btnMdbPath.Click += new System.EventHandler(this.btnMdbPath_Click);
+            // 
+            // tbMdbPath
+            // 
+            this.tbMdbPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbMdbPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbMdbPath.Location = new System.Drawing.Point(359, 155);
+            this.tbMdbPath.Name = "tbMdbPath";
+            this.tbMdbPath.ReadOnly = true;
+            this.tbMdbPath.Size = new System.Drawing.Size(423, 20);
+            this.tbMdbPath.TabIndex = 40;
+            this.tbMdbPath.TabStop = false;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label12.Location = new System.Drawing.Point(282, 32);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(57, 13);
+            this.label12.TabIndex = 41;
+            this.label12.Text = "or Folder";
+            // 
+            // btnClearStartFolder
+            // 
+            this.btnClearStartFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClearStartFolder.Location = new System.Drawing.Point(378, 27);
+            this.btnClearStartFolder.Name = "btnClearStartFolder";
+            this.btnClearStartFolder.Size = new System.Drawing.Size(47, 23);
+            this.btnClearStartFolder.TabIndex = 42;
+            this.btnClearStartFolder.Text = "Clear";
+            this.btnClearStartFolder.UseVisualStyleBackColor = true;
+            this.btnClearStartFolder.Click += new System.EventHandler(this.btnClearStartFolder_Click);
+            // 
+            // btnClearDrive
+            // 
+            this.btnClearDrive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClearDrive.Location = new System.Drawing.Point(224, 26);
+            this.btnClearDrive.Name = "btnClearDrive";
+            this.btnClearDrive.Size = new System.Drawing.Size(47, 23);
+            this.btnClearDrive.TabIndex = 43;
+            this.btnClearDrive.Text = "Clear";
+            this.btnClearDrive.UseVisualStyleBackColor = true;
+            this.btnClearDrive.Click += new System.EventHandler(this.btnClearDrive_Click);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label13.Location = new System.Drawing.Point(14, 61);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(161, 13);
+            this.label13.TabIndex = 44;
+            this.label13.Text = "Exlucluded Level 1 folders:";
+            // 
+            // tbExcludedAlways
+            // 
+            this.tbExcludedAlways.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbExcludedAlways.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbExcludedAlways.Location = new System.Drawing.Point(178, 58);
+            this.tbExcludedAlways.Name = "tbExcludedAlways";
+            this.tbExcludedAlways.Size = new System.Drawing.Size(603, 20);
+            this.tbExcludedAlways.TabIndex = 45;
+            this.tbExcludedAlways.Text = "$RECYCLE.BIN; System Volume Information";
+            // 
+            // tbExcludeSysFolders
+            // 
+            this.tbExcludeSysFolders.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbExcludeSysFolders.Location = new System.Drawing.Point(178, 82);
+            this.tbExcludeSysFolders.Name = "tbExcludeSysFolders";
+            this.tbExcludeSysFolders.Size = new System.Drawing.Size(601, 20);
+            this.tbExcludeSysFolders.TabIndex = 46;
+            this.tbExcludeSysFolders.Text = "Users; Windows; Program Files; Program Files (x86); ProgramData";
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(789, 477);
+            this.BackColor = System.Drawing.SystemColors.Window;
+            this.ClientSize = new System.Drawing.Size(792, 473);
+            this.Controls.Add(this.tbExcludeSysFolders);
+            this.Controls.Add(this.tbExcludedAlways);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.btnClearDrive);
+            this.Controls.Add(this.btnClearStartFolder);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.btnSqlSvr);
+            this.Controls.Add(this.tbMdbPath);
+            this.Controls.Add(this.label11);
             this.Controls.Add(this.prsSqlSvr);
             this.Controls.Add(this.tbTaskID);
             this.Controls.Add(this.label10);
@@ -509,7 +626,6 @@
             this.Controls.Add(this.chbExcludeSysFolders);
             this.Controls.Add(this.tbServer);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.btnSqlSvr);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.chbShort83);
             this.Controls.Add(this.tbStartFolder);
@@ -531,8 +647,10 @@
             this.Controls.Add(this.btnDecLevel);
             this.Controls.Add(this.btnList);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.btnMdbPath);
             this.Name = "FormMain";
             this.Text = "WinDiskSize";
+            this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -576,6 +694,15 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox tbTaskID;
         private System.Windows.Forms.ProgressBar prsSqlSvr;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Button btnMdbPath;
+        private System.Windows.Forms.TextBox tbMdbPath;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Button btnClearStartFolder;
+        private System.Windows.Forms.Button btnClearDrive;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox tbExcludedAlways;
+        private System.Windows.Forms.TextBox tbExcludeSysFolders;
     }
 }
 

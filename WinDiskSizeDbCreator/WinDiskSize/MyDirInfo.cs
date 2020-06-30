@@ -26,13 +26,19 @@ namespace WinDiskSize
 
         public bool bHidden;
 
+        protected Int64 i64Count;
+
+        protected Int64 i64CountSUM;
+
         protected Int64 i64Size;
+
+        protected Int64 i64SizeSUM;
 
         public DateTime dtYoungestFile;
         public bool dtYoungestFile_Valid;
 
-        public int iDirCountNoRecurse;
-        public int iFileCountNoRecurse;
+        public DateTime dtOldestFile;
+        public bool dtOldestFile_Valid;
 
         public MyDirInfo()
         {
@@ -52,25 +58,63 @@ namespace WinDiskSize
 
             bHidden = false;
 
+            i64Count = 0;
+
+            i64CountSUM = 0;
+
             i64Size = 0;
+
+            i64SizeSUM = 0;
 
             dtYoungestFile = new DateTime();
             dtYoungestFile_Valid = false;
 
-            iDirCountNoRecurse  = -1; // N/A
-            iFileCountNoRecurse = -1; // N/A
+            dtOldestFile = new DateTime();
+            dtOldestFile_Valid = false;
         }
 
-        public void AddFileLength(Int64 i64Length)
+        public void AddFileCount(Int64 i64FileCount)
         {
-            if (diParent != null) diParent.AddFileLength(i64Length);
-
-            i64Size += i64Length;
+            i64Count += i64FileCount;
         }
 
-        public Int64 GetSizeSum()
+        public Int64 GetCount()
+        {
+            return i64Count;
+        }
+
+        public void AddFileCountSUM(Int64 i64FileCount)
+        {
+            if (diParent != null) diParent.AddFileCountSUM(i64FileCount);
+
+            i64CountSUM += i64FileCount;
+        }
+
+        public Int64 GetCountSUM()
+        {
+            return i64CountSUM;
+        }
+
+        public void AddFileSize(Int64 i64FileSize)
+        {
+            i64Size += i64FileSize;
+        }
+
+        public Int64 GetSize()
         {
             return i64Size;
+        }
+
+        public void AddFileSizeSUM(Int64 i64FileSize)
+        {
+            if (diParent != null) diParent.AddFileSizeSUM(i64FileSize);
+
+            i64SizeSUM += i64FileSize;
+        }
+
+        public Int64 GetSizeSUM()
+        {
+            return i64SizeSUM;
         }
 
         public void AddFileChangeDate(DateTime dt)
@@ -82,15 +126,24 @@ namespace WinDiskSize
                 dtYoungestFile = dt;
                 dtYoungestFile_Valid = true;
             }
+
+            if ((!dtOldestFile_Valid) || dtOldestFile.CompareTo(dt) > 0)
+            {
+                dtOldestFile = dt;
+                dtOldestFile_Valid = true;
+            }
         }
 
         public void CopyChangeDateTo(MyDirInfo di)
         {
             di.dtYoungestFile = dtYoungestFile;
             di.dtYoungestFile_Valid = dtYoungestFile_Valid;
+
+            di.dtOldestFile = dtOldestFile;
+            di.dtOldestFile_Valid = dtOldestFile_Valid;
         }
 
-        public String ToShortSizeString()
+        public String ToShortSizeString(Int64 i64)
         {
             Int64 i64Div = 1;
             Int64 i64DivNext = 1024;
@@ -99,9 +152,9 @@ namespace WinDiskSize
             for (; ; )
             {
                 iCnt++;
-                if (i64Size < i64DivNext)
+                if (i64 < i64DivNext)
                 {
-                    Int64 i64Res = (i64Size * 10) / i64Div;
+                    Int64 i64Res = (i64 * 10) / i64Div;
                     String sRes = i64Res.ToString();
                     if (i64Res > 0)
                     {
@@ -138,7 +191,7 @@ namespace WinDiskSize
             */
             s += "{" + iLevel.ToString() + "} ";
 
-            String sSum = ToShortSizeString();
+            String sSum = ToShortSizeString(i64SizeSUM);
             if (sSum == "0 B")
             {
               //s += "(" + sSum + ")      "; //Cosmetic only...
@@ -159,6 +212,19 @@ namespace WinDiskSize
             {
                 s += "[NULL]                       "; //Cosmetic only...
             }
+
+            /*
+            s += "\t";
+
+            if (dtOldestFile_Valid)
+            {
+                s += "[" + dtOldestFile.ToShortDateString() + " " + dtOldestFile.ToLongTimeString() + "]";
+            }
+            else
+            {
+                s += "[NULL]                       "; //Cosmetic only...
+            }
+            */
 
             s += "\t";
 
@@ -184,16 +250,6 @@ namespace WinDiskSize
                     s += sPathLong;
                 }
             }
-
-            s += "\t\t";
-
-            s += "// ";
-            s += iDirCountNoRecurse.ToString();
-            s += " dir(s)";
-            s += ", ";
-            s += iFileCountNoRecurse.ToString();
-            s += " file(s)";
-            s += " (no recurse)";
 
             return s;
         }

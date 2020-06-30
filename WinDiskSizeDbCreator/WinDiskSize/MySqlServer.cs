@@ -3,84 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using System.Data;
 using System.Data.SqlClient;
 
 namespace WinDiskSize
 {
-    public class MySqlServer
+    public class MySqlServer : MyDb
     {
 
-        protected string m_sLastError;
+        protected string        m_sServer;
+        protected string        m_sDb;
+        protected string        m_sUser;
+        protected string        m_sPw;
 
-        protected bool m_bIsReady;
-
-        protected string m_sServer;
-        protected string m_sDb;
-        protected string m_sUser;
-        protected string m_sPw;
-
-        protected int m_iTaskID = -1;
+        protected SqlConnection m_conn;
 
         public MySqlServer()
         {
             Close();
         }
 
-        public bool HasLastError
-        {
-            get
-            {
-                return (m_sLastError.Length > 0);
-            }
-        }
-
-        public string LastError
-        {
-            get
-            {
-                return m_sLastError;
-            }
-        }
-
-        public bool IsReady
-        {
-            get
-            {
-                return m_bIsReady;
-            }
-        }
-
-        public int TaskID
-        {
-            get
-            {
-                return m_iTaskID;
-            }
-        }
-
-        public void Close()
-        {
-            m_sLastError = "";
-
-            m_bIsReady = false;
-
-            m_sServer = "";
-            m_sDb = "";
-            m_sUser = "";
-            m_sPw = "";
-
-            m_iTaskID = -1;
-        }
-
         public bool TestConnect(string sServer, string sDb, string sUser, string sPw)
         {
             Close();
 
-            String sConnetionString = "Data Source=" + sServer + ";Initial Catalog=" + sDb + ";User ID=" + sUser + ";Password=" + sPw;
-
-            SqlConnection conn = new SqlConnection(sConnetionString);
             try
             {
+                String sConnetionString = "Data Source=" + sServer + ";Initial Catalog=" + sDb + ";User ID=" + sUser + ";Password=" + sPw;
+                SqlConnection conn = new SqlConnection(sConnetionString);
                 conn.Open();
 
                 SqlTransaction trans = conn.BeginTransaction();
@@ -111,7 +61,23 @@ namespace WinDiskSize
             }
         }
 
-        public bool BeginTask(string sFolderType, string sFolderPath)
+        public override void Close()
+        {
+            base.Close();
+
+            m_sServer = "";
+            m_sDb = "";
+            m_sUser = "";
+            m_sPw = "";
+
+            if (m_conn != null)
+            {
+                m_conn.Close();
+                m_conn = null;
+            }
+        }
+
+        public override bool BeginTask(string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree)
         {
             if (!IsReady)
             {
@@ -121,21 +87,18 @@ namespace WinDiskSize
 
             m_iTaskID = -1;
 
-            String sConnetionString = "Data Source=" + m_sServer + ";Initial Catalog=" + m_sDb + ";User ID=" + m_sUser + ";Password=" + m_sPw;
-
-            SqlConnection conn = new SqlConnection(sConnetionString);
             try
             {
+                String sConnetionString = "Data Source=" + m_sServer + ";Initial Catalog=" + m_sDb + ";User ID=" + m_sUser + ";Password=" + m_sPw;
+                SqlConnection conn = new SqlConnection(sConnetionString);
                 conn.Open();
 
                 SqlTransaction trans1 = conn.BeginTransaction();
 
                 SqlCommand cmdInsert = conn.CreateCommand();
                 cmdInsert.Transaction = trans1;
-                cmdInsert.CommandText = "INSERT INTO dbo.Task (Version, Status, Program, VersionString, Machine, StartDate)"
-                                            +         " VALUES (103, 1, 'WinDiskSize'"
-                                            + ", 'CS2010EXPRESS.103', '"
-                                            + Environment.MachineName + "', SYSDATETIME())";
+                cmdInsert.CommandText = "INSERT INTO dbo.Task (Version, Status, Program, VersionString, Label, StorageSize, StorageFree, Machine, StartDate) VALUES (100, 1, 'WinDiskSize', 'CS2010EXPRESS.100', '" +
+                                            sLabel + "', '" + sStorageSize + "', '" + sStorageFree + "', '" + Environment.MachineName + "', SYSDATETIME())";
                 cmdInsert.ExecuteNonQuery();
 
                 SqlCommand cmdIdentity = conn.CreateCommand();
@@ -169,7 +132,7 @@ namespace WinDiskSize
             }
         }
 
-        public bool AddFolderRAW(int iLevel, string sSizeSUM, string sYoungestFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong, int iDirCountNoRecurse, int iFileCountNoRecurse)
+        public override bool AddFolderRAW(int iTreeLevel, string sCount, string sCountSUM, string sSize, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong)
         {
             if (!IsReady)
             {
@@ -182,33 +145,37 @@ namespace WinDiskSize
                 return false;
             }
 
-            String sConnetionString = "Data Source=" + m_sServer + ";Initial Catalog=" + m_sDb + ";User ID=" + m_sUser + ";Password=" + m_sPw;
-
-            SqlConnection conn = new SqlConnection(sConnetionString);
             try
             {
-                conn.Open();
+                if (m_conn == null)
+                {
+                    String sConnetionString = "Data Source=" + m_sServer + ";Initial Catalog=" + m_sDb + ";User ID=" + m_sUser + ";Password=" + m_sPw;
 
-                SqlTransaction trans1 = conn.BeginTransaction();
+                    SqlConnection conn = new SqlConnection(sConnetionString);
+                    conn.Open();
 
-                sNameShort83 = sNameShort83.Replace("'", "''");
-                sPathShort83 = sPathShort83.Replace("'", "''");
-                sNameLong = sNameLong.Replace("'", "''");
-                sPathLong = sPathLong.Replace("'", "''");
+                    m_conn = conn;
+                }
 
-                SqlCommand cmdInsert = conn.CreateCommand();
+                SqlTransaction trans1 = m_conn.BeginTransaction();
+
+                String sSQL = "INSERT INTO dbo.FolderRAW (TaskID, TreeLevel, FileCountSelf, FileCountSUM, FileSizeSelf, FileSizeSUM, MinFileDate, MaxFileDate, NameShort83, PathShort83, NameLong, PathLong) VALUES ("
+                                                         + m_iTaskID.ToString() + ", " + iTreeLevel.ToString() + ", '" + sCount + "', '" + sCountSUM + "', '" + sSize + "', '" + sSizeSUM + "', "
+                        /* '...' or NULL --> */          + sMinFileDate + ", " + sMaxFileDate
+                                                         + ", @sNameShort83, @sPathShort83, @sNameLong, @sPathLong)";
+
+                SqlCommand cmdInsert = m_conn.CreateCommand();
                 cmdInsert.Transaction = trans1;
-                cmdInsert.CommandText = "INSERT INTO dbo.FolderRAW (TaskID, HierarchyLevel, SizeSUM, YoungestFileDate, NameShort83, PathShort83, NameLong, PathLong"
-                                                    + ", DirCountNoRecurse, FileCountNoRecurse) VALUES ("
-                                                    + m_iTaskID.ToString() + ", " + iLevel.ToString() + ", " + sSizeSUM + ", " + sYoungestFileDate + ", '"
-                                                    + sNameShort83 + "', '" + sPathShort83 + "', '"
-                                                    + sNameLong + "', '" + sPathLong + "', "
-                                                    + iDirCountNoRecurse.ToString() + ", " + iFileCountNoRecurse.ToString() + ")";
+                cmdInsert.CommandText = sSQL;
+
+                cmdInsert.Parameters.Add("@sNameShort83",   SqlDbType.NVarChar).Value = sNameShort83;
+                cmdInsert.Parameters.Add("@sPathShort83",   SqlDbType.NVarChar).Value = sPathShort83;
+                cmdInsert.Parameters.Add("@sNameLong",      SqlDbType.NVarChar).Value = sNameLong;
+                cmdInsert.Parameters.Add("@sPathLong",      SqlDbType.NVarChar).Value = sPathLong;
+
                 cmdInsert.ExecuteNonQuery();
 
                 trans1.Commit();
-
-                conn.Close();
 
                 return true;
             }
@@ -220,7 +187,7 @@ namespace WinDiskSize
             }
         }
 
-        public bool EndTask()
+        public override bool EndTask()
         {
             if (!IsReady)
             {
@@ -233,23 +200,26 @@ namespace WinDiskSize
                 return false;
             }
 
-            String sConnetionString = "Data Source=" + m_sServer + ";Initial Catalog=" + m_sDb + ";User ID=" + m_sUser + ";Password=" + m_sPw;
-
-            SqlConnection conn = new SqlConnection(sConnetionString);
             try
             {
-                conn.Open();
+                if (m_conn == null)
+                {
+                    String sConnetionString = "Data Source=" + m_sServer + ";Initial Catalog=" + m_sDb + ";User ID=" + m_sUser + ";Password=" + m_sPw;
 
-                SqlTransaction trans1 = conn.BeginTransaction();
+                    SqlConnection conn = new SqlConnection(sConnetionString);
+                    conn.Open();
 
-                SqlCommand cmdUpdateEnd = conn.CreateCommand();
+                    m_conn = conn;
+                }
+
+                SqlTransaction trans1 = m_conn.BeginTransaction();
+
+                SqlCommand cmdUpdateEnd = m_conn.CreateCommand();
                 cmdUpdateEnd.Transaction = trans1;
                 cmdUpdateEnd.CommandText = "UPDATE dbo.Task SET EndDate = SYSDATETIME(), Status = 3 WHERE ID=" + m_iTaskID.ToString();
                 cmdUpdateEnd.ExecuteNonQuery();
 
                 trans1.Commit();
-
-                conn.Close();
 
                 return true;
             }
