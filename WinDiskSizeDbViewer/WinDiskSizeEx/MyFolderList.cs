@@ -31,27 +31,45 @@ namespace WinDiskSizeEx
 
     }
 
+    public enum MyFolderState
+    {
+        Unknown,
+
+        Equals,
+
+        DiffersOne,
+        DiffersOther,
+
+        MissingOther,
+        MissingOther_HIDDEN
+    }
+
     public class MyFolder
     {
 
-        public int      m_iLevel;
-        public String   m_sCount;
-        public Int64    m_i64Count;
-        public String   m_sSize;
-        public Int64    m_i64Size;
-        public String   m_sName;
-        public String   m_sPath;
-        public String   m_sFileDateMin;
-        public String   m_sFileDateMax;
-        public String   m_sName83;
-        public String   m_sPath83;
+        public int              m_iLevel;
+        public String           m_sCount;
+        public Int64            m_i64Count;
+        public String           m_sSize;
+        public Int64            m_i64Size;
+        public String           m_sName;
+        public String           m_sPath;
+        public String           m_sFileDateMin;
+        public String           m_sFileDateMax;
+        public String           m_sName83;
+        public String           m_sPath83;
 
-        public String   m_sIndent;  // UI Decoration
+        public String           m_sIndent;  // UI Decoration
 
-      /*public bool     m_bHasChildren;*/ // ROLLED BACK!!!
+      /*public bool             m_bHasChildren;*/ // ROLLED BACK!!!
+
+        public int              m_iTaskIndex;
+        public MyFolderState    m_State;
 
         public MyFolder()
         {
+            m_iTaskIndex    = -1;
+            m_State         = MyFolderState.Unknown;
         }
 
         public string CountAsString
