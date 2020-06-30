@@ -21,7 +21,7 @@ namespace WinDiskSizeEx
 
         protected String m_sInterTabArguments;
 
-        protected MyDb m_db = new MyDb();
+        protected List<MyTask> m_Tasks = new List<MyTask>();
 
         public FormMain()
         {
@@ -82,6 +82,13 @@ namespace WinDiskSizeEx
             }
 
             iCol = -1;
+            foreach (ColumnHeader ch in lvCompareTask.Columns)
+            {
+                iCol++;
+                RegistryWrite("CompareTaskCol" + iCol.ToString(), ch.Width);
+            }
+
+            iCol = -1;
             foreach (ColumnHeader ch in lvCompare.Columns)
             {
                 iCol++;
@@ -121,19 +128,20 @@ namespace WinDiskSizeEx
             return iValue;
         }
 
-        private bool ConnectToDb()
+        private MyDb ConnectToDb(string sInterTabArguments)
         {
-            string[] asArgs = m_sInterTabArguments.Split(';');
+            string[] asArgs = sInterTabArguments.Split(';');
+
             if (asArgs.Length < 3)
             {
-                MessageBox.Show("Unexpected inter-Tab arguments \"" + m_sInterTabArguments + "\"!");
-                return false;
+                MessageBox.Show("Unexpected inter-Tab arguments \"" + sInterTabArguments + "\"!");
+                return null;
             }
 
             if (asArgs[0] != "DB")
             {
-                MessageBox.Show("Unexpected inter-Tab arguments \"" + m_sInterTabArguments + "\"!");
-                return false;
+                MessageBox.Show("Unexpected inter-Tab arguments \"" + sInterTabArguments + "\"!");
+                return null;
             }
 
             if (asArgs[1] == "MDB")
@@ -142,16 +150,13 @@ namespace WinDiskSizeEx
                 mdb.Folder = System.IO.Path.GetDirectoryName(asArgs[2]);
                 mdb.MdbFile = System.IO.Path.GetFileName(asArgs[2]);
 
-                m_db.Close();
-                m_db = mdb;
+                return mdb;
             }
             else
             {
                 MessageBox.Show("Unexpected source type \"" + asArgs[1] + "\"!");
-                return false;
+                return null;
             }
-
-            return true;
         }
 
         private void ListTasks()
@@ -159,7 +164,8 @@ namespace WinDiskSizeEx
             lvTaskList.Items.Clear();
             lvTaskList.Columns.Clear();
 
-            if (!ConnectToDb())
+            MyDb db = ConnectToDb(m_sInterTabArguments);
+            if (db == null)
             {
                 return;
             }
@@ -182,16 +188,16 @@ namespace WinDiskSizeEx
                 }
             }
 
-            if (!m_db.QueryTasks())
+            if (!db.QueryTasks())
             {
-                MessageBox.Show(m_db.LastError);
+                MessageBox.Show(db.LastError);
                 return;
             }
 
-            int iRowCount = m_db.RowCount();
+            int iRowCount = db.RowCount();
             if (iRowCount < 0)
             {
-                MessageBox.Show(m_db.LastError);
+                MessageBox.Show(db.LastError);
                 return;
             }
 
@@ -199,9 +205,9 @@ namespace WinDiskSizeEx
 
             for (int iRow = 0; iRow < iRowCount; iRow++)
             {
-                int iTaskID = m_db.FieldAsInt(iRow, "ID");
+                int iTaskID = db.FieldAsInt(iRow, "ID");
 
-                int iStatus = m_db.FieldAsInt(iRow, "Status");
+                int iStatus = db.FieldAsInt(iRow, "Status");
                 String sStatus = "<unknown>";
                 switch (iStatus)
                 {
@@ -216,106 +222,173 @@ namespace WinDiskSizeEx
                         break;
                 }
 
-                lvTaskList.Items.Add(m_db.FieldAsString(iRow, "Machine"));
+                lvTaskList.Items.Add(db.FieldAsString(iRow, "Machine"));
 
                 lvTaskList.Items[iRow].SubItems.Add(sStatus);
-                lvTaskList.Items[iRow].SubItems.Add(m_db.FieldAsString(iRow, "StartDate"));
-                lvTaskList.Items[iRow].SubItems.Add(m_db.FieldAsString(iRow, "EndDate"));
-                lvTaskList.Items[iRow].SubItems.Add(m_db.FieldAsString(iRow, "FolderType"));
-                lvTaskList.Items[iRow].SubItems.Add(m_db.FieldAsString(iRow, "FolderPath"));
+                lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "StartDate"));
+                lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "EndDate"));
+                lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "FolderType"));
+                lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "FolderPath"));
 
                 lvTaskList.Items[iRow].Tag = iTaskID;
             }
 
             lvTaskList.EndUpdate();
             lvTaskList.Refresh();
+
+            db.Close();
+            db = null;
         }
 
         private void ListFolders()
         {
-            lvCompare.Items.Clear();
-            lvCompare.Columns.Clear();
-
-            lvCompareTask.Items.Clear();
-            lvCompareTask.Columns.Clear();
-
-            if (!ConnectToDb())
+            if (lvCompareTask.Columns.Count == 0)
             {
-                return;
-            }
+                lvCompareTask.Columns.Add("#"); lvCompareTask.Columns[lvCompareTask.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompareTask.Columns.Add("Machine");
+                lvCompareTask.Columns.Add("Status");
+                lvCompareTask.Columns.Add("Started");
+                lvCompareTask.Columns.Add("Completed");
+                lvCompareTask.Columns.Add("Type");
+                lvCompareTask.Columns.Add("Root Folder");
 
-            int iTaskID = -1;
-            string[] asArgs = m_sInterTabArguments.Split(';');
-            for (int i = 0; i < asArgs.Length; i++)
-            {
-                if (asArgs[i] == "TaskID")
+                int iCol = -1;
+                foreach (ColumnHeader ch in lvCompareTask.Columns)
                 {
-                    if (Int32.TryParse(asArgs[i + 1], out iTaskID))
+                    iCol++;
+                    int iWidth = RegistryRead("CompareTaskCol" + iCol.ToString(), -1);
+                    if (iWidth > -1)
                     {
-                        break;
+                        ch.Width = iWidth;
                     }
                 }
             }
-            if (iTaskID < 0)
-            {
-                MessageBox.Show("Unexpected inter-Tab arguments \"" + m_sInterTabArguments + "\"!");
-                return;
-            }
 
-            lvCompare.Columns.Add("Compare");
-            lvCompare.Columns.Add("Size"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
-            lvCompare.Columns.Add("FOLDERS");
-            lvCompare.Columns.Add("File Count"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
-            lvCompare.Columns.Add("File Date (MIN)");
-            lvCompare.Columns.Add("File Date (MAX)");
-            lvCompare.Columns.Add("Path");
-            lvCompare.Columns.Add("FOLDERS (8.3)");
-            lvCompare.Columns.Add("Path (8.3)");
-
-            int iCol = -1;
-            foreach (ColumnHeader ch in lvCompare.Columns)
+            if (lvCompare.Columns.Count == 0)
             {
-                iCol++;
-                int iWidth = RegistryRead("CompareCol" + iCol.ToString(), -1);
-                if (iWidth > -1)
+                lvCompare.Columns.Add("#"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompare.Columns.Add("Size"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompare.Columns.Add("FOLDERS");
+                lvCompare.Columns.Add("File Count"); lvCompare.Columns[lvCompare.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompare.Columns.Add("File Date (MIN)");
+                lvCompare.Columns.Add("File Date (MAX)");
+                lvCompare.Columns.Add("Path");
+                lvCompare.Columns.Add("FOLDERS (8.3)");
+                lvCompare.Columns.Add("Path (8.3)");
+
+                int iCol = -1;
+                foreach (ColumnHeader ch in lvCompare.Columns)
                 {
-                    ch.Width = iWidth;
+                    iCol++;
+                    int iWidth = RegistryRead("CompareCol" + iCol.ToString(), -1);
+                    if (iWidth > -1)
+                    {
+                        ch.Width = iWidth;
+                    }
                 }
             }
 
-            lvCompareTask.Columns.Add("Machine");
-            lvCompareTask.Columns.Add("Status");
-            lvCompareTask.Columns.Add("Started");
-            lvCompareTask.Columns.Add("Completed");
-            lvCompareTask.Columns.Add("Type");
-            lvCompareTask.Columns.Add("Root Folder");
+          //lvCompareTask.Items.Clear();
+            lvCompare.Items.Clear();
 
-          /*int*/ iCol = -1;
-            foreach (ColumnHeader ch in lvCompareTask.Columns)
+            MyTask myTask = null;
+            if (m_Tasks.Count == 0)
             {
-                iCol++;
-                int iWidth = RegistryRead("TaskCol" + iCol.ToString(), -1);
-                if (iWidth > -1)
+                myTask = new MyTask();
+                m_Tasks.Add(myTask);
+
+                myTask.m_sInterTabArguments = m_sInterTabArguments;
+            }
+            else
+            {
+                myTask = m_Tasks[0];
+
+                if (myTask.m_sInterTabArguments != m_sInterTabArguments)
                 {
-                    ch.Width = iWidth;
+                    if (m_sInterTabArguments.IndexOf(";TaskID;") < 0)
+                    {
+                        // RESTORE: Interruped Add with Tasks loaded...
+                        m_sInterTabArguments = myTask.m_sInterTabArguments;
+                    }
+                    else
+                    {
+                        myTask = new MyTask();
+                        m_Tasks.Add(myTask);
+
+                        myTask.m_sInterTabArguments = m_sInterTabArguments;
+                    }
                 }
             }
 
-            if (!m_db.QueryFolders(iTaskID))
+            MyDb db = ConnectToDb(myTask.m_sInterTabArguments);
+            if (db == null)
             {
-                MessageBox.Show(m_db.LastError);
                 return;
             }
 
-            int iRowCount = m_db.RowCount();
+            if (myTask.m_iTaskID < 0)
+            {
+                string[] asArgs = m_sInterTabArguments.Split(';');
+                for (int i = 0; i < asArgs.Length; i++)
+                {
+                    if (asArgs[i] == "TaskID")
+                    {
+                        if (Int32.TryParse(asArgs[i + 1], out myTask.m_iTaskID))
+                        {
+                            lvCompareTask.Items.Add("1");
+                            for (int j = i + 2; j < asArgs.Length; j++)
+                            {
+                                lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(asArgs[j]);
+
+                                switch (j - (i + 2))
+                                {
+                                    case 0:
+                                        myTask.m_sMachine = asArgs[j];
+                                        break;
+                                    case 1:
+                                        myTask.m_sStatus = asArgs[j];
+                                        break;
+                                    case 2:
+                                        myTask.m_sStarted = asArgs[j];
+                                        break;
+                                    case 3:
+                                        myTask.m_sCompleted = asArgs[j];
+                                        break;
+                                    case 4:
+                                        myTask.m_sType = asArgs[j];
+                                        break;
+                                    case 5:
+                                        myTask.m_sPath = asArgs[j];
+                                        break;
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+                if (myTask.m_iTaskID < 0)
+                {
+                    MessageBox.Show("Unexpected inter-Tab arguments \"" + m_sInterTabArguments + "\"!");
+                    return;
+                }
+            }
+
+            if (!db.QueryFolders(myTask.m_iTaskID))
+            {
+                MessageBox.Show(db.LastError);
+                return;
+            }
+
+            int iRowCount = db.RowCount();
             if (iRowCount < 0)
             {
-                MessageBox.Show(m_db.LastError);
+                MessageBox.Show(db.LastError);
                 return;
             }
             if (iRowCount == 0)
             {
-                MessageBox.Show("No folders with TaskID = " + iTaskID.ToString() + "!");
+                MessageBox.Show("No folders with TaskID = " + myTask.m_iTaskID.ToString() + "!");
                 return;
             }
 
@@ -327,8 +400,7 @@ namespace WinDiskSizeEx
             prsMain.Value = 0;
             prsMain.Update();
 
-            List<MyDirItem> aDir = new List<MyDirItem>();
-            MyDirItem diNew;
+            myTask.Folders.Clear();
 
             int     iLevelNext;
             String  sIndent;
@@ -339,48 +411,50 @@ namespace WinDiskSizeEx
                 prsMain.Value = prsMain.Value + 1;
                 prsMain.Update();
 
-                diNew = new MyDirItem();
-                diNew.m_iLevel          = m_db.FieldAsInt(   iRow, "TreeLevel");
-                diNew.SizeAsString      = m_db.FieldAsString(iRow, "SizeSUM");
-                diNew.CountAsString     = m_db.FieldAsString(iRow, "CountSUM");
-                diNew.m_sName = m_db.FieldAsString(iRow, "NameLong");
+                MyFolder fldrNew = new MyFolder();
+                myTask.Folders.Add(fldrNew);
 
-                sTmp = m_db.FieldAsString(iRow, "MinFileDate");
+                fldrNew.m_iLevel        = db.FieldAsInt(iRow, "TreeLevel");
+                fldrNew.SizeAsString    = db.FieldAsString(iRow, "SizeSUM");
+                fldrNew.CountAsString   = db.FieldAsString(iRow, "CountSUM");
+                fldrNew.m_sName         = db.FieldAsString(iRow, "NameLong");
+
+                sTmp = db.FieldAsString(iRow, "MinFileDate");
                 if (sTmp.Length > 5)
                 {
                     sTmp = sTmp.Insert(4, ".");
                     sTmp = sTmp.Insert(7, ".");
                     sTmp = sTmp.Insert(10, ".");
                 }
-                diNew.m_sFileDateMin    = sTmp;
+                fldrNew.m_sFileDateMin  = sTmp;
 
-                sTmp = m_db.FieldAsString(iRow, "MaxFileDate");
+                sTmp = db.FieldAsString(iRow, "MaxFileDate");
                 if (sTmp.Length > 5)
                 {
                     sTmp = sTmp.Insert(4, ".");
                     sTmp = sTmp.Insert(7, ".");
                     sTmp = sTmp.Insert(10, ".");
                 }
-                diNew.m_sFileDateMax = sTmp;
+                fldrNew.m_sFileDateMax  = sTmp;
 
-                diNew.m_sPath           = m_db.FieldAsString(iRow, "PathLong");
-                diNew.m_sName83         = m_db.FieldAsString(iRow, "NameShort83");
-                diNew.m_sPath83         = m_db.FieldAsString(iRow, "PathShort83");
+                fldrNew.m_sPath         = db.FieldAsString(iRow, "PathLong");
+                fldrNew.m_sName83       = db.FieldAsString(iRow, "NameShort83");
+                fldrNew.m_sPath83       = db.FieldAsString(iRow, "PathShort83");
 
                 iLevelNext = -1;
                 if (iRow + 1 < iRowCount)
                 {
-                    iLevelNext = m_db.FieldAsInt(iRow + 1, "TreeLevel");
+                    iLevelNext = db.FieldAsInt(iRow + 1, "TreeLevel");
                 }
 
-                lvCompare.Items.Add("");
+                lvCompare.Items.Add("1");
 
                 sIndent = "";
-                for (int i = 0; i < diNew.m_iLevel; i++)
+                for (int i = 0; i < fldrNew.m_iLevel; i++)
                 {
                     //String sTmp = " ɭ ʟ ʈ | ͢   - _ ¯ ʘ ̶  " + m_db.FieldAsString(iRow, "NameLong");
 
-                    if ((i == diNew.m_iLevel - 1) && (((iLevelNext > -1) && (iLevelNext < diNew.m_iLevel)) || iLevelNext == -1))
+                    if ((i == fldrNew.m_iLevel - 1) && (((iLevelNext > -1) && (iLevelNext < fldrNew.m_iLevel)) || iLevelNext == -1))
                     {
                         sIndent += " ʟ  ";
                     }
@@ -389,17 +463,17 @@ namespace WinDiskSizeEx
                         sIndent += " |  ";
                     }
                 }
-                lvCompare.Items[iRow].SubItems.Add(diNew.SizeAsString);
-                lvCompare.Items[iRow].SubItems.Add(sIndent + diNew.m_sName);
+                lvCompare.Items[iRow].SubItems.Add(fldrNew.SizeAsString);
+                lvCompare.Items[iRow].SubItems.Add(sIndent + fldrNew.m_sName);
 
-                lvCompare.Items[iRow].SubItems.Add(diNew.CountAsString);
-                lvCompare.Items[iRow].SubItems.Add(diNew.m_sFileDateMin);
-                lvCompare.Items[iRow].SubItems.Add(diNew.m_sFileDateMax);
+                lvCompare.Items[iRow].SubItems.Add(fldrNew.CountAsString);
+                lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateMin);
+                lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateMax);
 
-                lvCompare.Items[iRow].SubItems.Add(diNew.m_sPath);
+                lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sPath);
 
-                lvCompare.Items[iRow].SubItems.Add(sIndent + diNew.m_sName83);
-                lvCompare.Items[iRow].SubItems.Add(diNew.m_sPath83);
+                lvCompare.Items[iRow].SubItems.Add(sIndent + fldrNew.m_sName83);
+                lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sPath83);
             }
 
             prsMain.Visible = false;
@@ -407,6 +481,9 @@ namespace WinDiskSizeEx
 
             lvCompare.EndUpdate();
             lvCompare.Refresh();
+
+            db.Close();
+            db = null;
         }
 
         private void viewAny_Enter(object sender, EventArgs e)
@@ -427,6 +504,13 @@ namespace WinDiskSizeEx
 
         private void btnBack_Click(object sender, EventArgs e)
         {
+            if (Views.SelectedTab == viewCompare)
+            {
+                lvCompare.Items.Clear();
+                lvCompareTask.Items.Clear();
+                m_Tasks.Clear();
+            }
+
             if (m_ViewStack.Count > 0)
             {
                 Views.SelectedTab = m_ViewStack[m_ViewStack.Count - 1];
@@ -446,6 +530,14 @@ namespace WinDiskSizeEx
 
                 if (m_ViewStack[m_ViewStack.Count - 1] == viewMain)
                 {
+                    Views.SelectedTab = viewCompare;
+                    btnRefresh.PerformClick();
+                    break;
+                }
+                else if (m_ViewStack[m_ViewStack.Count - 1] == viewCompare)
+                {
+                    m_ViewStack.RemoveAt(m_ViewStack.Count - 1);
+
                     Views.SelectedTab = viewCompare;
                     btnRefresh.PerformClick();
                     break;
@@ -587,6 +679,20 @@ namespace WinDiskSizeEx
                 }
                 else
                 {
+                    foreach (MyTask myTask in m_Tasks)
+                    {
+                        if (myTask.m_iTaskID    != (int)lvTaskList.SelectedItems[0].Tag) continue;
+                        if (myTask.m_sMachine   != lvTaskList.SelectedItems[0].Text) continue;
+                        if (myTask.m_sStatus    != lvTaskList.SelectedItems[0].SubItems[1].Text) continue;
+                        if (myTask.m_sStarted   != lvTaskList.SelectedItems[0].SubItems[2].Text) continue;
+                        if (myTask.m_sCompleted != lvTaskList.SelectedItems[0].SubItems[3].Text) continue;
+                        if (myTask.m_sType      != lvTaskList.SelectedItems[0].SubItems[4].Text) continue;
+                        if (myTask.m_sPath      != lvTaskList.SelectedItems[0].SubItems[5].Text) continue;
+
+                        MessageBox.Show("Task has been already added!");
+                        return;
+                    }
+
                     int iPos = m_sInterTabArguments.IndexOf("TaskID;");
                     if (iPos >= 0)
                     {
@@ -594,6 +700,12 @@ namespace WinDiskSizeEx
                     }
                     if (m_sInterTabArguments.Length > 0) m_sInterTabArguments += ";";
                     m_sInterTabArguments += "TaskID;" + ((int)lvTaskList.SelectedItems[0].Tag).ToString();
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[1].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[2].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[3].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[4].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[5].Text;
 
                     GoBackAndRefresh();
                 }
@@ -602,6 +714,22 @@ namespace WinDiskSizeEx
             {
                 MessageBox.Show("Next is not implemented for View \"" + Views.SelectedTab.Text + "\"!");
             }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            if (Views.SelectedTab == viewCompare)
+            {
+                m_ViewStack.Add(Views.SelectedTab);
+                Views.SelectedTab = viewSource;
+
+                m_sInterTabArguments = "";
+            }
+            else
+            {
+                MessageBox.Show("Add is not implemented for View \"" + Views.SelectedTab.Text + "\"!");
+            }
+
         }
     }
 }

@@ -53,7 +53,7 @@
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
     <Compile Include="MyDb.cs" />
-    <Compile Include="MyDirList.cs" />
+    <Compile Include="MyFolderList.cs" />
     <Compile Include="MyMdb.cs" />
     <Compile Include="MySqlServer.cs" />
     <Compile Include="Program.cs" />

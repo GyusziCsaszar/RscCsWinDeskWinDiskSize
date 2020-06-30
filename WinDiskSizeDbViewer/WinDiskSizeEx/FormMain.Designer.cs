@@ -45,6 +45,7 @@
             this.lvTaskList = new System.Windows.Forms.ListView();
             this.lblTaskList = new System.Windows.Forms.Label();
             this.viewCompare = new System.Windows.Forms.TabPage();
+            this.lvCompareTask = new System.Windows.Forms.ListView();
             this.lvCompare = new System.Windows.Forms.ListView();
             this.btnRefresh = new System.Windows.Forms.Button();
             this.lblCaption = new System.Windows.Forms.Label();
@@ -52,7 +53,7 @@
             this.btnNext = new System.Windows.Forms.Button();
             this.lblViewStack = new System.Windows.Forms.Label();
             this.prsMain = new System.Windows.Forms.ProgressBar();
-            this.lvCompareTask = new System.Windows.Forms.ListView();
+            this.btnAdd = new System.Windows.Forms.Button();
             this.Views.SuspendLayout();
             this.viewMain.SuspendLayout();
             this.viewSource.SuspendLayout();
@@ -257,6 +258,19 @@
             this.viewCompare.Text = "Compare";
             this.viewCompare.Enter += new System.EventHandler(this.viewAny_Enter);
             // 
+            // lvCompareTask
+            // 
+            this.lvCompareTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvCompareTask.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lvCompareTask.FullRowSelect = true;
+            this.lvCompareTask.Location = new System.Drawing.Point(6, 6);
+            this.lvCompareTask.Name = "lvCompareTask";
+            this.lvCompareTask.Size = new System.Drawing.Size(856, 84);
+            this.lvCompareTask.TabIndex = 1;
+            this.lvCompareTask.UseCompatibleStateImageBehavior = false;
+            this.lvCompareTask.View = System.Windows.Forms.View.Details;
+            // 
             // lvCompare
             // 
             this.lvCompare.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -340,17 +354,16 @@
             this.prsMain.TabIndex = 6;
             this.prsMain.Visible = false;
             // 
-            // lvCompareTask
+            // btnAdd
             // 
-            this.lvCompareTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvCompareTask.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lvCompareTask.Location = new System.Drawing.Point(6, 6);
-            this.lvCompareTask.Name = "lvCompareTask";
-            this.lvCompareTask.Size = new System.Drawing.Size(856, 84);
-            this.lvCompareTask.TabIndex = 1;
-            this.lvCompareTask.UseCompatibleStateImageBehavior = false;
-            this.lvCompareTask.View = System.Windows.Forms.View.Details;
+            this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAdd.Location = new System.Drawing.Point(906, 142);
+            this.btnAdd.Name = "btnAdd";
+            this.btnAdd.Size = new System.Drawing.Size(75, 23);
+            this.btnAdd.TabIndex = 7;
+            this.btnAdd.Text = "Add";
+            this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
             // FormMain
             // 
@@ -358,6 +371,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(993, 618);
+            this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.prsMain);
             this.Controls.Add(this.lblViewStack);
             this.Controls.Add(this.btnNext);
@@ -410,6 +424,7 @@
         private System.Windows.Forms.ListView lvTaskList;
         private System.Windows.Forms.Label lblTaskList;
         private System.Windows.Forms.ListView lvCompareTask;
+        private System.Windows.Forms.Button btnAdd;
     }
 }
 
