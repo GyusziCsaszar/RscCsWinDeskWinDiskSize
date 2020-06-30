@@ -1,0 +1,16 @@
+
+Parser SRC from:
+
+	https://www.codeproject.com/Articles/19688/In-C-Use-Win-API-to-Enumerate-File-and-Directory 
+
+
+
+Samples of HUGE (several GB) Windows Files:
+
+	Windows SoftwareDistribution
+
+	Windows LOG CBS folder
+
+	SystemRoot - pagefile.sys
+
+	SystemRoot - hiberfil.sys
