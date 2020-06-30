@@ -53,6 +53,7 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="MyCsv.cs" />
     <Compile Include="MyDb.cs" />
     <Compile Include="MyDirInfo.cs" />
     <Compile Include="MyMdb.cs" />

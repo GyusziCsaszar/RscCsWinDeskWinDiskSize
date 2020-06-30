@@ -16,7 +16,7 @@ namespace WinDiskSize
     public partial class FormMain : Form
     {
 
-        protected const string csAPP_TITLE = "Win Disk Size v3.01";
+        protected const string csAPP_TITLE = "Win Disk Size v3.02";
 
         protected const String csMDB_TEMPLATE = "WinDiskSize_Template.mdb";
 
@@ -131,13 +131,33 @@ namespace WinDiskSize
             tbPw.Text       = RegistryRead("Last SQL Pw",       tbPw.Text);
             chbStorePw.Checked = tbPw.Text.Length > 0;
 
-            string sLastMdbFolder = RegistryRead("Last MDB Folder", "");
-            if (sLastMdbFolder.Length > 0)
+            string sLastMdbCsvFolder = RegistryRead("Last MDB and CSV Folder", "");
+            if (sLastMdbCsvFolder.Length == 0)
             {
-                tbMdbPath.Text = sLastMdbFolder;
-
-                chbMdbPath.Checked = true;
+                //Backward compatibility...
+                sLastMdbCsvFolder = RegistryRead("Last MDB Folder", "");
             }
+            if (sLastMdbCsvFolder.Length > 0)
+            {
+                tbMdbCsvFolderPath.Text = sLastMdbCsvFolder;
+            }
+
+            int iChk;
+
+            iChk = RegistryRead("MDB Instead", 0 /*false*/);
+            if (iChk > 0) chbMdb.Checked = true;
+
+            iChk = RegistryRead("CSV Files Instead", 0 /*false*/);
+            if (iChk > 0) chbCsvFiles.Checked = true;
+
+            tbCsvEol.Text = RegistryRead("CSV File EOL", "\\r\\n");
+
+            tbCsvDelim.Text = RegistryRead("CSV File Delimiter", ";");
+
+            tbCsvFldrLstDelim.Text = RegistryRead("CSV File Folder List Delimiter", "\\");
+
+            iChk = RegistryRead("CSV Files CRC32", 0 /*false*/);
+            if (iChk > 0) chbCsvCrc32.Checked = true;
         }
 
         void FormMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -317,7 +337,7 @@ namespace WinDiskSize
 
                     btnStop.Enabled = false;
 
-                    CopyToSqlServer();
+                    CopyToDatabase();
                 }
                 else
                 {
@@ -334,9 +354,9 @@ namespace WinDiskSize
 
             if (!m_db.IsReady)
             {
-                if (tbMdbPath.Text.Length > 0)
+                if (tbMdbCsvFolderPath.Text.Length > 0)
                 {
-                    if (DialogResult.Yes != MessageBox.Show("INFO: There are Database connection information specified\n(MDB Path: \"" + tbMdbPath.Text + "\")\nBUT not connected to Database!\n\nDo you want to continue?", csAPP_TITLE, MessageBoxButtons.YesNo))
+                    if (DialogResult.Yes != MessageBox.Show("INFO: There are Database connection information specified\n(MDB Path: \"" + tbMdbCsvFolderPath.Text + "\")\nBUT not connected to Database!\n\nDo you want to continue?", csAPP_TITLE, MessageBoxButtons.YesNo))
                     {
                         return;
                     }
@@ -581,6 +601,40 @@ namespace WinDiskSize
 
                 di.AddFileChangeDate(file.CreationTime);
                 di.AddFileChangeDate(file.LastWriteTime);
+
+                if (m_db != null)
+                {
+                    if (m_db.IsReady)
+                    {
+                        string sPathLong;
+                        if (di.sStartFolder.Length > 0)
+                        {
+                            sPathLong = di.sPathLong.Substring(di.sStartFolder.Length - 1);
+                        }
+                        else
+                        {
+                            sPathLong = di.sPathLong;
+                        }
+
+                        if (sPathLong.Length > 0)
+                        {
+                            if (sPathLong[0] == '\\')
+                            {
+                                sPathLong = sPathLong.Substring(1);
+                            }
+                        }
+
+                        if (sPathLong.Length > 0)
+                        {
+                            if (sPathLong[sPathLong.Length - 1] == '\\')
+                            {
+                                sPathLong = sPathLong.Substring(0, sPathLong.Length - 1);
+                            }
+                        }
+
+                        m_db.AddFileRAW(sPathLong, file.Name, file.Length, file.CreationTime, file.LastWriteTime);
+                    }
+                }
             }
 
             di.bParsed = true;
@@ -881,16 +935,16 @@ namespace WinDiskSize
             ListBoxRefresh();
         }
 
-        private void btnSqlSvr_Click(object sender, EventArgs e)
+        private void btnDbConnect_Click(object sender, EventArgs e)
         {
 
             tbTaskID.Text = "";
 
-            if (chbMdbPath.Checked) //tbMdbPath.Text.Length > 0)
+            if (chbMdb.Checked) //tbMdbPath.Text.Length > 0)
             {
-                if (!System.IO.Directory.Exists(tbMdbPath.Text))
+                if (!System.IO.Directory.Exists(tbMdbCsvFolderPath.Text))
                 {
-                    MessageBox.Show("MDB Path \"" + tbMdbPath.Text + "\" does not exist!", csAPP_TITLE);
+                    MessageBox.Show("MDB Folder Path \"" + tbMdbCsvFolderPath.Text + "\" does not exist!", csAPP_TITLE);
                 }
                 else
                 {
@@ -905,17 +959,74 @@ namespace WinDiskSize
                     else
                     {
                         MyMdb mdb = new MyMdb();
-                        mdb.Folder = tbMdbPath.Text;
+                        mdb.Folder = tbMdbCsvFolderPath.Text;
                         mdb.MdbTemplatePath = sMdbTemplatePath;
 
                         m_db.Close();
                         m_db = mdb;
 
-                        btnSqlSvr.Enabled = false;
-                        btnSqlSvr.Visible = false;
+                        btnDbConnect.Enabled = false;
+                        btnDbConnect.Visible = false;
 
-                        RegistryWrite("Last MDB Folder", tbMdbPath.Text);
+                        chbMdb.Enabled = false;
+                        chbCsvFiles.Enabled = false;
+
+                        RegistryWrite("Last MDB and CSV Folder", tbMdbCsvFolderPath.Text);
                     }
+                }
+            }
+            else if (chbCsvFiles.Checked)
+            {
+                if (!System.IO.Directory.Exists(tbMdbCsvFolderPath.Text))
+                {
+                    MessageBox.Show("CSV Folder Path \"" + tbMdbCsvFolderPath.Text + "\" does not exist!", csAPP_TITLE);
+                }
+                else
+                {
+                    MyCsv csv = new MyCsv();
+                    csv.Folder = tbMdbCsvFolderPath.Text;
+
+                    string sTmp;
+
+                    sTmp = tbCsvEol.Text;
+                    sTmp = sTmp.Replace("\\r", "\r");
+                    sTmp = sTmp.Replace("\\n", "\n");
+                    sTmp = sTmp.Replace("\\t", "\t");
+                    if (sTmp.Length > 0)
+                    {
+                        csv.EOL = sTmp;
+                    }
+
+                    sTmp = tbCsvDelim.Text;
+                    sTmp = sTmp.Replace("\\r", "\r");
+                    sTmp = sTmp.Replace("\\n", "\n");
+                    sTmp = sTmp.Replace("\\t", "\t");
+                    if (sTmp.Length > 0)
+                    {
+                        csv.Delimiter = sTmp;
+                    }
+
+                    if (tbCsvFldrLstDelim.Text.Length > 0)
+                    {
+                        csv.FolderListDelimiter = tbCsvFldrLstDelim.Text;
+                    }
+
+                    csv.CRC32 = chbCsvCrc32.Checked;
+
+                    m_db.Close();
+                    m_db = csv;
+
+                    btnDbConnect.Enabled = false;
+                    btnDbConnect.Visible = false;
+
+                    chbMdb.Enabled = false;
+                    chbCsvFiles.Enabled = false;
+
+                    RegistryWrite("Last MDB and CSV Folder", tbMdbCsvFolderPath.Text);
+
+                    RegistryWrite("CSV File EOL", tbCsvEol.Text);
+                    RegistryWrite("CSV File Delimiter", tbCsvDelim.Text);
+                    RegistryWrite("CSV File Folder List Delimiter", tbCsvFldrLstDelim.Text);
                 }
             }
             else
@@ -939,8 +1050,8 @@ namespace WinDiskSize
                     m_db.Close();
                     m_db = sqlsvr;
 
-                    btnSqlSvr.Enabled = false;
-                    btnSqlSvr.Visible = false;
+                    btnDbConnect.Enabled = false;
+                    btnDbConnect.Visible = false;
                 }
             }
 
@@ -958,7 +1069,7 @@ namespace WinDiskSize
             }
         }
 
-        private void CopyToSqlServer()
+        private void CopyToDatabase()
         {
             if (aDi == null) return;
             if (aDi.Count == 0) return;
@@ -1104,16 +1215,16 @@ namespace WinDiskSize
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                tbMdbPath.Text = dlg.SelectedPath;
+                tbMdbCsvFolderPath.Text = dlg.SelectedPath;
 
                 tbServer.Enabled = false;
                 tbDb.Enabled = false;
                 tbUser.Enabled = false;
                 tbPw.Enabled = false;
 
-                chbMdbPath.Checked = true;
+                chbMdb.Checked = true;
 
-                btnSqlSvr.PerformClick();
+                btnDbConnect.PerformClick();
             }
         }
 
@@ -1157,23 +1268,29 @@ namespace WinDiskSize
                 if (tmrWalk.Enabled) return;
             }
 
-            tbMdbPath.Text = "";
+            tbMdbCsvFolderPath.Text = "";
 
-            RegistryWrite("Last MDB Folder", tbMdbPath.Text);
+            RegistryWrite("Last MDB and CSV Folder", tbMdbCsvFolderPath.Text);
 
-            chbMdbPath.Checked = false;
+            chbMdb.Checked = false;
         }
 
         private void chbMdbPath_CheckedChanged(object sender, EventArgs e)
         {
-            if (chbMdbPath.Checked)
+            if (chbMdb.Checked)
             {
-                chbMdbPath.ForeColor = Color.Red;
+                chbCsvFiles.Checked = false;
+
+                chbMdb.ForeColor = Color.Red;
             }
             else
             {
-                chbMdbPath.ForeColor = Color.Black;
+                chbMdb.ForeColor = Color.RoyalBlue;
             }
+
+            int iChk = 0;
+            if (chbMdb.Checked) iChk = 1;
+            RegistryWrite("MDB Instead", iChk);
         }
 
         private void chbStorePw_CheckedChanged(object sender, EventArgs e)
@@ -1188,6 +1305,40 @@ namespace WinDiskSize
 
                 RegistryWrite("Last SQL Pw", "");
             }
+        }
+
+        private void chbCsvFiles_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chbCsvFiles.Checked)
+            {
+                chbMdb.Checked = false;
+
+                chbCsvFiles.ForeColor = Color.Red;
+            }
+            else
+            {
+                chbCsvFiles.ForeColor = Color.RoyalBlue;
+            }
+
+            int iChk = 0;
+            if (chbCsvFiles.Checked) iChk = 1;
+            RegistryWrite("CSV Files Instead", iChk);
+        }
+
+        private void chbCsvCrc32_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chbCsvCrc32.Checked)
+            {
+                chbCsvCrc32.ForeColor = Color.Red;
+            }
+            else
+            {
+                chbCsvCrc32.ForeColor = Color.Black;
+            }
+
+            int iChk = 0;
+            if (chbCsvCrc32.Checked) iChk = 1;
+            RegistryWrite("CSV Files CRC32", iChk);
         }
 
     }

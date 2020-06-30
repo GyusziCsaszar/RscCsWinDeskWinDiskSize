@@ -171,6 +171,11 @@ namespace WinDiskSize
 
         public override bool AddFolderRAW(int iTreeLevel, string sCount, string sCountSUM, string sSize, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong)
         {
+            if (HasLastError)
+            {
+                return false;
+            }
+
             if (!IsReady)
             {
                 m_sLastError = "TestConnect() not called!";
@@ -226,6 +231,11 @@ namespace WinDiskSize
 
         public override bool EndTask()
         {
+            if (HasLastError)
+            {
+                return false;
+            }
+
             if (!IsReady)
             {
                 m_sLastError = "TestConnect() not called!";
