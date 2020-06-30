@@ -65,6 +65,13 @@
             this.prsMain = new System.Windows.Forms.ProgressBar();
             this.btnAdd = new System.Windows.Forms.Button();
             this.lblPrsMain = new System.Windows.Forms.Label();
+            this.btnHome = new System.Windows.Forms.Button();
+            this.lblTabCaptionMain = new System.Windows.Forms.Label();
+            this.lblTabCaptionSource = new System.Windows.Forms.Label();
+            this.lblTabCaptionSourceMdb = new System.Windows.Forms.Label();
+            this.lblTabCaptionTasks = new System.Windows.Forms.Label();
+            this.btnMainOpenReport = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.Views.SuspendLayout();
             this.viewMain.SuspendLayout();
             this.viewSource.SuspendLayout();
@@ -86,51 +93,56 @@
             this.Views.Location = new System.Drawing.Point(12, 56);
             this.Views.Name = "Views";
             this.Views.SelectedIndex = 0;
-            this.Views.Size = new System.Drawing.Size(672, 388);
+            this.Views.Size = new System.Drawing.Size(675, 384);
             this.Views.TabIndex = 0;
             // 
             // viewMain
             // 
             this.viewMain.BackColor = System.Drawing.SystemColors.Window;
+            this.viewMain.Controls.Add(this.label1);
+            this.viewMain.Controls.Add(this.btnMainOpenReport);
+            this.viewMain.Controls.Add(this.lblTabCaptionMain);
             this.viewMain.Controls.Add(this.lblMainOpen);
             this.viewMain.Controls.Add(this.btnMainOpen);
             this.viewMain.Location = new System.Drawing.Point(4, 22);
             this.viewMain.Name = "viewMain";
             this.viewMain.Padding = new System.Windows.Forms.Padding(3);
-            this.viewMain.Size = new System.Drawing.Size(664, 362);
+            this.viewMain.Size = new System.Drawing.Size(667, 358);
             this.viewMain.TabIndex = 1;
-            this.viewMain.Text = "Main";
+            this.viewMain.Text = "Home";
             this.viewMain.Enter += new System.EventHandler(this.viewAny_Enter);
             // 
             // lblMainOpen
             // 
             this.lblMainOpen.AutoSize = true;
-            this.lblMainOpen.Location = new System.Drawing.Point(172, 116);
+            this.lblMainOpen.Location = new System.Drawing.Point(235, 116);
             this.lblMainOpen.Name = "lblMainOpen";
-            this.lblMainOpen.Size = new System.Drawing.Size(147, 13);
+            this.lblMainOpen.Size = new System.Drawing.Size(213, 13);
             this.lblMainOpen.TabIndex = 1;
-            this.lblMainOpen.Text = "Open an existing folder listing.";
+            this.lblMainOpen.Text = "Open an existing Disk Map recorded earlier.";
             // 
             // btnMainOpen
             // 
             this.btnMainOpen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMainOpen.Location = new System.Drawing.Point(73, 111);
             this.btnMainOpen.Name = "btnMainOpen";
-            this.btnMainOpen.Size = new System.Drawing.Size(75, 23);
+            this.btnMainOpen.Size = new System.Drawing.Size(132, 23);
             this.btnMainOpen.TabIndex = 0;
-            this.btnMainOpen.Text = "Open";
+            this.btnMainOpen.Text = "Open Disk Map";
+            this.btnMainOpen.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnMainOpen.UseVisualStyleBackColor = true;
             this.btnMainOpen.Click += new System.EventHandler(this.btnMainOpen_Click);
             // 
             // viewSource
             // 
             this.viewSource.BackColor = System.Drawing.SystemColors.Window;
+            this.viewSource.Controls.Add(this.lblTabCaptionSource);
             this.viewSource.Controls.Add(this.lblSourceMdb);
             this.viewSource.Controls.Add(this.btnSourceMdb);
             this.viewSource.Location = new System.Drawing.Point(4, 22);
             this.viewSource.Name = "viewSource";
             this.viewSource.Padding = new System.Windows.Forms.Padding(3);
-            this.viewSource.Size = new System.Drawing.Size(664, 362);
+            this.viewSource.Size = new System.Drawing.Size(667, 358);
             this.viewSource.TabIndex = 2;
             this.viewSource.Text = "Source";
             this.viewSource.Enter += new System.EventHandler(this.viewAny_Enter);
@@ -138,7 +150,7 @@
             // lblSourceMdb
             // 
             this.lblSourceMdb.AutoSize = true;
-            this.lblSourceMdb.Location = new System.Drawing.Point(172, 116);
+            this.lblSourceMdb.Location = new System.Drawing.Point(235, 116);
             this.lblSourceMdb.Name = "lblSourceMdb";
             this.lblSourceMdb.Size = new System.Drawing.Size(259, 13);
             this.lblSourceMdb.TabIndex = 1;
@@ -149,7 +161,7 @@
             this.btnSourceMdb.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSourceMdb.Location = new System.Drawing.Point(73, 111);
             this.btnSourceMdb.Name = "btnSourceMdb";
-            this.btnSourceMdb.Size = new System.Drawing.Size(75, 23);
+            this.btnSourceMdb.Size = new System.Drawing.Size(132, 23);
             this.btnSourceMdb.TabIndex = 0;
             this.btnSourceMdb.Text = "MDB";
             this.btnSourceMdb.UseVisualStyleBackColor = true;
@@ -158,6 +170,7 @@
             // viewSourceMdb
             // 
             this.viewSourceMdb.BackColor = System.Drawing.SystemColors.Window;
+            this.viewSourceMdb.Controls.Add(this.lblTabCaptionSourceMdb);
             this.viewSourceMdb.Controls.Add(this.lbSourceMdbFolder);
             this.viewSourceMdb.Controls.Add(this.tbSourceMdbFolder);
             this.viewSourceMdb.Controls.Add(this.lblSourceMdbFolderList);
@@ -166,7 +179,7 @@
             this.viewSourceMdb.Location = new System.Drawing.Point(4, 22);
             this.viewSourceMdb.Name = "viewSourceMdb";
             this.viewSourceMdb.Padding = new System.Windows.Forms.Padding(3);
-            this.viewSourceMdb.Size = new System.Drawing.Size(664, 362);
+            this.viewSourceMdb.Size = new System.Drawing.Size(667, 358);
             this.viewSourceMdb.TabIndex = 3;
             this.viewSourceMdb.Text = "Source (.MDB)";
             this.viewSourceMdb.Enter += new System.EventHandler(this.viewAny_Enter);
@@ -209,9 +222,9 @@
             this.lblSourceMdbFolder.AutoSize = true;
             this.lblSourceMdbFolder.Location = new System.Drawing.Point(235, 116);
             this.lblSourceMdbFolder.Name = "lblSourceMdbFolder";
-            this.lblSourceMdbFolder.Size = new System.Drawing.Size(386, 13);
+            this.lblSourceMdbFolder.Size = new System.Drawing.Size(365, 13);
             this.lblSourceMdbFolder.TabIndex = 1;
-            this.lblSourceMdbFolder.Text = "Select folder containing Win Disk Size files (Microsoft Access Database (.MDB)).";
+            this.lblSourceMdbFolder.Text = "Select folder containing Disk Map files (Microsoft Access Database (.MDB)).";
             // 
             // btnSourceMdbFolder
             // 
@@ -227,12 +240,13 @@
             // viewTasks
             // 
             this.viewTasks.BackColor = System.Drawing.SystemColors.Window;
+            this.viewTasks.Controls.Add(this.lblTabCaptionTasks);
             this.viewTasks.Controls.Add(this.lvTaskList);
             this.viewTasks.Controls.Add(this.lblTaskList);
             this.viewTasks.Location = new System.Drawing.Point(4, 22);
             this.viewTasks.Name = "viewTasks";
             this.viewTasks.Padding = new System.Windows.Forms.Padding(3);
-            this.viewTasks.Size = new System.Drawing.Size(664, 362);
+            this.viewTasks.Size = new System.Drawing.Size(667, 358);
             this.viewTasks.TabIndex = 4;
             this.viewTasks.Text = "Tasks";
             this.viewTasks.Enter += new System.EventHandler(this.viewAny_Enter);
@@ -257,9 +271,9 @@
             this.lblTaskList.AutoSize = true;
             this.lblTaskList.Location = new System.Drawing.Point(73, 116);
             this.lblTaskList.Name = "lblTaskList";
-            this.lblTaskList.Size = new System.Drawing.Size(152, 13);
+            this.lblTaskList.Size = new System.Drawing.Size(200, 13);
             this.lblTaskList.TabIndex = 0;
-            this.lblTaskList.Text = "Select a Task in the database.";
+            this.lblTaskList.Text = "Select a Disk Map Task in the database.";
             // 
             // viewCompare
             // 
@@ -279,7 +293,7 @@
             this.viewCompare.Location = new System.Drawing.Point(4, 22);
             this.viewCompare.Name = "viewCompare";
             this.viewCompare.Padding = new System.Windows.Forms.Padding(3);
-            this.viewCompare.Size = new System.Drawing.Size(664, 362);
+            this.viewCompare.Size = new System.Drawing.Size(667, 358);
             this.viewCompare.TabIndex = 0;
             this.viewCompare.Text = "Compare";
             this.viewCompare.Enter += new System.EventHandler(this.viewAny_Enter);
@@ -434,7 +448,7 @@
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRefresh.Location = new System.Drawing.Point(702, 99);
+            this.btnRefresh.Location = new System.Drawing.Point(705, 114);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(75, 23);
             this.btnRefresh.TabIndex = 1;
@@ -457,7 +471,7 @@
             // 
             this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnBack.Location = new System.Drawing.Point(702, 13);
+            this.btnBack.Location = new System.Drawing.Point(705, 56);
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(75, 23);
             this.btnBack.TabIndex = 3;
@@ -469,7 +483,7 @@
             // 
             this.btnNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNext.Location = new System.Drawing.Point(702, 56);
+            this.btnNext.Location = new System.Drawing.Point(705, 85);
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(75, 23);
             this.btnNext.TabIndex = 4;
@@ -495,7 +509,7 @@
             this.prsMain.BackColor = System.Drawing.SystemColors.Info;
             this.prsMain.Location = new System.Drawing.Point(314, 26);
             this.prsMain.Name = "prsMain";
-            this.prsMain.Size = new System.Drawing.Size(370, 23);
+            this.prsMain.Size = new System.Drawing.Size(373, 23);
             this.prsMain.TabIndex = 6;
             this.prsMain.Visible = false;
             // 
@@ -503,11 +517,11 @@
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAdd.Location = new System.Drawing.Point(702, 142);
+            this.btnAdd.Location = new System.Drawing.Point(705, 143);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(75, 23);
+            this.btnAdd.Size = new System.Drawing.Size(75, 45);
             this.btnAdd.TabIndex = 7;
-            this.btnAdd.Text = "Add";
+            this.btnAdd.Text = "Compare with Task...";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
@@ -523,12 +537,89 @@
             this.lblPrsMain.Text = "N/A";
             this.lblPrsMain.Visible = false;
             // 
+            // btnHome
+            // 
+            this.btnHome.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnHome.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHome.Location = new System.Drawing.Point(705, 9);
+            this.btnHome.Name = "btnHome";
+            this.btnHome.Size = new System.Drawing.Size(75, 40);
+            this.btnHome.TabIndex = 9;
+            this.btnHome.Text = "Home";
+            this.btnHome.UseVisualStyleBackColor = true;
+            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
+            // 
+            // lblTabCaptionMain
+            // 
+            this.lblTabCaptionMain.AutoSize = true;
+            this.lblTabCaptionMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionMain.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionMain.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionMain.Name = "lblTabCaptionMain";
+            this.lblTabCaptionMain.Size = new System.Drawing.Size(272, 25);
+            this.lblTabCaptionMain.TabIndex = 3;
+            this.lblTabCaptionMain.Text = "Select what you want to Do";
+            // 
+            // lblTabCaptionSource
+            // 
+            this.lblTabCaptionSource.AutoSize = true;
+            this.lblTabCaptionSource.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionSource.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionSource.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionSource.Name = "lblTabCaptionSource";
+            this.lblTabCaptionSource.Size = new System.Drawing.Size(313, 25);
+            this.lblTabCaptionSource.TabIndex = 4;
+            this.lblTabCaptionSource.Text = "Select the type of the Database";
+            // 
+            // lblTabCaptionSourceMdb
+            // 
+            this.lblTabCaptionSourceMdb.AutoSize = true;
+            this.lblTabCaptionSourceMdb.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionSourceMdb.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionSourceMdb.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionSourceMdb.Name = "lblTabCaptionSourceMdb";
+            this.lblTabCaptionSourceMdb.Size = new System.Drawing.Size(320, 25);
+            this.lblTabCaptionSourceMdb.TabIndex = 5;
+            this.lblTabCaptionSourceMdb.Text = "Select Folder and Database File";
+            // 
+            // lblTabCaptionTasks
+            // 
+            this.lblTabCaptionTasks.AutoSize = true;
+            this.lblTabCaptionTasks.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionTasks.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionTasks.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionTasks.Name = "lblTabCaptionTasks";
+            this.lblTabCaptionTasks.Size = new System.Drawing.Size(396, 25);
+            this.lblTabCaptionTasks.TabIndex = 6;
+            this.lblTabCaptionTasks.Text = "Select a Disk Map Task recorded earlier";
+            // 
+            // btnMainOpenReport
+            // 
+            this.btnMainOpenReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMainOpenReport.Location = new System.Drawing.Point(73, 152);
+            this.btnMainOpenReport.Name = "btnMainOpenReport";
+            this.btnMainOpenReport.Size = new System.Drawing.Size(132, 23);
+            this.btnMainOpenReport.TabIndex = 4;
+            this.btnMainOpenReport.Text = "Open Disk Map Report";
+            this.btnMainOpenReport.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnMainOpenReport.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(235, 157);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(248, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Open an existing Disk Map Report recorded earlier.";
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(789, 477);
+            this.ClientSize = new System.Drawing.Size(792, 473);
+            this.Controls.Add(this.btnHome);
             this.Controls.Add(this.lblPrsMain);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.prsMain);
@@ -597,6 +688,13 @@
         private System.Windows.Forms.Label lblDiffClrMissOneHdn;
         private System.Windows.Forms.Label lblDiffClrMissOne;
         private System.Windows.Forms.Label lblDiffClrEquHnd;
+        private System.Windows.Forms.Button btnHome;
+        private System.Windows.Forms.Label lblTabCaptionMain;
+        private System.Windows.Forms.Label lblTabCaptionSource;
+        private System.Windows.Forms.Label lblTabCaptionSourceMdb;
+        private System.Windows.Forms.Label lblTabCaptionTasks;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnMainOpenReport;
     }
 }
 

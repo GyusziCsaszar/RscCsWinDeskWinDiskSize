@@ -15,10 +15,13 @@ namespace WinDiskSizeEx
     public partial class FormMain : Form
     {
 
+        protected const string csAPP_TITLE = "Win Disk Size Ex v 1.00";
+
         protected const int ciCOMPARE_COL_SIZE  = 2;
         protected const int ciCOMPARE_COL_COUNT = 6;
 
         protected const String csMDB_TEMPLATE = "WinDiskSize_Template.mdb";
+        protected const String csMDB_MAP_PREFIX = "WinDiskSizeMap";
 
         protected List<TabPage> m_ViewStack = new List<TabPage>();
 
@@ -30,16 +33,22 @@ namespace WinDiskSizeEx
         StatusBarPanel sbPanelLb;
         StatusBarPanel sbPanelLevel;
 
+        protected int m_iTickCountLast;
+
         // Settings
         protected bool m_bSetting_CompareFileDateTime           = false;
         protected bool m_bSetting_CompareFileDateOnly           = false;
         protected bool m_bSetting_HideChildrenOfMissingFolder   = true;
         protected bool m_bSetting_HideChildrenOfEqualFolder     = true;
         protected bool m_bSetting_DoubleCheck                   = true;
+        protected int  m_iFreez                                 = 500;  // Milliseconds
 
         public FormMain()
         {
             InitializeComponent();
+
+            this.Text = csAPP_TITLE;
+            lblCaption.Text = csAPP_TITLE;
 
             // SRC: https://stackoverflow.com/questions/552579/how-to-hide-tabpage-from-tabcontrol
             Views.Appearance = TabAppearance.FlatButtons;
@@ -104,18 +113,24 @@ namespace WinDiskSizeEx
 
         private void FormMain_Shown(object sender, EventArgs e)
         {
-            this.Left   = RegistryRead("Main_Left",     this.Left);
-            this.Top    = RegistryRead("Main_Top",      this.Top);
-            this.Width  = RegistryRead("Main_Width",    this.Width);
-            this.Height = RegistryRead("Main_Height",   this.Height);
+            this.Left = Math.Max(0, RegistryRead("Main_Left", this.Left));
+            this.Top = Math.Max(0, RegistryRead("Main_Top", this.Top));
+            this.Width = Math.Max(800, RegistryRead("Main_Width", this.Width));
+            this.Height = Math.Max(500, RegistryRead("Main_Height", this.Height));
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryWrite("Main_Left",   this.Left);
-            RegistryWrite("Main_Top",    this.Top);
-            RegistryWrite("Main_Width",  this.Width);
-            RegistryWrite("Main_Height", this.Height);
+            if (lblPrsMain.Visible)
+            {
+                e.Cancel = true;
+                return; //In Progress...
+            }
+
+            if (this.Left >= 0) RegistryWrite("Main_Left", this.Left);
+            if (this.Top >= 0) RegistryWrite("Main_Top", this.Top);
+            if (this.Width >= 800) RegistryWrite("Main_Width", this.Width);
+            if (this.Height >= 500) RegistryWrite("Main_Height", this.Height);
 
             int iCol;
             
@@ -179,13 +194,13 @@ namespace WinDiskSizeEx
 
             if (asArgs.Length < 3)
             {
-                MessageBox.Show("Unexpected inter-Tab arguments \"" + sInterTabArguments + "\"!");
+                MessageBox.Show("Unexpected inter-Tab arguments \"" + sInterTabArguments + "\"!", csAPP_TITLE);
                 return null;
             }
 
             if (asArgs[0] != "DB")
             {
-                MessageBox.Show("Unexpected inter-Tab arguments \"" + sInterTabArguments + "\"!");
+                MessageBox.Show("Unexpected inter-Tab arguments \"" + sInterTabArguments + "\"!", csAPP_TITLE);
                 return null;
             }
 
@@ -199,7 +214,7 @@ namespace WinDiskSizeEx
             }
             else
             {
-                MessageBox.Show("Unexpected source type \"" + asArgs[1] + "\"!");
+                MessageBox.Show("Unexpected source type \"" + asArgs[1] + "\"!", csAPP_TITLE);
                 return null;
             }
         }
@@ -216,6 +231,9 @@ namespace WinDiskSizeEx
             }
 
             lvTaskList.Columns.Add("Task ID"); lvTaskList.Columns[lvTaskList.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+            lvTaskList.Columns.Add("Label");
+            lvTaskList.Columns.Add("Total Size"); lvTaskList.Columns[lvTaskList.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+            lvTaskList.Columns.Add("Free Space"); lvTaskList.Columns[lvTaskList.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
             lvTaskList.Columns.Add("Machine");
             lvTaskList.Columns.Add("Status");
             lvTaskList.Columns.Add("Started");
@@ -236,14 +254,14 @@ namespace WinDiskSizeEx
 
             if (!db.QueryTasks())
             {
-                MessageBox.Show(db.LastError);
+                MessageBox.Show(db.LastError, csAPP_TITLE);
                 return;
             }
 
             int iRowCount = db.RowCount();
             if (iRowCount < 0)
             {
-                MessageBox.Show(db.LastError);
+                MessageBox.Show(db.LastError, csAPP_TITLE);
                 return;
             }
 
@@ -270,6 +288,31 @@ namespace WinDiskSizeEx
 
                 lvTaskList.Items.Add(iTaskID.ToString());
 
+                lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "Label"));
+
+                string sTmp;
+                sTmp = db.FieldAsString(iRow, "StorageSize");
+                if (sTmp.Length > 0)
+                {
+                    Int64 i64 = 0;
+                    if (Int64.TryParse(sTmp, out i64))
+                    {
+                        sTmp = MyFolder.ToShortSizeString(i64);
+                    }
+                }
+                lvTaskList.Items[iRow].SubItems.Add(sTmp);
+
+                sTmp = db.FieldAsString(iRow, "StorageFree");
+                if (sTmp.Length > 0)
+                {
+                    Int64 i64 = 0;
+                    if (Int64.TryParse(sTmp, out i64))
+                    {
+                        sTmp = MyFolder.ToShortSizeString(i64);
+                    }
+                }
+                lvTaskList.Items[iRow].SubItems.Add(sTmp);
+
                 lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "Machine"));
                 lvTaskList.Items[iRow].SubItems.Add(sStatus);
                 lvTaskList.Items[iRow].SubItems.Add(db.FieldAsString(iRow, "StartDate"));
@@ -293,6 +336,9 @@ namespace WinDiskSizeEx
             {
                 lvCompareTask.Columns.Add("Active");
                 lvCompareTask.Columns.Add("#"); lvCompareTask.Columns[lvCompareTask.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompareTask.Columns.Add("Label");
+                lvCompareTask.Columns.Add("Total Size"); lvCompareTask.Columns[lvCompareTask.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
+                lvCompareTask.Columns.Add("Free Space"); lvCompareTask.Columns[lvCompareTask.Columns.Count - 1].TextAlign = HorizontalAlignment.Right;
                 lvCompareTask.Columns.Add("Machine");
                 lvCompareTask.Columns.Add("Status");
                 lvCompareTask.Columns.Add("Started");
@@ -409,21 +455,30 @@ namespace WinDiskSizeEx
                                 switch (j - (i + 2))
                                 {
                                     case 0:
-                                        myTask.m_sMachine = asArgs[j];
+                                        myTask.m_sLabel = asArgs[j];
                                         break;
                                     case 1:
-                                        myTask.m_sStatus = asArgs[j];
+                                        myTask.m_sTotalSize = asArgs[j];
                                         break;
                                     case 2:
-                                        myTask.m_sStarted = asArgs[j];
+                                        myTask.m_sFreeSpace = asArgs[j];
                                         break;
                                     case 3:
-                                        myTask.m_sCompleted = asArgs[j];
+                                        myTask.m_sMachine = asArgs[j];
                                         break;
                                     case 4:
-                                        myTask.m_sType = asArgs[j];
+                                        myTask.m_sStatus = asArgs[j];
                                         break;
                                     case 5:
+                                        myTask.m_sStarted = asArgs[j];
+                                        break;
+                                    case 6:
+                                        myTask.m_sCompleted = asArgs[j];
+                                        break;
+                                    case 7:
+                                        myTask.m_sType = asArgs[j];
+                                        break;
+                                    case 8:
                                         myTask.m_sPath = asArgs[j];
                                         break;
                                 }
@@ -435,26 +490,26 @@ namespace WinDiskSizeEx
                 }
                 if (myTask.m_iTaskID < 0)
                 {
-                    MessageBox.Show("Unexpected inter-Tab arguments \"" + m_sInterTabArguments + "\"!");
+                    MessageBox.Show("Unexpected inter-Tab arguments \"" + m_sInterTabArguments + "\"!", csAPP_TITLE);
                     return;
                 }
             }
 
             if (!db.QueryFolders(myTask.m_iTaskID))
             {
-                MessageBox.Show(db.LastError);
+                MessageBox.Show(db.LastError, csAPP_TITLE);
                 return;
             }
 
             int iRowCount = db.RowCount();
             if (iRowCount < 0)
             {
-                MessageBox.Show(db.LastError);
+                MessageBox.Show(db.LastError, csAPP_TITLE);
                 return;
             }
             if (iRowCount == 0)
             {
-                MessageBox.Show("No folders with TaskID = " + myTask.m_iTaskID.ToString() + "!");
+                MessageBox.Show("No folders with TaskID = " + myTask.m_iTaskID.ToString() + "!", csAPP_TITLE);
                 return;
             }
 
@@ -468,6 +523,7 @@ namespace WinDiskSizeEx
             prsMain.Maximum = iRowCount;
             prsMain.Value = 0;
             prsMain.Update();
+            m_iTickCountLast = Environment.TickCount;
 
             myTask.Folders.Clear();
             myTask.m_iMaxLevel = 0;
@@ -480,6 +536,11 @@ namespace WinDiskSizeEx
             {
                 prsMain.Value = Math.Min(prsMain.Maximum, prsMain.Value + 1); ;
                 prsMain.Update();
+                if (Environment.TickCount - m_iTickCountLast > m_iFreez)
+                {
+                    m_iTickCountLast = Environment.TickCount;
+                    Application.DoEvents();
+                }
 
                 MyFolder fldrNew = new MyFolder();
                 myTask.Folders.Add(fldrNew);
@@ -605,6 +666,9 @@ namespace WinDiskSizeEx
                 myTaskRes.m_sStarted = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
                 lvCompareTask.Items.Add(">>");
                 lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(lvCompareTask.Items.Count.ToString());
+                lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(myTaskRes.m_sLabel);
+                lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(myTaskRes.m_sTotalSize);
+                lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(myTaskRes.m_sFreeSpace);
                 lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(myTaskRes.m_sMachine);
                 lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(myTaskRes.m_sStatus);
                 lvCompareTask.Items[lvCompareTask.Items.Count - 1].SubItems.Add(myTaskRes.m_sStarted);
@@ -620,6 +684,7 @@ namespace WinDiskSizeEx
                 prsMain.Maximum = Math.Max(myTaskOrig.Folders.Count, myTask.Folders.Count);
                 prsMain.Value = 0;
                 prsMain.Update();
+                m_iTickCountLast = Environment.TickCount;
 
                 int iFldrOrig = 0;
                 int iFldr = 0;
@@ -627,6 +692,11 @@ namespace WinDiskSizeEx
                 {
                     prsMain.Value = Math.Min(prsMain.Maximum, prsMain.Value + 1);
                     prsMain.Update();
+                    if (Environment.TickCount - m_iTickCountLast > m_iFreez)
+                    {
+                        m_iTickCountLast = Environment.TickCount;
+                        Application.DoEvents();
+                    }
 
                     if (iFldrOrig >= myTaskOrig.Folders.Count && iFldr >= myTask.Folders.Count)
                     {
@@ -1109,6 +1179,7 @@ namespace WinDiskSizeEx
                     prsMain.Maximum = myTaskOrig.Folders.Count;
                     prsMain.Value = 0;
                     prsMain.Update();
+                    m_iTickCountLast = Environment.TickCount;
 
                     MyFolder fldrPrev = null;
                     MyFolder fldr;
@@ -1124,6 +1195,11 @@ namespace WinDiskSizeEx
 
                         prsMain.Value = Math.Min(prsMain.Maximum, prsMain.Value + 1);
                         prsMain.Update();
+                        if (Environment.TickCount - m_iTickCountLast > m_iFreez)
+                        {
+                            m_iTickCountLast = Environment.TickCount;
+                            Application.DoEvents();
+                        }
 
                         fldr = myTaskOrig.Folders[iFldrOrig];
 
@@ -1208,6 +1284,7 @@ namespace WinDiskSizeEx
                         prsMain.Maximum = myTaskOrig.Folders.Count;
                         prsMain.Value = 0;
                         prsMain.Update();
+                        m_iTickCountLast = Environment.TickCount;
 
                         MyFolder fldrPrev = null;
                         MyFolder fldr;
@@ -1223,6 +1300,11 @@ namespace WinDiskSizeEx
 
                             prsMain.Value = Math.Min(prsMain.Maximum, prsMain.Value + 1);
                             prsMain.Update();
+                            if (Environment.TickCount - m_iTickCountLast > m_iFreez)
+                            {
+                                m_iTickCountLast = Environment.TickCount;
+                                Application.DoEvents();
+                            }
 
                             fldr = myTaskOrig.Folders[iFldrOrig];
                             if ((fldr.m_iTaskIndex != iTaskIndex) && (fldr.m_State != MyFolderState.Equals) && (fldr.m_State != MyFolderState.Equals_HIDDEN))
@@ -1312,7 +1394,7 @@ namespace WinDiskSizeEx
 
                     if (bMissMatch)
                     {
-                        MessageBox.Show("Double check found missmatches!\n\nSee yellow (state: Unknown (ERROR)) items for more information!");
+                        MessageBox.Show("Double check found missmatches!\n\nSee yellow (state: Unknown (ERROR)) items for more information!", csAPP_TITLE);
                     }
                 }
 
@@ -1361,6 +1443,7 @@ namespace WinDiskSizeEx
             prsMain.Maximum = myTask.Folders.Count;
             prsMain.Value = 0;
             prsMain.Update();
+            m_iTickCountLast = Environment.TickCount;
 
             lvCompare.Items.Clear();
 
@@ -1368,6 +1451,11 @@ namespace WinDiskSizeEx
             {
                 prsMain.Value = Math.Min(prsMain.Maximum, prsMain.Value + 1); ;
                 prsMain.Update();
+                if (Environment.TickCount - m_iTickCountLast > m_iFreez)
+                {
+                    m_iTickCountLast = Environment.TickCount;
+                    Application.DoEvents();
+                }
 
                 MyFolder fldr = myTask.Folders[iFldr];
 
@@ -1507,7 +1595,21 @@ namespace WinDiskSizeEx
             lblViewStack.Text = sTmp;
         }
 
+        private void btnHome_Click(object sender, EventArgs e)
+        {
+            if (lblPrsMain.Visible) return; //In Progress...
+
+            while (DoBack()) ;
+        }
+
         private void btnBack_Click(object sender, EventArgs e)
+        {
+            if (lblPrsMain.Visible) return; //In Progress...
+
+            DoBack();
+        }
+
+        private bool DoBack()
         {
             if (Views.SelectedTab == viewCompare)
             {
@@ -1525,7 +1627,11 @@ namespace WinDiskSizeEx
                 m_ViewStack.RemoveAt(m_ViewStack.Count - 1);
 
                 viewAny_Enter(Views.SelectedTab, EventArgs.Empty);
+
+                return true;
             }
+
+            return false;
         }
 
         private void GoBackAndRefresh()
@@ -1594,6 +1700,8 @@ namespace WinDiskSizeEx
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
+            if (lblPrsMain.Visible) return; //In Progress...
+
             if (Views.SelectedTab == viewSourceMdb)
             {
                 String sFolder = tbSourceMdbFolder.Text;
@@ -1604,22 +1712,25 @@ namespace WinDiskSizeEx
 
                     if (!System.IO.Directory.Exists(sFolder))
                     {
-                        MessageBox.Show("Folder \"" + sFolder + "\" does not exist!");
+                        MessageBox.Show("Folder \"" + sFolder + "\" does not exist!", csAPP_TITLE);
                     }
                     else
                     {
                         RegistryWrite("Last MDB Folder", sFolder);
 
-                        string[] asFiles = System.IO.Directory.GetFiles(sFolder, "*.mdb");
+                        string[] asFiles = System.IO.Directory.GetFiles(sFolder, csMDB_MAP_PREFIX + "*.mdb");
                         foreach (string sFile in asFiles)
                         {
-                            lbSourceMdbFolder.Items.Add(System.IO.Path.GetFileName(sFile));
+                            string sTmp = System.IO.Path.GetFileName(sFile);
+                            sTmp = sTmp.Substring(csMDB_MAP_PREFIX.Length);
+                            sTmp = sTmp.Substring(0, sTmp.Length - 4);
+                            lbSourceMdbFolder.Items.Add(sTmp);
                         }
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Select a folder first!");
+                    MessageBox.Show("Select a folder first!", csAPP_TITLE);
                 }
             }
             else if (Views.SelectedTab == viewTasks)
@@ -1632,7 +1743,7 @@ namespace WinDiskSizeEx
             }
             else
             {
-                MessageBox.Show("Refresh is not implemented for View \"" + Views.SelectedTab.Text + "\"!");
+                MessageBox.Show("Refresh is not implemented for View \"" + Views.SelectedTab.Text + "\"!", csAPP_TITLE);
             }
         }
 
@@ -1653,17 +1764,21 @@ namespace WinDiskSizeEx
 
         private void btnNext_Click(object sender, EventArgs e)
         {
+            if (lblPrsMain.Visible) return; //In Progress...
+
             if (Views.SelectedTab == viewSourceMdb)
             {
                 if (lbSourceMdbFolder.SelectedIndex < 0)
                 {
-                    MessageBox.Show("Select a file first!");
+                    MessageBox.Show("Select a file first!", csAPP_TITLE);
                 }
                 else
                 {
                     String sPath = tbSourceMdbFolder.Text;
                     if (sPath[sPath.Length - 1] != '\\') sPath += "\\";
+                    sPath += csMDB_MAP_PREFIX;
                     sPath += (string) lbSourceMdbFolder.Items[lbSourceMdbFolder.SelectedIndex];
+                    sPath += ".mdb";
 
                     int iPos = m_sInterTabArguments.IndexOf("DB;");
                     if (iPos >= 0)
@@ -1683,21 +1798,24 @@ namespace WinDiskSizeEx
             {
                 if (lvTaskList.SelectedItems.Count == 0)
                 {
-                    MessageBox.Show("Select a Task first!");
+                    MessageBox.Show("Select a Task first!", csAPP_TITLE);
                 }
                 else
                 {
                     foreach (MyTask myTask in m_Tasks)
                     {
                         if (myTask.m_iTaskID    != (int)lvTaskList.SelectedItems[0].Tag) continue;
-                        if (myTask.m_sMachine   != lvTaskList.SelectedItems[0].SubItems[1].Text) continue;
-                        if (myTask.m_sStatus    != lvTaskList.SelectedItems[0].SubItems[2].Text) continue;
-                        if (myTask.m_sStarted   != lvTaskList.SelectedItems[0].SubItems[3].Text) continue;
-                        if (myTask.m_sCompleted != lvTaskList.SelectedItems[0].SubItems[4].Text) continue;
-                        if (myTask.m_sType      != lvTaskList.SelectedItems[0].SubItems[5].Text) continue;
-                        if (myTask.m_sPath      != lvTaskList.SelectedItems[0].SubItems[6].Text) continue;
+                        if (myTask.m_sLabel     != lvTaskList.SelectedItems[0].SubItems[1].Text) continue;
+                        if (myTask.m_sTotalSize != lvTaskList.SelectedItems[0].SubItems[2].Text) continue;
+                        if (myTask.m_sFreeSpace != lvTaskList.SelectedItems[0].SubItems[3].Text) continue;
+                        if (myTask.m_sMachine   != lvTaskList.SelectedItems[0].SubItems[4].Text) continue;
+                        if (myTask.m_sStatus    != lvTaskList.SelectedItems[0].SubItems[5].Text) continue;
+                        if (myTask.m_sStarted   != lvTaskList.SelectedItems[0].SubItems[6].Text) continue;
+                        if (myTask.m_sCompleted != lvTaskList.SelectedItems[0].SubItems[7].Text) continue;
+                        if (myTask.m_sType      != lvTaskList.SelectedItems[0].SubItems[8].Text) continue;
+                        if (myTask.m_sPath      != lvTaskList.SelectedItems[0].SubItems[9].Text) continue;
 
-                        MessageBox.Show("Task has been already added!");
+                        MessageBox.Show("Task has been already added!", csAPP_TITLE);
                         return;
                     }
 
@@ -1714,23 +1832,28 @@ namespace WinDiskSizeEx
                     m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[4].Text;
                     m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[5].Text;
                     m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[6].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[7].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[8].Text;
+                    m_sInterTabArguments += ";" + lvTaskList.SelectedItems[0].SubItems[9].Text;
 
                     GoBackAndRefresh();
                 }
             }
             else
             {
-                MessageBox.Show("Next is not implemented for View \"" + Views.SelectedTab.Text + "\"!");
+                MessageBox.Show("Next is not implemented for View \"" + Views.SelectedTab.Text + "\"!", csAPP_TITLE);
             }
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
+            if (lblPrsMain.Visible) return; //In Progress...
+
             if (Views.SelectedTab == viewCompare)
             {
                 if (m_Tasks.Count > 1)
                 {
-                    MessageBox.Show("The maximum allowed one more Task has been already added!");
+                    MessageBox.Show("The maximum allowed one more Task has been already added!", csAPP_TITLE);
                     return;
                 }
 
@@ -1741,7 +1864,7 @@ namespace WinDiskSizeEx
             }
             else
             {
-                MessageBox.Show("Add is not implemented for View \"" + Views.SelectedTab.Text + "\"!");
+                MessageBox.Show("Add is not implemented for View \"" + Views.SelectedTab.Text + "\"!", csAPP_TITLE);
             }
 
         }
@@ -1750,14 +1873,14 @@ namespace WinDiskSizeEx
         {
             if (lvCompareTask.SelectedIndices.Count == 0)
             {
-                MessageBox.Show("Select a Task first!");
+                MessageBox.Show("Select a Task first!", csAPP_TITLE);
                 return;
             }
 
             int iTaskIdx = lvCompareTask.SelectedIndices[0];
             if (lvCompareTask.Items[iTaskIdx].Text == ">>")
             {
-                MessageBox.Show("Selected Task is already listed!");
+                MessageBox.Show("Selected Task is already listed!", csAPP_TITLE);
                 return;
             }
 

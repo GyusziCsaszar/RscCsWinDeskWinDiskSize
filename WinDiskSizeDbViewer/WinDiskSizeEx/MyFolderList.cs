@@ -12,6 +12,9 @@ namespace WinDiskSizeEx
         public string           m_sInterTabArguments;
 
         public int              m_iTaskID;
+        public string           m_sLabel;
+        public string           m_sTotalSize;
+        public string           m_sFreeSpace;
         public string           m_sMachine;
         public string           m_sStatus;
         public string           m_sStarted;
@@ -168,7 +171,7 @@ namespace WinDiskSizeEx
             }
         }
 
-        public String ToShortSizeString(Int64 i64)
+        public static String ToShortSizeString(Int64 i64)
         {
             Int64 i64Div = 1;
             Int64 i64DivNext = 1024;
