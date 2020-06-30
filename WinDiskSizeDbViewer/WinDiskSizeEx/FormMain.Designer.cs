@@ -54,6 +54,7 @@
             this.lblViewStack = new System.Windows.Forms.Label();
             this.prsMain = new System.Windows.Forms.ProgressBar();
             this.btnAdd = new System.Windows.Forms.Button();
+            this.lblPrsMain = new System.Windows.Forms.Label();
             this.Views.SuspendLayout();
             this.viewMain.SuspendLayout();
             this.viewSource.SuspendLayout();
@@ -75,7 +76,7 @@
             this.Views.Location = new System.Drawing.Point(12, 56);
             this.Views.Name = "Views";
             this.Views.SelectedIndex = 0;
-            this.Views.Size = new System.Drawing.Size(876, 550);
+            this.Views.Size = new System.Drawing.Size(672, 388);
             this.Views.TabIndex = 0;
             // 
             // viewMain
@@ -86,7 +87,7 @@
             this.viewMain.Location = new System.Drawing.Point(4, 22);
             this.viewMain.Name = "viewMain";
             this.viewMain.Padding = new System.Windows.Forms.Padding(3);
-            this.viewMain.Size = new System.Drawing.Size(868, 524);
+            this.viewMain.Size = new System.Drawing.Size(664, 362);
             this.viewMain.TabIndex = 1;
             this.viewMain.Text = "Main";
             this.viewMain.Enter += new System.EventHandler(this.viewAny_Enter);
@@ -119,7 +120,7 @@
             this.viewSource.Location = new System.Drawing.Point(4, 22);
             this.viewSource.Name = "viewSource";
             this.viewSource.Padding = new System.Windows.Forms.Padding(3);
-            this.viewSource.Size = new System.Drawing.Size(868, 524);
+            this.viewSource.Size = new System.Drawing.Size(664, 362);
             this.viewSource.TabIndex = 2;
             this.viewSource.Text = "Source";
             this.viewSource.Enter += new System.EventHandler(this.viewAny_Enter);
@@ -155,29 +156,32 @@
             this.viewSourceMdb.Location = new System.Drawing.Point(4, 22);
             this.viewSourceMdb.Name = "viewSourceMdb";
             this.viewSourceMdb.Padding = new System.Windows.Forms.Padding(3);
-            this.viewSourceMdb.Size = new System.Drawing.Size(868, 524);
+            this.viewSourceMdb.Size = new System.Drawing.Size(664, 362);
             this.viewSourceMdb.TabIndex = 3;
             this.viewSourceMdb.Text = "Source (.MDB)";
             this.viewSourceMdb.Enter += new System.EventHandler(this.viewAny_Enter);
             // 
             // lbSourceMdbFolder
             // 
-            this.lbSourceMdbFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbSourceMdbFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbSourceMdbFolder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lbSourceMdbFolder.FormattingEnabled = true;
             this.lbSourceMdbFolder.Location = new System.Drawing.Point(73, 194);
             this.lbSourceMdbFolder.Name = "lbSourceMdbFolder";
-            this.lbSourceMdbFolder.Size = new System.Drawing.Size(603, 275);
+            this.lbSourceMdbFolder.Size = new System.Drawing.Size(573, 145);
             this.lbSourceMdbFolder.TabIndex = 4;
             this.lbSourceMdbFolder.DoubleClick += new System.EventHandler(this.lbSourceMdbFolder_DoubleClick);
             // 
             // tbSourceMdbFolder
             // 
+            this.tbSourceMdbFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tbSourceMdbFolder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbSourceMdbFolder.Location = new System.Drawing.Point(73, 140);
             this.tbSourceMdbFolder.Name = "tbSourceMdbFolder";
-            this.tbSourceMdbFolder.Size = new System.Drawing.Size(603, 20);
+            this.tbSourceMdbFolder.Size = new System.Drawing.Size(573, 20);
             this.tbSourceMdbFolder.TabIndex = 3;
             this.tbSourceMdbFolder.TextChanged += new System.EventHandler(this.tbSourceMdbFolder_TextChanged);
             // 
@@ -195,10 +199,9 @@
             this.lblSourceMdbFolder.AutoSize = true;
             this.lblSourceMdbFolder.Location = new System.Drawing.Point(235, 116);
             this.lblSourceMdbFolder.Name = "lblSourceMdbFolder";
-            this.lblSourceMdbFolder.Size = new System.Drawing.Size(441, 13);
+            this.lblSourceMdbFolder.Size = new System.Drawing.Size(386, 13);
             this.lblSourceMdbFolder.TabIndex = 1;
-            this.lblSourceMdbFolder.Text = "Select folder containing Microsoft Access Database (.MDB) files holding Win Disk " +
-    "Size data.";
+            this.lblSourceMdbFolder.Text = "Select folder containing Win Disk Size files (Microsoft Access Database (.MDB)).";
             // 
             // btnSourceMdbFolder
             // 
@@ -219,18 +222,21 @@
             this.viewTasks.Location = new System.Drawing.Point(4, 22);
             this.viewTasks.Name = "viewTasks";
             this.viewTasks.Padding = new System.Windows.Forms.Padding(3);
-            this.viewTasks.Size = new System.Drawing.Size(868, 524);
+            this.viewTasks.Size = new System.Drawing.Size(664, 362);
             this.viewTasks.TabIndex = 4;
             this.viewTasks.Text = "Tasks";
             this.viewTasks.Enter += new System.EventHandler(this.viewAny_Enter);
             // 
             // lvTaskList
             // 
+            this.lvTaskList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lvTaskList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lvTaskList.FullRowSelect = true;
             this.lvTaskList.Location = new System.Drawing.Point(76, 132);
             this.lvTaskList.Name = "lvTaskList";
-            this.lvTaskList.Size = new System.Drawing.Size(603, 337);
+            this.lvTaskList.Size = new System.Drawing.Size(564, 210);
             this.lvTaskList.TabIndex = 1;
             this.lvTaskList.UseCompatibleStateImageBehavior = false;
             this.lvTaskList.View = System.Windows.Forms.View.Details;
@@ -253,7 +259,7 @@
             this.viewCompare.Location = new System.Drawing.Point(4, 22);
             this.viewCompare.Name = "viewCompare";
             this.viewCompare.Padding = new System.Windows.Forms.Padding(3);
-            this.viewCompare.Size = new System.Drawing.Size(868, 524);
+            this.viewCompare.Size = new System.Drawing.Size(664, 362);
             this.viewCompare.TabIndex = 0;
             this.viewCompare.Text = "Compare";
             this.viewCompare.Enter += new System.EventHandler(this.viewAny_Enter);
@@ -266,7 +272,7 @@
             this.lvCompareTask.FullRowSelect = true;
             this.lvCompareTask.Location = new System.Drawing.Point(6, 6);
             this.lvCompareTask.Name = "lvCompareTask";
-            this.lvCompareTask.Size = new System.Drawing.Size(856, 84);
+            this.lvCompareTask.Size = new System.Drawing.Size(652, 84);
             this.lvCompareTask.TabIndex = 1;
             this.lvCompareTask.UseCompatibleStateImageBehavior = false;
             this.lvCompareTask.View = System.Windows.Forms.View.Details;
@@ -280,7 +286,7 @@
             this.lvCompare.FullRowSelect = true;
             this.lvCompare.Location = new System.Drawing.Point(6, 96);
             this.lvCompare.Name = "lvCompare";
-            this.lvCompare.Size = new System.Drawing.Size(856, 422);
+            this.lvCompare.Size = new System.Drawing.Size(652, 260);
             this.lvCompare.TabIndex = 0;
             this.lvCompare.UseCompatibleStateImageBehavior = false;
             this.lvCompare.View = System.Windows.Forms.View.Details;
@@ -289,7 +295,7 @@
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRefresh.Location = new System.Drawing.Point(906, 99);
+            this.btnRefresh.Location = new System.Drawing.Point(702, 99);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(75, 23);
             this.btnRefresh.TabIndex = 1;
@@ -312,7 +318,7 @@
             // 
             this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnBack.Location = new System.Drawing.Point(906, 13);
+            this.btnBack.Location = new System.Drawing.Point(702, 13);
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(75, 23);
             this.btnBack.TabIndex = 3;
@@ -324,7 +330,7 @@
             // 
             this.btnNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNext.Location = new System.Drawing.Point(906, 56);
+            this.btnNext.Location = new System.Drawing.Point(702, 56);
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(75, 23);
             this.btnNext.TabIndex = 4;
@@ -350,7 +356,7 @@
             this.prsMain.BackColor = System.Drawing.SystemColors.Info;
             this.prsMain.Location = new System.Drawing.Point(314, 26);
             this.prsMain.Name = "prsMain";
-            this.prsMain.Size = new System.Drawing.Size(574, 23);
+            this.prsMain.Size = new System.Drawing.Size(370, 23);
             this.prsMain.TabIndex = 6;
             this.prsMain.Visible = false;
             // 
@@ -358,7 +364,7 @@
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAdd.Location = new System.Drawing.Point(906, 142);
+            this.btnAdd.Location = new System.Drawing.Point(702, 142);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(75, 23);
             this.btnAdd.TabIndex = 7;
@@ -366,12 +372,25 @@
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
+            // lblPrsMain
+            // 
+            this.lblPrsMain.AutoSize = true;
+            this.lblPrsMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblPrsMain.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblPrsMain.Location = new System.Drawing.Point(311, 9);
+            this.lblPrsMain.Name = "lblPrsMain";
+            this.lblPrsMain.Size = new System.Drawing.Size(30, 13);
+            this.lblPrsMain.TabIndex = 8;
+            this.lblPrsMain.Text = "N/A";
+            this.lblPrsMain.Visible = false;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(993, 618);
+            this.ClientSize = new System.Drawing.Size(789, 477);
+            this.Controls.Add(this.lblPrsMain);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.prsMain);
             this.Controls.Add(this.lblViewStack);
@@ -426,6 +445,7 @@
         private System.Windows.Forms.Label lblTaskList;
         private System.Windows.Forms.ListView lvCompareTask;
         private System.Windows.Forms.Button btnAdd;
+        private System.Windows.Forms.Label lblPrsMain;
     }
 }
 

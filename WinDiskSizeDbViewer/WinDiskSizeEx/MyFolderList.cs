@@ -21,9 +21,12 @@ namespace WinDiskSizeEx
 
         public List<MyFolder>   Folders = new List<MyFolder>();
 
+        public int              m_iMaxLevel;
+
         public MyTask()
         {
-            m_iTaskID = -1;
+            m_iTaskID   = -1;
+            m_iMaxLevel = 0;
         }
 
     }
@@ -44,7 +47,8 @@ namespace WinDiskSizeEx
         public String   m_sPath83;
 
         public String   m_sIndent;  // UI Decoration
-        public bool     m_bHasChildren;
+
+      /*public bool     m_bHasChildren;*/ // ROLLED BACK!!!
 
         public MyFolder()
         {
