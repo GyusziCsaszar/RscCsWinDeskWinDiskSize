@@ -90,7 +90,7 @@ namespace WinDiskSizeEx
             }
         }
 
-        public override bool BeginTask(string sFolderType, string sFolderPath)
+        public override bool BeginTask(string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree)
         {
             if (!IsReady)
             {
@@ -110,8 +110,9 @@ namespace WinDiskSizeEx
 
                 SqlCommand cmdInsert = conn.CreateCommand();
                 cmdInsert.Transaction = trans1;
-                cmdInsert.CommandText = "INSERT INTO dbo.Task (Version, Status, Program, VersionString, Machine, StartDate) VALUES (100, 1, 'WinDiskSize', 'CS2010EXPRESS.100', '" +
-                                            Environment.MachineName + "', SYSDATETIME())";
+                cmdInsert.CommandText = "INSERT INTO dbo.Task (Version, Status, Program, VersionString, Label, StorageSize, StorageFree, Machine, StartDate)" 
+                                            + " VALUES (100, 1, 'WinDiskSize', 'CS2010EXPRESS.100', '"
+                                            + sLabel + "', '" + sStorageSize + "', '" + sStorageFree + "', '" + Environment.MachineName + "', SYSDATETIME())";
                 cmdInsert.ExecuteNonQuery();
 
                 SqlCommand cmdIdentity = conn.CreateCommand();
@@ -145,7 +146,7 @@ namespace WinDiskSizeEx
             }
         }
 
-        public override bool AddFolderRAW(int iLevel, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong)
+        public override bool AddFolderRAW(int iTreeLevel, string sCount, string sCountSUM, string sSize, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong, int iReportSubTaskID)
         {
             if (!IsReady)
             {
@@ -164,8 +165,9 @@ namespace WinDiskSizeEx
 
                 SqlTransaction trans1 = m_conn.BeginTransaction();
 
-                String sSQL = "INSERT INTO dbo.FolderRAW (TaskID, [Level], SizeSUM, MinFileDate, MaxFileDate, NameShort83, PathShort83, NameLong, PathLong) VALUES ("
-                                                         + m_iTaskID.ToString() + ", " + iLevel.ToString() + ", '" + sSizeSUM + "', "
+                String sSQL = "INSERT INTO dbo.FolderRAW (TaskID, ReportSubTaskID, TreeLevel, FileCountSelf, FileCountSUM, FileSizeSelf, FileSizeSUM, MinFileDate, MaxFileDate, NameShort83, PathShort83, NameLong, PathLong)"
+                                                         + " VALUES (" + m_iTaskID.ToString() + ", " + iReportSubTaskID.ToString() + ", "
+                                                         + iTreeLevel.ToString() + ", '" + sCount + "', '" + sCountSUM + "', '" + sSize + "', '" + sSizeSUM + "', "
                         /* '...' or NULL --> */          + sMinFileDate + ", " + sMaxFileDate
                                                          + ", @sNameShort83, @sPathShort83, @sNameLong, @sPathLong)";
 

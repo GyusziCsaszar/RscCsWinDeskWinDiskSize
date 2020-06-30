@@ -16,6 +16,7 @@ namespace WinDiskSizeEx
         public string           m_sTotalSize;
         public string           m_sFreeSpace;
         public string           m_sMachine;
+        public int              m_iStatus;
         public string           m_sStatus;
         public string           m_sStarted;
         public string           m_sCompleted;
@@ -25,11 +26,40 @@ namespace WinDiskSizeEx
         public List<MyFolder>   Folders = new List<MyFolder>();
 
         public int              m_iMaxLevel;
+        public int              m_iTaskID_inReport;
 
         public MyTask()
         {
-            m_iTaskID   = -1;
-            m_iMaxLevel = 0;
+            m_iTaskID           = -1;
+            m_iStatus           = -1;
+
+            m_iMaxLevel         = 0;
+            m_iTaskID_inReport  = -1;
+        }
+
+        public string Title
+        {
+            get
+            {
+                string sTitle;
+
+                if (m_sLabel.Length > 0)
+                {
+                  //sTitle = m_sLabel;
+                    return m_sLabel;
+                }
+                else
+                {
+                    sTitle = m_sMachine;
+                }
+
+                if (m_sPath.Length > 0)
+                {
+                    sTitle += " - " + m_sPath;
+                }
+
+                return sTitle;
+            }
         }
 
     }
@@ -85,6 +115,10 @@ namespace WinDiskSizeEx
 
         public MyFolderState    m_StateBranch_TEMP;
 
+        public MyFolder         m_Twin;
+
+        public int              m_iReportSubTaskID;
+
         public MyFolder()
         {
             m_iTaskIndex          = -1;
@@ -97,6 +131,10 @@ namespace WinDiskSizeEx
             m_bMissMatch          = new bool[2];
 
             m_StateBranch_TEMP    = MyFolderState.Unknown;
+
+            m_Twin                = null;
+
+            m_iReportSubTaskID    = -1;
         }
 
         public string CountAsString

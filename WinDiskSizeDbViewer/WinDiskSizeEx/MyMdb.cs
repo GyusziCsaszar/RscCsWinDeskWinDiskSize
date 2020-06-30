@@ -10,19 +10,19 @@ namespace WinDiskSizeEx
 {
     public class MyMdb : MyDb
     {
-        protected string            m_sTemplateMdbName;
+       protected string             m_sFolder;
+       protected string             m_sMdbTemplatePath;
 
-        protected string            m_sFolder;
 
         protected string            m_sMdbPath;
 
         protected OleDbConnection   m_conn;
         protected DataSet           m_dataSet;
 
-        public MyMdb(String sTemplateMdbName)
+        public MyMdb(String sMdbTemplatePath)
         : base()
         {
-            m_sTemplateMdbName = sTemplateMdbName;
+            m_sMdbTemplatePath = sMdbTemplatePath;
 
             Close();
         }
@@ -94,7 +94,108 @@ namespace WinDiskSizeEx
             }
         }
 
-        public override bool BeginTask(string sFolderType, string sFolderPath)
+        public override int AddTask(int iStatus, string sLabel)
+        {
+            if (!IsReady)
+            {
+                m_sLastError = "Is not Ready!";
+                return -1;
+            }
+
+            try
+            {
+                string sConnectString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + m_sMdbPath + ";";
+
+                var conn = new OleDbConnection(sConnectString);
+                conn.Open();
+
+                OleDbCommand cmd1 = new OleDbCommand("INSERT INTO Task (Version, Status, Program, VersionString, Label, StorageSize, StorageFree, Machine, StartDate)" 
+                                            + " VALUES (100, " + iStatus.ToString() + ", 'WinDiskSize', 'CS2010EXPRESS.100', '"
+                                            + sLabel + "', NULL, NULL, '" + Environment.MachineName + "', Now())", conn);
+
+                cmd1.ExecuteNonQuery();
+
+                OleDbCommand cmd2 = new OleDbCommand("SELECT @@IDENTITY", conn);
+
+                int iTaskID = (int)cmd2.ExecuteScalar();
+
+                conn.Close();
+
+                return iTaskID;
+            }
+            catch (Exception ex)
+            {
+                m_sLastError = "OleDB (MDB) Error: " + ex.Message;
+
+                return -1;
+            }
+        }
+
+        public override int AddTaskIfNotExists(int iStatus, string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree, string sMachine, string sStartDate, string sEndDate)
+        {
+            if (!IsReady)
+            {
+                m_sLastError = "Is not Ready!";
+                return -1;
+            }
+
+            try
+            {
+                string sConnectString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + m_sMdbPath + ";";
+
+                var conn = new OleDbConnection(sConnectString);
+                conn.Open();
+
+                OleDbCommand cmd1 = new OleDbCommand("SELECT ID FROM Task WHERE Version = 100 AND Status = " + iStatus.ToString()
+                                            + " AND Program = 'WinDiskSize' AND VersionString = 'CS2010EXPRESS.100'"
+                                            + " AND FolderType = '" + sFolderType + "' AND FolderPath = '" + sFolderPath + "' AND Label = '" + sLabel + "'"
+                                            + " AND StorageSize = '" + sStorageSize + "' AND StorageFree = '" + sStorageFree + "'"
+                                            + " AND Machine = '" + sMachine + "' AND StartDate = @StartDate AND EndDate = @EndDate", conn);
+
+                cmd1.Parameters.Add("@StartDate", OleDbType.DBTimeStamp).Value = DateTime.Parse(sStartDate);
+                cmd1.Parameters.Add("@EndDate", OleDbType.DBTimeStamp).Value = DateTime.Parse(sEndDate);
+
+                object oTaskID = cmd1.ExecuteScalar();
+
+                int iTaskID = -1;
+
+                if (oTaskID != null)
+                {
+                    iTaskID = (int) oTaskID;
+                }
+                else
+                {
+                    OleDbCommand cmd2 = new OleDbCommand("INSERT INTO Task (Version, Status, Program, VersionString, FolderType, FolderPath, Label"
+                                                + ", StorageSize, StorageFree, Machine, StartDate, EndDate)"
+                                                + " VALUES (100, " + iStatus.ToString() + ", 'WinDiskSize', 'CS2010EXPRESS.100', '"
+                                                + sFolderType + "', '" + sFolderPath + "', '" + sLabel + "', '" + sStorageSize + "', '" + sStorageFree + "', '"
+                                                + sMachine + "', @StartDate, @EndDate)", conn);
+
+                    cmd2.Parameters.Add("@StartDate", OleDbType.DBTimeStamp).Value = DateTime.Parse(sStartDate);
+                    cmd2.Parameters.Add("@EndDate", OleDbType.DBTimeStamp).Value = DateTime.Parse(sEndDate);
+
+                    cmd2.ExecuteNonQuery();
+
+                    OleDbCommand cmd3 = new OleDbCommand("SELECT @@IDENTITY", conn);
+
+                    iTaskID = (int)cmd3.ExecuteScalar();
+                }
+
+                //
+
+                conn.Close();
+
+                return iTaskID;
+            }
+            catch (Exception ex)
+            {
+                m_sLastError = "OleDB (MDB) Error: " + ex.Message;
+
+                return -1;
+            }
+        }
+
+        public override bool BeginTask(string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree)
         {
             if (!IsReady)
             {
@@ -106,13 +207,16 @@ namespace WinDiskSizeEx
 
             try
             {
+                if (m_sFolder.Length == 0)
+                {
+                    m_sLastError = "MDB Path is not specified!";
+                    return false;
+                }
+
                 String sTmp = m_sFolder;
-                if (sTmp.Length == 0) sTmp = "C:\\";
                 if (sTmp[sTmp.Length - 1] != '\\') sTmp += "\\";
 
-                String sMdbTemplatePath = sTmp + m_sTemplateMdbName;
-
-                String sMdbPath = sTmp + "WinDiskSize (" + Environment.MachineName + ")";
+                String sMdbPath = sTmp + "WinDiskSizeMap (" + Environment.MachineName + ")";
 
                 DateTime dt = DateTime.Now;
                 sTmp = dt.ToShortDateString(); // + " " + dt.ToShortTimeString().Replace(":", "-");
@@ -126,7 +230,7 @@ namespace WinDiskSizeEx
 
                 if (!System.IO.File.Exists(sMdbPath))
                 {
-                    System.IO.File.Copy(sMdbTemplatePath, sMdbPath, true);
+                    System.IO.File.Copy(m_sMdbTemplatePath, sMdbPath, true);
                 }
 
                 m_sMdbPath = sMdbPath;
@@ -136,9 +240,10 @@ namespace WinDiskSizeEx
                 var conn = new OleDbConnection(sConnectString);
                 conn.Open();
 
-                OleDbCommand cmd1 = new OleDbCommand("INSERT INTO Task (Version, Status, Program, VersionString, Machine, StartDate) VALUES (100, 1, 'WinDiskSize', 'CS2010EXPRESS.100', '" +
-                                            Environment.MachineName + "', Now())", conn);
-
+                OleDbCommand cmd1 = new OleDbCommand("INSERT INTO Task (Version, Status, Program, VersionString, Label, StorageSize, StorageFree, Machine, StartDate)" 
+                                            + " VALUES (100, 1, 'WinDiskSize', 'CS2010EXPRESS.100', '" +
+                                            sLabel + "', '" + sStorageSize + "', '" + sStorageFree + "', '" + Environment.MachineName + "', Now())", conn);
+ 
                 cmd1.ExecuteNonQuery();
 
                 OleDbCommand cmd2 = new OleDbCommand("SELECT @@IDENTITY", conn);
@@ -164,7 +269,67 @@ namespace WinDiskSizeEx
             }
         }
 
-        public override bool AddFolderRAW(int iLevel, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong)
+        public override bool AddReportFolderRAWIfNotExists(int iTaskID, int iTreeLevel, string sCount, string sCountSUM, string sSize, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong, int iReportSubTaskID)
+        {
+            if (!IsReady)
+            {
+                m_sLastError = "Is not Ready!";
+                return false;
+            }
+
+            try
+            {
+                OpenIfNotOpen();
+
+                OleDbCommand cmd1 = new OleDbCommand("SELECT ID FROM FolderRAW WHERE TaskID = " + iTaskID.ToString() + " AND ReportSubTaskID = " + iReportSubTaskID.ToString()
+                                            + " AND TreeLevel = " + iTreeLevel.ToString()
+                                            + " AND FileCountSelf = '" + sCount + "' AND FileCountSUM = '" + sCountSUM + "'"
+                                            + " AND FileSizeSelf = '" + sSize + "' AND FileSizeSUM = '" + sSizeSUM + "'"
+                    /* '...' or NULL --> */ + " AND MinFileDate = " + sMinFileDate + " AND MaxFileDate = " + sMaxFileDate
+                                         // + " AND NameShort83 = @sNameShort83 AND PathShort83 = @sPathShort83"
+                                            + " AND NameLong = @sNameLong AND PathLong = @sPathLong", m_conn);
+
+                /*
+                cmd1.Parameters.Add("@sNameShort83", OleDbType.VarWChar).Value = sNameShort83;
+                cmd1.Parameters.Add("@sPathShort83", OleDbType.VarWChar).Value = sPathShort83;
+                */
+                cmd1.Parameters.Add("@sNameLong", OleDbType.VarWChar).Value = sNameLong;
+                cmd1.Parameters.Add("@sPathLong", OleDbType.VarWChar).Value = sPathLong;
+
+                object oFolderRAWID = cmd1.ExecuteScalar();
+                if (oFolderRAWID != null)
+                {
+                    return true;
+                }
+
+                //
+
+                String sSQL = "INSERT INTO FolderRAW (TaskID, ReportSubTaskID, TreeLevel, FileCountSelf, FileCountSUM, FileSizeSelf, FileSizeSUM, MinFileDate, MaxFileDate, NameShort83, PathShort83, NameLong, PathLong)"
+                                                    + " VALUES (" + iTaskID.ToString() + ", " + iReportSubTaskID.ToString() + ", "
+                                                    + iTreeLevel.ToString() + ", '" + sCount + "', '" + sCountSUM + "', '" + sSize + "', '" + sSizeSUM + "', "
+                    /* '...' or NULL --> */         + sMinFileDate + ", " + sMaxFileDate
+                                                    + ", @sNameShort83, @sPathShort83, @sNameLong, @sPathLong)";
+
+                OleDbCommand cmd2 = new OleDbCommand(sSQL, m_conn);
+
+                cmd2.Parameters.Add("@sNameShort83", OleDbType.VarWChar).Value = sNameShort83;
+                cmd2.Parameters.Add("@sPathShort83", OleDbType.VarWChar).Value = sPathShort83;
+                cmd2.Parameters.Add("@sNameLong", OleDbType.VarWChar).Value = sNameLong;
+                cmd2.Parameters.Add("@sPathLong", OleDbType.VarWChar).Value = sPathLong;
+
+                cmd2.ExecuteNonQuery();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                m_sLastError = "OleDB (MDB) Error: " + ex.Message;
+
+                return false;
+            }
+        }
+
+        public override bool AddFolderRAW(int iTreeLevel, string sCount, string sCountSUM, string sSize, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong, int iReportSubTaskID)
         {
             if (!IsReady)
             {
@@ -181,8 +346,9 @@ namespace WinDiskSizeEx
             {
                 OpenIfNotOpen();
 
-                String sSQL = "INSERT INTO FolderRAW (TaskID, [Level], SizeSUM, MinFileDate, MaxFileDate, NameShort83, PathShort83, NameLong, PathLong) VALUES ("
-                                                    + m_iTaskID.ToString() + ", " + iLevel.ToString() + ", '" + sSizeSUM + "', "
+                String sSQL = "INSERT INTO FolderRAW (TaskID, ReportSubTaskID, TreeLevel, FileCountSelf, FileCountSUM, FileSizeSelf, FileSizeSUM, MinFileDate, MaxFileDate, NameShort83, PathShort83, NameLong, PathLong)"
+                                                    + " VALUES (" + m_iTaskID.ToString() + ", " + iReportSubTaskID.ToString() + ", "
+                                                    + iTreeLevel.ToString() + ", '" + sCount + "', '" + sCountSUM + "', '" + sSize + "', '" + sSizeSUM + "', "
                     /* '...' or NULL --> */         + sMinFileDate + ", " + sMaxFileDate
                                                     + ", @sNameShort83, @sPathShort83, @sNameLong, @sPathLong)";
 
@@ -222,7 +388,7 @@ namespace WinDiskSizeEx
             {
                 OpenIfNotOpen();
 
-                OleDbCommand cmd1 = new OleDbCommand("UPDATE Task SET EndDate = Now() WHERE ID=" + m_iTaskID.ToString(), m_conn);
+                OleDbCommand cmd1 = new OleDbCommand("UPDATE Task SET EndDate = Now(), Status = 3 WHERE ID=" + m_iTaskID.ToString(), m_conn);
 
                 cmd1.ExecuteNonQuery();
 
@@ -236,7 +402,7 @@ namespace WinDiskSizeEx
             }
         }
 
-        public override bool QueryTasks()
+        public override bool QueryTasks(int iTaskStatusFilter, int iReportTaskID)
         {
             if (!IsReady)
             {
@@ -254,7 +420,24 @@ namespace WinDiskSizeEx
             {
                 OpenIfNotOpen();
 
-                OleDbCommand cmd = new OleDbCommand("SELECT * FROM Task ORDER BY ID DESC", m_conn);
+                string sSQL = "SELECT DISTINCT Task.* FROM Task";
+                if (iTaskStatusFilter > -1)
+                {
+                    sSQL += " WHERE Status = " + iTaskStatusFilter.ToString();
+                    sSQL += " ORDER BY ID DESC";
+                }
+                else if (iReportTaskID > -1)
+                {
+                    sSQL += " INNER JOIN FolderRAW ON FolderRAW.ReportSubTaskID = Task.ID";
+                    sSQL += " WHERE FolderRAW.TaskID = " + iReportTaskID.ToString();
+                    sSQL += " ORDER BY Task.ID";
+                }
+                else
+                {
+                    sSQL += " ORDER BY ID DESC";
+                }
+
+                OleDbCommand cmd = new OleDbCommand(sSQL, m_conn);
 
                 OleDbDataAdapter adapter = new OleDbDataAdapter(cmd);
 
@@ -278,7 +461,7 @@ namespace WinDiskSizeEx
             }
         }
 
-        public override bool QueryFolders(int iTaskID)
+        public override bool QueryFolders(int iTaskID, string sOrderBy)
         {
             if (!IsReady)
             {
@@ -296,7 +479,17 @@ namespace WinDiskSizeEx
             {
                 OpenIfNotOpen();
 
-                OleDbCommand cmd = new OleDbCommand("SELECT * FROM FolderRAW WHERE TaskID = " + iTaskID.ToString() + " ORDER BY ID", m_conn);
+                string sSQL = "SELECT * FROM FolderRAW WHERE TaskID = " + iTaskID.ToString() + " ";
+                if (sOrderBy.Length > 0)
+                {
+                    sSQL += sOrderBy;
+                }
+                else
+                {
+                    sSQL += "ORDER BY ID";
+                }
+
+                OleDbCommand cmd = new OleDbCommand(sSQL, m_conn);
 
                 OleDbDataAdapter adapter = new OleDbDataAdapter(cmd);
 

@@ -30,18 +30,27 @@
         {
             this.Views = new System.Windows.Forms.TabControl();
             this.viewMain = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
+            this.btnMainOpenReport = new System.Windows.Forms.Button();
+            this.lblTabCaptionMain = new System.Windows.Forms.Label();
             this.lblMainOpen = new System.Windows.Forms.Label();
             this.btnMainOpen = new System.Windows.Forms.Button();
             this.viewSource = new System.Windows.Forms.TabPage();
+            this.lblTabCaptionSource = new System.Windows.Forms.Label();
             this.lblSourceMdb = new System.Windows.Forms.Label();
             this.btnSourceMdb = new System.Windows.Forms.Button();
             this.viewSourceMdb = new System.Windows.Forms.TabPage();
+            this.btnSourceMdbNew = new System.Windows.Forms.Button();
+            this.tbSourceMdbNewTitle = new System.Windows.Forms.TextBox();
+            this.lblSourceMdbNewTitle = new System.Windows.Forms.Label();
+            this.lblTabCaptionSourceMdb = new System.Windows.Forms.Label();
             this.lbSourceMdbFolder = new System.Windows.Forms.ListBox();
             this.tbSourceMdbFolder = new System.Windows.Forms.TextBox();
             this.lblSourceMdbFolderList = new System.Windows.Forms.Label();
             this.lblSourceMdbFolder = new System.Windows.Forms.Label();
             this.btnSourceMdbFolder = new System.Windows.Forms.Button();
             this.viewTasks = new System.Windows.Forms.TabPage();
+            this.lblTabCaptionTasks = new System.Windows.Forms.Label();
             this.lvTaskList = new System.Windows.Forms.ListView();
             this.lblTaskList = new System.Windows.Forms.Label();
             this.viewCompare = new System.Windows.Forms.TabPage();
@@ -63,15 +72,12 @@
             this.btnNext = new System.Windows.Forms.Button();
             this.lblViewStack = new System.Windows.Forms.Label();
             this.prsMain = new System.Windows.Forms.ProgressBar();
-            this.btnAdd = new System.Windows.Forms.Button();
+            this.btnCompareWith = new System.Windows.Forms.Button();
             this.lblPrsMain = new System.Windows.Forms.Label();
             this.btnHome = new System.Windows.Forms.Button();
-            this.lblTabCaptionMain = new System.Windows.Forms.Label();
-            this.lblTabCaptionSource = new System.Windows.Forms.Label();
-            this.lblTabCaptionSourceMdb = new System.Windows.Forms.Label();
-            this.lblTabCaptionTasks = new System.Windows.Forms.Label();
-            this.btnMainOpenReport = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.btnAddToReport = new System.Windows.Forms.Button();
+            this.btnOpenUpdatedReport = new System.Windows.Forms.Button();
+            this.btnPrintReport = new System.Windows.Forms.Button();
             this.Views.SuspendLayout();
             this.viewMain.SuspendLayout();
             this.viewSource.SuspendLayout();
@@ -112,6 +118,38 @@
             this.viewMain.Text = "Home";
             this.viewMain.Enter += new System.EventHandler(this.viewAny_Enter);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(235, 157);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(326, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Open an existing Disk Map Compare Result Report recorded earlier.";
+            // 
+            // btnMainOpenReport
+            // 
+            this.btnMainOpenReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMainOpenReport.Location = new System.Drawing.Point(73, 152);
+            this.btnMainOpenReport.Name = "btnMainOpenReport";
+            this.btnMainOpenReport.Size = new System.Drawing.Size(132, 23);
+            this.btnMainOpenReport.TabIndex = 4;
+            this.btnMainOpenReport.Text = "Open Disk Map Report";
+            this.btnMainOpenReport.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnMainOpenReport.UseVisualStyleBackColor = true;
+            this.btnMainOpenReport.Click += new System.EventHandler(this.btnMainOpenReport_Click);
+            // 
+            // lblTabCaptionMain
+            // 
+            this.lblTabCaptionMain.AutoSize = true;
+            this.lblTabCaptionMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionMain.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionMain.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionMain.Name = "lblTabCaptionMain";
+            this.lblTabCaptionMain.Size = new System.Drawing.Size(272, 25);
+            this.lblTabCaptionMain.TabIndex = 3;
+            this.lblTabCaptionMain.Text = "Select what you want to Do";
+            // 
             // lblMainOpen
             // 
             this.lblMainOpen.AutoSize = true;
@@ -123,6 +161,7 @@
             // 
             // btnMainOpen
             // 
+            this.btnMainOpen.BackColor = System.Drawing.SystemColors.Window;
             this.btnMainOpen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMainOpen.Location = new System.Drawing.Point(73, 111);
             this.btnMainOpen.Name = "btnMainOpen";
@@ -130,7 +169,7 @@
             this.btnMainOpen.TabIndex = 0;
             this.btnMainOpen.Text = "Open Disk Map";
             this.btnMainOpen.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnMainOpen.UseVisualStyleBackColor = true;
+            this.btnMainOpen.UseVisualStyleBackColor = false;
             this.btnMainOpen.Click += new System.EventHandler(this.btnMainOpen_Click);
             // 
             // viewSource
@@ -146,6 +185,17 @@
             this.viewSource.TabIndex = 2;
             this.viewSource.Text = "Source";
             this.viewSource.Enter += new System.EventHandler(this.viewAny_Enter);
+            // 
+            // lblTabCaptionSource
+            // 
+            this.lblTabCaptionSource.AutoSize = true;
+            this.lblTabCaptionSource.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionSource.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionSource.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionSource.Name = "lblTabCaptionSource";
+            this.lblTabCaptionSource.Size = new System.Drawing.Size(313, 25);
+            this.lblTabCaptionSource.TabIndex = 4;
+            this.lblTabCaptionSource.Text = "Select the type of the Database";
             // 
             // lblSourceMdb
             // 
@@ -170,6 +220,9 @@
             // viewSourceMdb
             // 
             this.viewSourceMdb.BackColor = System.Drawing.SystemColors.Window;
+            this.viewSourceMdb.Controls.Add(this.btnSourceMdbNew);
+            this.viewSourceMdb.Controls.Add(this.tbSourceMdbNewTitle);
+            this.viewSourceMdb.Controls.Add(this.lblSourceMdbNewTitle);
             this.viewSourceMdb.Controls.Add(this.lblTabCaptionSourceMdb);
             this.viewSourceMdb.Controls.Add(this.lbSourceMdbFolder);
             this.viewSourceMdb.Controls.Add(this.tbSourceMdbFolder);
@@ -184,16 +237,60 @@
             this.viewSourceMdb.Text = "Source (.MDB)";
             this.viewSourceMdb.Enter += new System.EventHandler(this.viewAny_Enter);
             // 
+            // btnSourceMdbNew
+            // 
+            this.btnSourceMdbNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSourceMdbNew.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSourceMdbNew.Location = new System.Drawing.Point(586, 184);
+            this.btnSourceMdbNew.Name = "btnSourceMdbNew";
+            this.btnSourceMdbNew.Size = new System.Drawing.Size(60, 23);
+            this.btnSourceMdbNew.TabIndex = 8;
+            this.btnSourceMdbNew.Text = "Create";
+            this.btnSourceMdbNew.UseVisualStyleBackColor = true;
+            this.btnSourceMdbNew.Click += new System.EventHandler(this.btnSourceMdbNew_Click);
+            // 
+            // tbSourceMdbNewTitle
+            // 
+            this.tbSourceMdbNewTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbSourceMdbNewTitle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbSourceMdbNewTitle.Location = new System.Drawing.Point(209, 187);
+            this.tbSourceMdbNewTitle.Name = "tbSourceMdbNewTitle";
+            this.tbSourceMdbNewTitle.Size = new System.Drawing.Size(365, 20);
+            this.tbSourceMdbNewTitle.TabIndex = 7;
+            // 
+            // lblSourceMdbNewTitle
+            // 
+            this.lblSourceMdbNewTitle.AutoSize = true;
+            this.lblSourceMdbNewTitle.Location = new System.Drawing.Point(70, 189);
+            this.lblSourceMdbNewTitle.Name = "lblSourceMdbNewTitle";
+            this.lblSourceMdbNewTitle.Size = new System.Drawing.Size(133, 13);
+            this.lblSourceMdbNewTitle.TabIndex = 6;
+            this.lblSourceMdbNewTitle.Text = "Title of new Database File:";
+            // 
+            // lblTabCaptionSourceMdb
+            // 
+            this.lblTabCaptionSourceMdb.AutoSize = true;
+            this.lblTabCaptionSourceMdb.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionSourceMdb.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionSourceMdb.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionSourceMdb.Name = "lblTabCaptionSourceMdb";
+            this.lblTabCaptionSourceMdb.Size = new System.Drawing.Size(320, 25);
+            this.lblTabCaptionSourceMdb.TabIndex = 5;
+            this.lblTabCaptionSourceMdb.Text = "Select Folder and Database File";
+            // 
             // lbSourceMdbFolder
             // 
             this.lbSourceMdbFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbSourceMdbFolder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lbSourceMdbFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.lbSourceMdbFolder.FormattingEnabled = true;
-            this.lbSourceMdbFolder.Location = new System.Drawing.Point(73, 194);
+            this.lbSourceMdbFolder.ItemHeight = 16;
+            this.lbSourceMdbFolder.Location = new System.Drawing.Point(73, 245);
             this.lbSourceMdbFolder.Name = "lbSourceMdbFolder";
-            this.lbSourceMdbFolder.Size = new System.Drawing.Size(573, 145);
+            this.lbSourceMdbFolder.Size = new System.Drawing.Size(573, 98);
             this.lbSourceMdbFolder.TabIndex = 4;
             this.lbSourceMdbFolder.DoubleClick += new System.EventHandler(this.lbSourceMdbFolder_DoubleClick);
             // 
@@ -211,7 +308,7 @@
             // lblSourceMdbFolderList
             // 
             this.lblSourceMdbFolderList.AutoSize = true;
-            this.lblSourceMdbFolderList.Location = new System.Drawing.Point(70, 178);
+            this.lblSourceMdbFolderList.Location = new System.Drawing.Point(70, 229);
             this.lblSourceMdbFolderList.Name = "lblSourceMdbFolderList";
             this.lblSourceMdbFolderList.Size = new System.Drawing.Size(356, 13);
             this.lblSourceMdbFolderList.TabIndex = 2;
@@ -251,12 +348,24 @@
             this.viewTasks.Text = "Tasks";
             this.viewTasks.Enter += new System.EventHandler(this.viewAny_Enter);
             // 
+            // lblTabCaptionTasks
+            // 
+            this.lblTabCaptionTasks.AutoSize = true;
+            this.lblTabCaptionTasks.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabCaptionTasks.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.lblTabCaptionTasks.Location = new System.Drawing.Point(68, 36);
+            this.lblTabCaptionTasks.Name = "lblTabCaptionTasks";
+            this.lblTabCaptionTasks.Size = new System.Drawing.Size(396, 25);
+            this.lblTabCaptionTasks.TabIndex = 6;
+            this.lblTabCaptionTasks.Text = "Select a Disk Map Task recorded earlier";
+            // 
             // lvTaskList
             // 
             this.lvTaskList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvTaskList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lvTaskList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.lvTaskList.FullRowSelect = true;
             this.lvTaskList.Location = new System.Drawing.Point(76, 132);
             this.lvTaskList.Name = "lvTaskList";
@@ -304,7 +413,7 @@
             this.lblDiffClrEquHnd.BackColor = System.Drawing.Color.Turquoise;
             this.lblDiffClrEquHnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrEquHnd.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrEquHnd.Location = new System.Drawing.Point(92, 92);
+            this.lblDiffClrEquHnd.Location = new System.Drawing.Point(92, 141);
             this.lblDiffClrEquHnd.Name = "lblDiffClrEquHnd";
             this.lblDiffClrEquHnd.Size = new System.Drawing.Size(66, 15);
             this.lblDiffClrEquHnd.TabIndex = 12;
@@ -316,7 +425,7 @@
             this.lblDiffClrMissOtherHdn.BackColor = System.Drawing.Color.Red;
             this.lblDiffClrMissOtherHdn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrMissOtherHdn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrMissOtherHdn.Location = new System.Drawing.Point(485, 92);
+            this.lblDiffClrMissOtherHdn.Location = new System.Drawing.Point(485, 141);
             this.lblDiffClrMissOtherHdn.Name = "lblDiffClrMissOtherHdn";
             this.lblDiffClrMissOtherHdn.Size = new System.Drawing.Size(80, 15);
             this.lblDiffClrMissOtherHdn.TabIndex = 11;
@@ -328,7 +437,7 @@
             this.lblDiffClrMissOther.BackColor = System.Drawing.Color.LightPink;
             this.lblDiffClrMissOther.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrMissOther.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrMissOther.Location = new System.Drawing.Point(430, 92);
+            this.lblDiffClrMissOther.Location = new System.Drawing.Point(430, 141);
             this.lblDiffClrMissOther.Name = "lblDiffClrMissOther";
             this.lblDiffClrMissOther.Size = new System.Drawing.Size(49, 15);
             this.lblDiffClrMissOther.TabIndex = 10;
@@ -340,7 +449,7 @@
             this.lblDiffClrMissOneHdn.BackColor = System.Drawing.Color.Goldenrod;
             this.lblDiffClrMissOneHdn.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrMissOneHdn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrMissOneHdn.Location = new System.Drawing.Point(335, 92);
+            this.lblDiffClrMissOneHdn.Location = new System.Drawing.Point(335, 141);
             this.lblDiffClrMissOneHdn.Name = "lblDiffClrMissOneHdn";
             this.lblDiffClrMissOneHdn.Size = new System.Drawing.Size(80, 15);
             this.lblDiffClrMissOneHdn.TabIndex = 9;
@@ -352,7 +461,7 @@
             this.lblDiffClrMissOne.BackColor = System.Drawing.Color.Orange;
             this.lblDiffClrMissOne.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrMissOne.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrMissOne.Location = new System.Drawing.Point(280, 92);
+            this.lblDiffClrMissOne.Location = new System.Drawing.Point(280, 141);
             this.lblDiffClrMissOne.Name = "lblDiffClrMissOne";
             this.lblDiffClrMissOne.Size = new System.Drawing.Size(49, 15);
             this.lblDiffClrMissOne.TabIndex = 8;
@@ -364,7 +473,7 @@
             this.lblDiffClrDiffOther.BackColor = System.Drawing.Color.LightBlue;
             this.lblDiffClrDiffOther.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrDiffOther.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrDiffOther.Location = new System.Drawing.Point(221, 92);
+            this.lblDiffClrDiffOther.Location = new System.Drawing.Point(221, 141);
             this.lblDiffClrDiffOther.Name = "lblDiffClrDiffOther";
             this.lblDiffClrDiffOther.Size = new System.Drawing.Size(44, 15);
             this.lblDiffClrDiffOther.TabIndex = 7;
@@ -376,7 +485,7 @@
             this.lblDiffClrDiffOne.BackColor = System.Drawing.Color.PaleTurquoise;
             this.lblDiffClrDiffOne.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrDiffOne.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrDiffOne.Location = new System.Drawing.Point(171, 92);
+            this.lblDiffClrDiffOne.Location = new System.Drawing.Point(171, 141);
             this.lblDiffClrDiffOne.Name = "lblDiffClrDiffOne";
             this.lblDiffClrDiffOne.Size = new System.Drawing.Size(44, 15);
             this.lblDiffClrDiffOne.TabIndex = 6;
@@ -388,7 +497,7 @@
             this.lblDiffClrEqu.BackColor = System.Drawing.Color.LightGreen;
             this.lblDiffClrEqu.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrEqu.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrEqu.Location = new System.Drawing.Point(51, 92);
+            this.lblDiffClrEqu.Location = new System.Drawing.Point(51, 141);
             this.lblDiffClrEqu.Name = "lblDiffClrEqu";
             this.lblDiffClrEqu.Size = new System.Drawing.Size(35, 15);
             this.lblDiffClrEqu.TabIndex = 5;
@@ -397,7 +506,7 @@
             // lblDiffClrs
             // 
             this.lblDiffClrs.AutoSize = true;
-            this.lblDiffClrs.Location = new System.Drawing.Point(6, 92);
+            this.lblDiffClrs.Location = new System.Drawing.Point(6, 141);
             this.lblDiffClrs.Name = "lblDiffClrs";
             this.lblDiffClrs.Size = new System.Drawing.Size(39, 13);
             this.lblDiffClrs.TabIndex = 4;
@@ -410,7 +519,7 @@
             this.lblDiffClrUnk.BackColor = System.Drawing.Color.Yellow;
             this.lblDiffClrUnk.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblDiffClrUnk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrUnk.Location = new System.Drawing.Point(580, 92);
+            this.lblDiffClrUnk.Location = new System.Drawing.Point(580, 141);
             this.lblDiffClrUnk.Name = "lblDiffClrUnk";
             this.lblDiffClrUnk.Size = new System.Drawing.Size(78, 15);
             this.lblDiffClrUnk.TabIndex = 3;
@@ -424,7 +533,7 @@
             this.lvCompareTask.FullRowSelect = true;
             this.lvCompareTask.Location = new System.Drawing.Point(6, 6);
             this.lvCompareTask.Name = "lvCompareTask";
-            this.lvCompareTask.Size = new System.Drawing.Size(652, 84);
+            this.lvCompareTask.Size = new System.Drawing.Size(652, 132);
             this.lvCompareTask.TabIndex = 1;
             this.lvCompareTask.UseCompatibleStateImageBehavior = false;
             this.lvCompareTask.View = System.Windows.Forms.View.Details;
@@ -437,9 +546,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvCompare.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lvCompare.FullRowSelect = true;
-            this.lvCompare.Location = new System.Drawing.Point(6, 109);
+            this.lvCompare.Location = new System.Drawing.Point(6, 159);
             this.lvCompare.Name = "lvCompare";
-            this.lvCompare.Size = new System.Drawing.Size(652, 247);
+            this.lvCompare.Size = new System.Drawing.Size(652, 197);
             this.lvCompare.TabIndex = 0;
             this.lvCompare.UseCompatibleStateImageBehavior = false;
             this.lvCompare.View = System.Windows.Forms.View.Details;
@@ -513,17 +622,17 @@
             this.prsMain.TabIndex = 6;
             this.prsMain.Visible = false;
             // 
-            // btnAdd
+            // btnCompareWith
             // 
-            this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAdd.Location = new System.Drawing.Point(705, 143);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(75, 45);
-            this.btnAdd.TabIndex = 7;
-            this.btnAdd.Text = "Compare with Task...";
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            this.btnCompareWith.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCompareWith.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCompareWith.Location = new System.Drawing.Point(705, 157);
+            this.btnCompareWith.Name = "btnCompareWith";
+            this.btnCompareWith.Size = new System.Drawing.Size(75, 45);
+            this.btnCompareWith.TabIndex = 7;
+            this.btnCompareWith.Text = "Compare with...";
+            this.btnCompareWith.UseVisualStyleBackColor = true;
+            this.btnCompareWith.Click += new System.EventHandler(this.btnCompareWith_Click);
             // 
             // lblPrsMain
             // 
@@ -549,69 +658,41 @@
             this.btnHome.UseVisualStyleBackColor = true;
             this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
             // 
-            // lblTabCaptionMain
+            // btnAddToReport
             // 
-            this.lblTabCaptionMain.AutoSize = true;
-            this.lblTabCaptionMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblTabCaptionMain.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.lblTabCaptionMain.Location = new System.Drawing.Point(68, 36);
-            this.lblTabCaptionMain.Name = "lblTabCaptionMain";
-            this.lblTabCaptionMain.Size = new System.Drawing.Size(272, 25);
-            this.lblTabCaptionMain.TabIndex = 3;
-            this.lblTabCaptionMain.Text = "Select what you want to Do";
+            this.btnAddToReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAddToReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddToReport.Location = new System.Drawing.Point(705, 223);
+            this.btnAddToReport.Name = "btnAddToReport";
+            this.btnAddToReport.Size = new System.Drawing.Size(75, 45);
+            this.btnAddToReport.TabIndex = 10;
+            this.btnAddToReport.Text = "Add to Report...";
+            this.btnAddToReport.UseVisualStyleBackColor = true;
+            this.btnAddToReport.Click += new System.EventHandler(this.btnAddToReport_Click);
             // 
-            // lblTabCaptionSource
+            // btnOpenUpdatedReport
             // 
-            this.lblTabCaptionSource.AutoSize = true;
-            this.lblTabCaptionSource.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblTabCaptionSource.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.lblTabCaptionSource.Location = new System.Drawing.Point(68, 36);
-            this.lblTabCaptionSource.Name = "lblTabCaptionSource";
-            this.lblTabCaptionSource.Size = new System.Drawing.Size(313, 25);
-            this.lblTabCaptionSource.TabIndex = 4;
-            this.lblTabCaptionSource.Text = "Select the type of the Database";
+            this.btnOpenUpdatedReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenUpdatedReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnOpenUpdatedReport.Location = new System.Drawing.Point(705, 274);
+            this.btnOpenUpdatedReport.Name = "btnOpenUpdatedReport";
+            this.btnOpenUpdatedReport.Size = new System.Drawing.Size(75, 57);
+            this.btnOpenUpdatedReport.TabIndex = 11;
+            this.btnOpenUpdatedReport.Text = "Open Updated Report...";
+            this.btnOpenUpdatedReport.UseVisualStyleBackColor = true;
+            this.btnOpenUpdatedReport.Click += new System.EventHandler(this.btnOpenUpdatedReport_Click);
             // 
-            // lblTabCaptionSourceMdb
+            // btnPrintReport
             // 
-            this.lblTabCaptionSourceMdb.AutoSize = true;
-            this.lblTabCaptionSourceMdb.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblTabCaptionSourceMdb.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.lblTabCaptionSourceMdb.Location = new System.Drawing.Point(68, 36);
-            this.lblTabCaptionSourceMdb.Name = "lblTabCaptionSourceMdb";
-            this.lblTabCaptionSourceMdb.Size = new System.Drawing.Size(320, 25);
-            this.lblTabCaptionSourceMdb.TabIndex = 5;
-            this.lblTabCaptionSourceMdb.Text = "Select Folder and Database File";
-            // 
-            // lblTabCaptionTasks
-            // 
-            this.lblTabCaptionTasks.AutoSize = true;
-            this.lblTabCaptionTasks.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblTabCaptionTasks.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.lblTabCaptionTasks.Location = new System.Drawing.Point(68, 36);
-            this.lblTabCaptionTasks.Name = "lblTabCaptionTasks";
-            this.lblTabCaptionTasks.Size = new System.Drawing.Size(396, 25);
-            this.lblTabCaptionTasks.TabIndex = 6;
-            this.lblTabCaptionTasks.Text = "Select a Disk Map Task recorded earlier";
-            // 
-            // btnMainOpenReport
-            // 
-            this.btnMainOpenReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMainOpenReport.Location = new System.Drawing.Point(73, 152);
-            this.btnMainOpenReport.Name = "btnMainOpenReport";
-            this.btnMainOpenReport.Size = new System.Drawing.Size(132, 23);
-            this.btnMainOpenReport.TabIndex = 4;
-            this.btnMainOpenReport.Text = "Open Disk Map Report";
-            this.btnMainOpenReport.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnMainOpenReport.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(235, 157);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(248, 13);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Open an existing Disk Map Report recorded earlier.";
+            this.btnPrintReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPrintReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPrintReport.Location = new System.Drawing.Point(705, 352);
+            this.btnPrintReport.Name = "btnPrintReport";
+            this.btnPrintReport.Size = new System.Drawing.Size(75, 69);
+            this.btnPrintReport.TabIndex = 12;
+            this.btnPrintReport.Text = "Print Report (generated .RTF file)...";
+            this.btnPrintReport.UseVisualStyleBackColor = true;
+            this.btnPrintReport.Click += new System.EventHandler(this.btnPrintReport_Click);
             // 
             // FormMain
             // 
@@ -619,9 +700,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(792, 473);
+            this.Controls.Add(this.btnPrintReport);
+            this.Controls.Add(this.btnOpenUpdatedReport);
+            this.Controls.Add(this.btnAddToReport);
             this.Controls.Add(this.btnHome);
             this.Controls.Add(this.lblPrsMain);
-            this.Controls.Add(this.btnAdd);
+            this.Controls.Add(this.btnCompareWith);
             this.Controls.Add(this.prsMain);
             this.Controls.Add(this.lblViewStack);
             this.Controls.Add(this.btnNext);
@@ -676,7 +760,7 @@
         private System.Windows.Forms.ListView lvTaskList;
         private System.Windows.Forms.Label lblTaskList;
         private System.Windows.Forms.ListView lvCompareTask;
-        private System.Windows.Forms.Button btnAdd;
+        private System.Windows.Forms.Button btnCompareWith;
         private System.Windows.Forms.Label lblPrsMain;
         private System.Windows.Forms.Label lblDiffClrUnk;
         private System.Windows.Forms.Label lblDiffClrEqu;
@@ -695,6 +779,12 @@
         private System.Windows.Forms.Label lblTabCaptionTasks;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnMainOpenReport;
+        private System.Windows.Forms.Button btnAddToReport;
+        private System.Windows.Forms.Button btnSourceMdbNew;
+        private System.Windows.Forms.TextBox tbSourceMdbNewTitle;
+        private System.Windows.Forms.Label lblSourceMdbNewTitle;
+        private System.Windows.Forms.Button btnOpenUpdatedReport;
+        private System.Windows.Forms.Button btnPrintReport;
     }
 }
 

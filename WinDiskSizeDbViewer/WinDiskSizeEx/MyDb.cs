@@ -66,7 +66,33 @@ namespace WinDiskSizeEx
         {
         }
 
-        public virtual bool BeginTask(string sFolderType, string sFolderPath)
+        public virtual int AddTask(int iStatus, string sLabel)
+        {
+            if (!IsReady)
+            {
+                m_sLastError = "Is not Ready!";
+                return -1;
+            }
+
+            m_sLastError = "AddReportTask is not implemented!";
+
+            return -1;
+        }
+
+        public virtual int AddTaskIfNotExists(int iStatus, string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree, string sMachine, string sStartDate, string sEndDate)
+        {
+            if (!IsReady)
+            {
+                m_sLastError = "Is not Ready!";
+                return -1;
+            }
+
+            m_sLastError = "AddReportTask is not implemented!";
+
+            return -1;
+        }
+
+        public virtual bool BeginTask(string sFolderType, string sFolderPath, string sLabel, string sStorageSize, string sStorageFree)
         {
             if (!IsReady)
             {
@@ -81,7 +107,25 @@ namespace WinDiskSizeEx
             return false;
         }
 
-        public virtual bool AddFolderRAW(int iLevel, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong)
+        public virtual bool AddReportFolderRAWIfNotExists(int iTaskID, int iTreeLevel, string sCount, string sCountSUM, string sSize, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong, int iReportSubTaskID)
+        {
+            if (!IsReady)
+            {
+                m_sLastError = "Is not Ready!";
+                return false;
+            }
+            if (m_iTaskID <= 0)
+            {
+                m_sLastError = "BeginTask() not called!";
+                return false;
+            }
+
+            m_sLastError = "AddFolderRAW is not implemented!";
+
+            return false;
+        }
+
+        public virtual bool AddFolderRAW(int iTreeLevel, string sCount, string sCountSUM, string sSize, string sSizeSUM, string sMinFileDate, string sMaxFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong, int iReportSubTaskID)
         {
             if (!IsReady)
             {
@@ -117,7 +161,7 @@ namespace WinDiskSizeEx
             return false;
         }
 
-        public virtual bool QueryTasks()
+        public virtual bool QueryTasks(int iTaskStatusFilter, int iReportTaskID)
         {
             if (!IsReady)
             {
@@ -130,7 +174,7 @@ namespace WinDiskSizeEx
             return false;
         }
 
-        public virtual bool QueryFolders(int iTaskID)
+        public virtual bool QueryFolders(int iTaskID, string sOrderBy)
         {
             if (!IsReady)
             {
