@@ -64,7 +64,6 @@
             this.label10 = new System.Windows.Forms.Label();
             this.tbTaskID = new System.Windows.Forms.TextBox();
             this.prsSqlSvr = new System.Windows.Forms.ProgressBar();
-            this.label11 = new System.Windows.Forms.Label();
             this.btnMdbPath = new System.Windows.Forms.Button();
             this.tbMdbPath = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -73,6 +72,9 @@
             this.label13 = new System.Windows.Forms.Label();
             this.tbExcludedAlways = new System.Windows.Forms.TextBox();
             this.tbExcludeSysFolders = new System.Windows.Forms.TextBox();
+            this.btnClearMdbPath = new System.Windows.Forms.Button();
+            this.chbMdbPath = new System.Windows.Forms.CheckBox();
+            this.chbStorePw = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -192,9 +194,9 @@
             // 
             this.btnCopy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCopy.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnCopy.Location = new System.Drawing.Point(14, 129);
+            this.btnCopy.Location = new System.Drawing.Point(461, 409);
             this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(111, 48);
+            this.btnCopy.Size = new System.Drawing.Size(134, 36);
             this.btnCopy.TabIndex = 10;
             this.btnCopy.Text = "Copy Result as Text";
             this.btnCopy.UseVisualStyleBackColor = true;
@@ -375,9 +377,9 @@
             // 
             this.btnSqlSvr.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSqlSvr.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnSqlSvr.Location = new System.Drawing.Point(147, 129);
+            this.btnSqlSvr.Location = new System.Drawing.Point(17, 128);
             this.btnSqlSvr.Name = "btnSqlSvr";
-            this.btnSqlSvr.Size = new System.Drawing.Size(109, 48);
+            this.btnSqlSvr.Size = new System.Drawing.Size(75, 48);
             this.btnSqlSvr.TabIndex = 24;
             this.btnSqlSvr.Text = "Connect to DB";
             this.btnSqlSvr.UseVisualStyleBackColor = true;
@@ -386,18 +388,18 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(262, 131);
+            this.label6.Location = new System.Drawing.Point(98, 130);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(65, 13);
+            this.label6.Size = new System.Drawing.Size(111, 13);
             this.label6.TabIndex = 25;
-            this.label6.Text = "SQL Server:";
+            this.label6.Text = "SQL Server\\Instance:";
             // 
             // tbServer
             // 
             this.tbServer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tbServer.Location = new System.Drawing.Point(327, 129);
+            this.tbServer.Location = new System.Drawing.Point(212, 128);
             this.tbServer.Name = "tbServer";
-            this.tbServer.Size = new System.Drawing.Size(66, 20);
+            this.tbServer.Size = new System.Drawing.Size(138, 20);
             this.tbServer.TabIndex = 26;
             this.tbServer.TextChanged += new System.EventHandler(this.tbSqlAny_TextChanged);
             // 
@@ -418,7 +420,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(403, 132);
+            this.label7.Location = new System.Drawing.Point(362, 132);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(25, 13);
             this.label7.TabIndex = 28;
@@ -427,17 +429,17 @@
             // tbDb
             // 
             this.tbDb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tbDb.Location = new System.Drawing.Point(431, 129);
+            this.tbDb.Location = new System.Drawing.Point(390, 128);
             this.tbDb.Name = "tbDb";
-            this.tbDb.Size = new System.Drawing.Size(100, 20);
+            this.tbDb.Size = new System.Drawing.Size(124, 20);
             this.tbDb.TabIndex = 29;
-            this.tbDb.Text = "WinDiskSize";
+            this.tbDb.Text = "";
             this.tbDb.TextChanged += new System.EventHandler(this.tbSqlAny_TextChanged);
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(541, 132);
+            this.label8.Location = new System.Drawing.Point(523, 132);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(32, 13);
             this.label8.TabIndex = 30;
@@ -446,9 +448,9 @@
             // tbUser
             // 
             this.tbUser.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tbUser.Location = new System.Drawing.Point(574, 129);
+            this.tbUser.Location = new System.Drawing.Point(555, 128);
             this.tbUser.Name = "tbUser";
-            this.tbUser.Size = new System.Drawing.Size(68, 20);
+            this.tbUser.Size = new System.Drawing.Size(93, 20);
             this.tbUser.TabIndex = 31;
             this.tbUser.Text = "";
             this.tbUser.TextChanged += new System.EventHandler(this.tbSqlAny_TextChanged);
@@ -456,7 +458,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(654, 131);
+            this.label9.Location = new System.Drawing.Point(654, 119);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(56, 13);
             this.label9.TabIndex = 32;
@@ -475,7 +477,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(175, 131);
+            this.label10.Location = new System.Drawing.Point(14, 130);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(66, 13);
             this.label10.TabIndex = 35;
@@ -486,7 +488,7 @@
             this.tbTaskID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbTaskID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.tbTaskID.ForeColor = System.Drawing.Color.Red;
-            this.tbTaskID.Location = new System.Drawing.Point(178, 154);
+            this.tbTaskID.Location = new System.Drawing.Point(17, 153);
             this.tbTaskID.Name = "tbTaskID";
             this.tbTaskID.ReadOnly = true;
             this.tbTaskID.Size = new System.Drawing.Size(58, 22);
@@ -503,19 +505,10 @@
             this.prsSqlSvr.TabIndex = 37;
             this.prsSqlSvr.Visible = false;
             // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(262, 158);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(59, 13);
-            this.label11.TabIndex = 38;
-            this.label11.Text = "MDB Path:";
-            // 
             // btnMdbPath
             // 
             this.btnMdbPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMdbPath.Location = new System.Drawing.Point(327, 153);
+            this.btnMdbPath.Location = new System.Drawing.Point(221, 152);
             this.btnMdbPath.Name = "btnMdbPath";
             this.btnMdbPath.Size = new System.Drawing.Size(26, 23);
             this.btnMdbPath.TabIndex = 39;
@@ -528,10 +521,10 @@
             this.tbMdbPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbMdbPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tbMdbPath.Location = new System.Drawing.Point(359, 155);
+            this.tbMdbPath.Location = new System.Drawing.Point(310, 155);
             this.tbMdbPath.Name = "tbMdbPath";
             this.tbMdbPath.ReadOnly = true;
-            this.tbMdbPath.Size = new System.Drawing.Size(423, 20);
+            this.tbMdbPath.Size = new System.Drawing.Size(472, 20);
             this.tbMdbPath.TabIndex = 40;
             this.tbMdbPath.TabStop = false;
             // 
@@ -597,12 +590,50 @@
             this.tbExcludeSysFolders.TabIndex = 46;
             this.tbExcludeSysFolders.Text = "Users; Windows; Program Files; Program Files (x86); ProgramData";
             // 
+            // btnClearMdbPath
+            // 
+            this.btnClearMdbPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClearMdbPath.Location = new System.Drawing.Point(255, 152);
+            this.btnClearMdbPath.Name = "btnClearMdbPath";
+            this.btnClearMdbPath.Size = new System.Drawing.Size(47, 23);
+            this.btnClearMdbPath.TabIndex = 47;
+            this.btnClearMdbPath.Text = "Clear";
+            this.btnClearMdbPath.UseVisualStyleBackColor = true;
+            this.btnClearMdbPath.Click += new System.EventHandler(this.btnClearMdbPath_Click);
+            // 
+            // chbMdbPath
+            // 
+            this.chbMdbPath.AutoSize = true;
+            this.chbMdbPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chbMdbPath.Location = new System.Drawing.Point(101, 156);
+            this.chbMdbPath.Name = "chbMdbPath";
+            this.chbMdbPath.Size = new System.Drawing.Size(115, 17);
+            this.chbMdbPath.TabIndex = 48;
+            this.chbMdbPath.Text = "MDB instead, Path:";
+            this.chbMdbPath.UseVisualStyleBackColor = true;
+            this.chbMdbPath.CheckedChanged += new System.EventHandler(this.chbMdbPath_CheckedChanged);
+            // 
+            // chbStorePw
+            // 
+            this.chbStorePw.AutoSize = true;
+            this.chbStorePw.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chbStorePw.Location = new System.Drawing.Point(657, 135);
+            this.chbStorePw.Name = "chbStorePw";
+            this.chbStorePw.Size = new System.Drawing.Size(48, 17);
+            this.chbStorePw.TabIndex = 49;
+            this.chbStorePw.Text = "Save";
+            this.chbStorePw.UseVisualStyleBackColor = true;
+            this.chbStorePw.CheckedChanged += new System.EventHandler(this.chbStorePw_CheckedChanged);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(792, 473);
+            this.Controls.Add(this.chbStorePw);
+            this.Controls.Add(this.chbMdbPath);
+            this.Controls.Add(this.btnClearMdbPath);
             this.Controls.Add(this.tbExcludeSysFolders);
             this.Controls.Add(this.tbExcludedAlways);
             this.Controls.Add(this.label13);
@@ -611,7 +642,6 @@
             this.Controls.Add(this.label12);
             this.Controls.Add(this.btnSqlSvr);
             this.Controls.Add(this.tbMdbPath);
-            this.Controls.Add(this.label11);
             this.Controls.Add(this.prsSqlSvr);
             this.Controls.Add(this.tbTaskID);
             this.Controls.Add(this.label10);
@@ -694,7 +724,6 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox tbTaskID;
         private System.Windows.Forms.ProgressBar prsSqlSvr;
-        private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button btnMdbPath;
         private System.Windows.Forms.TextBox tbMdbPath;
         private System.Windows.Forms.Label label12;
@@ -703,6 +732,9 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TextBox tbExcludedAlways;
         private System.Windows.Forms.TextBox tbExcludeSysFolders;
+        private System.Windows.Forms.Button btnClearMdbPath;
+        private System.Windows.Forms.CheckBox chbMdbPath;
+        private System.Windows.Forms.CheckBox chbStorePw;
     }
 }
 

@@ -35,23 +35,57 @@ namespace WinDiskSize
 
                 SqlTransaction trans = conn.BeginTransaction();
 
+                /*
                 SqlCommand cmdIdentity = conn.CreateCommand();
                 cmdIdentity.Transaction = trans;
                 cmdIdentity.CommandText = "SELECT IDENT_CURRENT ('dbo.Task')";
-                int iTmp = Convert.ToInt32(cmdIdentity.ExecuteScalar());
+                object oResult = cmdIdentity.ExecuteScalar();
+                */
+
+                SqlCommand cmdChk1 = conn.CreateCommand();
+                cmdChk1.Transaction = trans;
+                cmdChk1.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Task'";
+                int iTableCount_Task = (int) cmdChk1.ExecuteScalar();
+
+                SqlCommand cmdChk2 = conn.CreateCommand();
+                cmdChk2.Transaction = trans;
+                cmdChk2.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'FolderRAW'";
+                int iTableCount_FolderRAW = (int)cmdChk2.ExecuteScalar();
 
                 trans.Commit();
 
                 conn.Close();
 
-                m_bIsReady = true;
+                if (iTableCount_Task == 0 || iTableCount_FolderRAW == 0)
+                {
+                    string sTbls = "";
+                    if (iTableCount_Task == 0)
+                    {
+                        if (sTbls.Length > 0) sTbls += ", ";
+                        sTbls += "Task";
+                    }
+                    if (iTableCount_FolderRAW == 0)
+                    {
+                        if (sTbls.Length > 0) sTbls += ", ";
+                        sTbls += "FoldrRAW";
+                    }
+                    m_sLastError = "Table \"" + sTbls + "\" does not exist in SQL Server Database (" + sServer + ", " + sDb + ")!";
 
-                m_sServer = sServer;
-                m_sDb = sDb;
-                m_sUser = sUser;
-                m_sPw = sPw;
+                    return false;
+                }
+                else
+                {
 
-                return true;
+                    m_bIsReady = true;
+
+                    m_sServer = sServer;
+                    m_sDb = sDb;
+                    m_sUser = sUser;
+                    m_sPw = sPw;
+
+                    return true;
+                }
+
             }
             catch (Exception ex)
             {
@@ -97,8 +131,11 @@ namespace WinDiskSize
 
                 SqlCommand cmdInsert = conn.CreateCommand();
                 cmdInsert.Transaction = trans1;
-                cmdInsert.CommandText = "INSERT INTO dbo.Task (Version, Status, Program, VersionString, Label, StorageSize, StorageFree, Machine, StartDate) VALUES (100, 1, 'WinDiskSize', 'CS2010EXPRESS.100', '" +
-                                            sLabel + "', '" + sStorageSize + "', '" + sStorageFree + "', '" + Environment.MachineName + "', SYSDATETIME())";
+                cmdInsert.CommandText = "INSERT INTO dbo.Task (ForReport, Version, Status, Program, VersionString, Label, StorageSize, StorageFree, Machine, StartDate)"
+                                            + " VALUES (0, 100, 1, N'WinDiskSize', N'CS2010EXPRESS.100', N'" +
+                                            // FIX: To Support SQL Server 2000 SP3
+                                          //sLabel + "', N'" + sStorageSize + "', N'" + sStorageFree + "', N'" + Environment.MachineName + "', SYSDATETIME())";
+                                            sLabel + "', N'" + sStorageSize + "', N'" + sStorageFree + "', N'" + Environment.MachineName + "', GETDATE())";
                 cmdInsert.ExecuteNonQuery();
 
                 SqlCommand cmdIdentity = conn.CreateCommand();
@@ -114,7 +151,7 @@ namespace WinDiskSize
 
                 SqlCommand cmdUpdateStart = conn.CreateCommand();
                 cmdUpdateStart.Transaction = trans2;
-                cmdUpdateStart.CommandText = "UPDATE dbo.Task SET FolderType = '" + sFolderType + "', FolderPath = '" +
+                cmdUpdateStart.CommandText = "UPDATE dbo.Task SET FolderType = N'" + sFolderType + "', FolderPath = N'" +
                                                 sFolderPath + "', Status = 2 WHERE ID=" + m_iTaskID.ToString();
                 cmdUpdateStart.ExecuteNonQuery();
 
@@ -159,8 +196,8 @@ namespace WinDiskSize
 
                 SqlTransaction trans1 = m_conn.BeginTransaction();
 
-                String sSQL = "INSERT INTO dbo.FolderRAW (TaskID, TreeLevel, FileCountSelf, FileCountSUM, FileSizeSelf, FileSizeSUM, MinFileDate, MaxFileDate, NameShort83, PathShort83, NameLong, PathLong) VALUES ("
-                                                         + m_iTaskID.ToString() + ", " + iTreeLevel.ToString() + ", '" + sCount + "', '" + sCountSUM + "', '" + sSize + "', '" + sSizeSUM + "', "
+                String sSQL = "INSERT INTO dbo.FolderRAW (TaskID, ReportSubTaskID, TreeLevel, FileCountSelf, FileCountSUM, FileSizeSelf, FileSizeSUM, MinFileDate, MaxFileDate, NameShort83, PathShort83, NameLong, PathLong) VALUES ("
+                                                         + m_iTaskID.ToString() + ", -1" + ", " + iTreeLevel.ToString() + ", '" + sCount + "', '" + sCountSUM + "', '" + sSize + "', '" + sSizeSUM + "', "
                         /* '...' or NULL --> */          + sMinFileDate + ", " + sMaxFileDate
                                                          + ", @sNameShort83, @sPathShort83, @sNameLong, @sPathLong)";
 
@@ -216,7 +253,9 @@ namespace WinDiskSize
 
                 SqlCommand cmdUpdateEnd = m_conn.CreateCommand();
                 cmdUpdateEnd.Transaction = trans1;
-                cmdUpdateEnd.CommandText = "UPDATE dbo.Task SET EndDate = SYSDATETIME(), Status = 3 WHERE ID=" + m_iTaskID.ToString();
+                // FIX: To Support SQL Server 2000 SP3
+              //cmdUpdateEnd.CommandText = "UPDATE dbo.Task SET EndDate = SYSDATETIME(), Status = 3 WHERE ID=" + m_iTaskID.ToString();
+                cmdUpdateEnd.CommandText = "UPDATE dbo.Task SET EndDate = GETDATE(), Status = 3 WHERE ID=" + m_iTaskID.ToString();
                 cmdUpdateEnd.ExecuteNonQuery();
 
                 trans1.Commit();

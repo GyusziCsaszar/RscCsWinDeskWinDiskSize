@@ -16,7 +16,7 @@ namespace WinDiskSize
     public partial class FormMain : Form
     {
 
-        protected const string csAPP_TITLE = "Win Disk Size v3.00";
+        protected const string csAPP_TITLE = "Win Disk Size v3.01";
 
         protected const String csMDB_TEMPLATE = "WinDiskSize_Template.mdb";
 
@@ -102,14 +102,41 @@ namespace WinDiskSize
 
             tbStartFolder.Text = RegistryRead("Last Start Folder", "");
 
+            if (tbStartFolder.Text.Length > 0 && cbDrive.SelectedIndex < 0)
+            {
+                string sTmp = tbStartFolder.Text;
+                sTmp = sTmp.Replace("\\", "_");
+                sTmp = sTmp.Replace(":", "_");
+                try
+                {
+                    int iChecked = 0;
+                    iChecked = RegistryRead("Exclude Sys Folders(" + sTmp + ")", iChecked);
+                    if (iChecked > 0)
+                    {
+                        chbExcludeSysFolders.Checked = true;
+                    }
+                    else
+                    {
+                        chbExcludeSysFolders.Checked = false;
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+
             tbServer.Text   = RegistryRead("Last SQL Server",   tbServer.Text);
             tbDb.Text       = RegistryRead("Last SQL Db",       tbDb.Text);
             tbUser.Text     = RegistryRead("Last SQL User",     tbUser.Text);
+            tbPw.Text       = RegistryRead("Last SQL Pw",       tbPw.Text);
+            chbStorePw.Checked = tbPw.Text.Length > 0;
 
             string sLastMdbFolder = RegistryRead("Last MDB Folder", "");
             if (sLastMdbFolder.Length > 0)
             {
                 tbMdbPath.Text = sLastMdbFolder;
+
+                chbMdbPath.Checked = true;
             }
         }
 
@@ -130,6 +157,22 @@ namespace WinDiskSize
 
                 RegistryWrite("Exclude Always",      tbExcludedAlways.Text);
                 RegistryWrite("Exclude Sys Folders", tbExcludeSysFolders.Text);
+
+                if (tbStartFolder.Text.Length > 0 && cbDrive.SelectedIndex < 0)
+                {
+                    string sTmp = tbStartFolder.Text;
+                    sTmp = sTmp.Replace("\\", "_");
+                    sTmp = sTmp.Replace(":", "_");
+                    try
+                    {
+                        int iChecked = 0;
+                        if (chbExcludeSysFolders.Checked) iChecked = 1;
+                        RegistryWrite("Exclude Sys Folders(" + sTmp + ")", iChecked);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
 
                 if (this.Left >= 0) RegistryWrite("Main_Left", this.Left);
                 if (this.Top >= 0) RegistryWrite("Main_Top", this.Top);
@@ -725,6 +768,44 @@ namespace WinDiskSize
                 if (tmrWalk.Enabled) return;
             }
 
+            if (cbDrive.SelectedIndex >= 0)
+            {
+                string sTmp = cbDrive.Text;
+                sTmp = sTmp.Replace("\\", "_");
+                sTmp = sTmp.Replace(":", "_");
+                try
+                {
+                    int iChecked = 0;
+                    iChecked = RegistryRead("Exclude Sys Folders(" + sTmp + ")", iChecked);
+                    if (iChecked > 0)
+                    {
+                        if (DialogResult.Yes == MessageBox.Show("Also exclude has been checked for this drive last time!\n\nDo you want to check it now?", csAPP_TITLE, MessageBoxButtons.YesNo))
+                        {
+                            chbExcludeSysFolders.Checked = true;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            if (cbDrive.SelectedIndex >= 0)
+            {
+                string sTmp = cbDrive.Text;
+                sTmp = sTmp.Replace("\\", "_");
+                sTmp = sTmp.Replace(":", "_");
+                try
+                {
+                    int iChecked = 0;
+                    if (chbExcludeSysFolders.Checked) iChecked = 1;
+                    RegistryWrite("Exclude Sys Folders(" + sTmp + ")", iChecked);
+                }
+                catch (Exception)
+                {
+                }
+            }
+
             this.Text = csAPP_TITLE;
 
             btnStop.Enabled = false;
@@ -768,6 +849,29 @@ namespace WinDiskSize
 
                 RegistryWrite("Last Start Folder", tbStartFolder.Text);
 
+                chbExcludeSysFolders.Checked = false;
+                if (tbStartFolder.Text.Length > 0 && cbDrive.SelectedIndex < 0)
+                {
+                    string sTmp = tbStartFolder.Text;
+                    sTmp = sTmp.Replace("\\", "_");
+                    sTmp = sTmp.Replace(":", "_");
+                    try
+                    {
+                        int iChecked = 0;
+                        iChecked = RegistryRead("Exclude Sys Folders(" + sTmp + ")", iChecked);
+                        if (iChecked > 0)
+                        {
+                            if (DialogResult.Yes == MessageBox.Show("Also exclude has been checked for this folder last time!\n\nDo you want to check it now?", csAPP_TITLE, MessageBoxButtons.YesNo))
+                            {
+                                chbExcludeSysFolders.Checked = true;
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+
                 btnList_Click(null, EventArgs.Empty);
             }
         }
@@ -782,7 +886,7 @@ namespace WinDiskSize
 
             tbTaskID.Text = "";
 
-            if (tbMdbPath.Text.Length > 0)
+            if (chbMdbPath.Checked) //tbMdbPath.Text.Length > 0)
             {
                 if (!System.IO.Directory.Exists(tbMdbPath.Text))
                 {
@@ -816,6 +920,15 @@ namespace WinDiskSize
             }
             else
             {
+                RegistryWrite("Last SQL Server", tbServer.Text);
+                RegistryWrite("Last SQL Db", tbDb.Text);
+                RegistryWrite("Last SQL User", tbUser.Text);
+
+                if (chbStorePw.Checked)
+                {
+                    RegistryWrite("Last SQL Pw", tbPw.Text);
+                }
+
                 MySqlServer sqlsvr = new MySqlServer();
                 if (!sqlsvr.TestConnect(tbServer.Text, tbDb.Text, tbUser.Text, tbPw.Text))
                 {
@@ -828,10 +941,6 @@ namespace WinDiskSize
 
                     btnSqlSvr.Enabled = false;
                     btnSqlSvr.Visible = false;
-
-                    RegistryWrite("Last SQL Server",    tbServer.Text);
-                    RegistryWrite("Last SQL Db",        tbDb.Text);
-                    RegistryWrite("Last SQL User",      tbUser.Text);
                 }
             }
 
@@ -1002,6 +1111,8 @@ namespace WinDiskSize
                 tbUser.Enabled = false;
                 tbPw.Enabled = false;
 
+                chbMdbPath.Checked = true;
+
                 btnSqlSvr.PerformClick();
             }
         }
@@ -1013,7 +1124,10 @@ namespace WinDiskSize
                 if (tmrWalk.Enabled) return;
             }
 
+            //ROLLBACK!
+            /*
             tbMdbPath.Text = "";
+            */
         }
 
         private void btnClearStartFolder_Click(object sender, EventArgs e)
@@ -1034,6 +1148,46 @@ namespace WinDiskSize
             }
 
             cbDrive.SelectedIndex = -1;
+        }
+
+        private void btnClearMdbPath_Click(object sender, EventArgs e)
+        {
+            if (tmrWalk != null)
+            {
+                if (tmrWalk.Enabled) return;
+            }
+
+            tbMdbPath.Text = "";
+
+            RegistryWrite("Last MDB Folder", tbMdbPath.Text);
+
+            chbMdbPath.Checked = false;
+        }
+
+        private void chbMdbPath_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chbMdbPath.Checked)
+            {
+                chbMdbPath.ForeColor = Color.Red;
+            }
+            else
+            {
+                chbMdbPath.ForeColor = Color.Black;
+            }
+        }
+
+        private void chbStorePw_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chbStorePw.Checked)
+            {
+                chbStorePw.ForeColor = Color.Red;
+            }
+            else
+            {
+                chbStorePw.ForeColor = Color.Black;
+
+                RegistryWrite("Last SQL Pw", "");
+            }
         }
 
     }
