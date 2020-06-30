@@ -126,6 +126,9 @@ namespace WinDiskSize
 
                     di.AddFileLength(diDrive.GetSizeSum());
                     diDrive.CopyChangeDateTo(di);
+                    di.iDirCountNoRecurse = diDrive.iDirCountNoRecurse;
+                    di.iFileCountNoRecurse = diDrive.iFileCountNoRecurse;
+
                     di.bParsed = true;  //ATTN: Without this duplicated parsing occures!!!
                     di.bHidden = true;    //ATTN: Exclude this from counting files!!!
                     aDi.Add(di);
@@ -185,6 +188,8 @@ namespace WinDiskSize
                     lblPercent.Text = sPercent + " (DONE)";
 
                     btnStop.Enabled = false;
+
+                    CopyToSqlServer();
                 }
                 else
                 {
@@ -294,8 +299,11 @@ namespace WinDiskSize
             myEnum.ReturnStringType = false;
             myEnum.SearchPattern = "*.*";
             int iSubIdx = iDirInfoIdx;
+            di.iDirCountNoRecurse = 0;
             foreach (System.IO.DirectoryInfo dir in myEnum)
             {
+                di.iDirCountNoRecurse += 1;
+
                 if (chbExcludeSysFolders.Checked)
                 {
                     if (
@@ -355,8 +363,11 @@ namespace WinDiskSize
             myEnum.SearchPattern = "*.*";
             //WinXHome FIX
             //foreach (System.IO.FileInfo file in myEnum)
+            di.iFileCountNoRecurse = 0;
             foreach (LongFileInfo file in myEnum)
             {
+                di.iFileCountNoRecurse += 1;
+
                 di.AddFileLength(file.Length);
                 //lbDirList.Items.Add(file.Name + "\tLength:" + file.Length + " bytes ");
 
@@ -591,15 +602,15 @@ namespace WinDiskSize
         {
 
             tbTaskID.Text = "";
-            btnCopyToSqlServer.Enabled = false;
 
             if (!m_sqlsvr.TestConnect(tbServer.Text, tbDb.Text, tbUser.Text, tbPw.Text))
             {
+                prsSqlSvr.Visible = false;
                 MessageBox.Show(m_sqlsvr.LastError);
             }
             else
             {
-                btnCopyToSqlServer.Enabled = true;
+                prsSqlSvr.Visible = true;
             }
 
         }
@@ -618,11 +629,14 @@ namespace WinDiskSize
 
         private void btnCopyToSqlServer_Click(object sender, EventArgs e)
         {
+        }
+
+        private void CopyToSqlServer()
+        {
             if (aDi == null) return;
             if (aDi.Count == 0) return;
             if (!m_sqlsvr.IsReady) return;
 
-            prsSqlSvr.Visible = true;
             prsSqlSvr.Minimum = 0;
             prsSqlSvr.Maximum = aDi.Count;
             prsSqlSvr.Value = 0;
@@ -697,7 +711,8 @@ namespace WinDiskSize
                     sYoungestFileDate = "NULL";
                 }
 
-                if (!m_sqlsvr.AddFolderRAW(di.GetSizeSum().ToString(), sYoungestFileDate, sNameShort83, sPathShort83, sNameLong, sPathLong))
+                if (!m_sqlsvr.AddFolderRAW(di.iLevel, di.GetSizeSum().ToString(), sYoungestFileDate, sNameShort83, sPathShort83, sNameLong, sPathLong,
+                        di.iDirCountNoRecurse, di.iFileCountNoRecurse))
                 {
                     break;
                 }
@@ -714,7 +729,7 @@ namespace WinDiskSize
 
             if (m_sqlsvr.EndTask())
             {
-                MessageBox.Show("Unfiltered Folder List has been successfully transferred to SQL Server Database!\n\nItem Count: " + lCnt.ToString());
+                MessageBox.Show("Folder List has been successfully transferred to SQL Server Database!\n\nItem Count: " + lCnt.ToString());
             }
             else
             {

@@ -31,6 +31,9 @@ namespace WinDiskSize
         public DateTime dtYoungestFile;
         public bool dtYoungestFile_Valid;
 
+        public int iDirCountNoRecurse;
+        public int iFileCountNoRecurse;
+
         public MyDirInfo()
         {
             diParent = null;
@@ -53,6 +56,9 @@ namespace WinDiskSize
 
             dtYoungestFile = new DateTime();
             dtYoungestFile_Valid = false;
+
+            iDirCountNoRecurse  = -1; // N/A
+            iFileCountNoRecurse = -1; // N/A
         }
 
         public void AddFileLength(Int64 i64Length)
@@ -178,6 +184,16 @@ namespace WinDiskSize
                     s += sPathLong;
                 }
             }
+
+            s += "\t\t";
+
+            s += "// ";
+            s += iDirCountNoRecurse.ToString();
+            s += " dir(s)";
+            s += ", ";
+            s += iFileCountNoRecurse.ToString();
+            s += " file(s)";
+            s += " (no recurse)";
 
             return s;
         }

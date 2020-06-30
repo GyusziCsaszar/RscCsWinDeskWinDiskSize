@@ -132,8 +132,10 @@ namespace WinDiskSize
 
                 SqlCommand cmdInsert = conn.CreateCommand();
                 cmdInsert.Transaction = trans1;
-                cmdInsert.CommandText = "INSERT INTO dbo.Task (Version, Status, Program, VersionString, Machine, StartDate) VALUES (100, 1, 'WinDiskSize', 'CS2010EXPRESS.100', '" +
-                                            Environment.MachineName + "', SYSDATETIME())";
+                cmdInsert.CommandText = "INSERT INTO dbo.Task (Version, Status, Program, VersionString, Machine, StartDate)"
+                                            +         " VALUES (103, 1, 'WinDiskSize'"
+                                            + ", 'CS2010EXPRESS.103', '"
+                                            + Environment.MachineName + "', SYSDATETIME())";
                 cmdInsert.ExecuteNonQuery();
 
                 SqlCommand cmdIdentity = conn.CreateCommand();
@@ -167,7 +169,7 @@ namespace WinDiskSize
             }
         }
 
-        public bool AddFolderRAW(string sSizeSUM, string sYoungestFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong)
+        public bool AddFolderRAW(int iLevel, string sSizeSUM, string sYoungestFileDate, string sNameShort83, string sPathShort83, string sNameLong, string sPathLong, int iDirCountNoRecurse, int iFileCountNoRecurse)
         {
             if (!IsReady)
             {
@@ -196,9 +198,12 @@ namespace WinDiskSize
 
                 SqlCommand cmdInsert = conn.CreateCommand();
                 cmdInsert.Transaction = trans1;
-                cmdInsert.CommandText = "INSERT INTO dbo.FolderRAW (TaskID, SizeSUM, YoungestFileDate, NameShort83, PathShort83, NameLong, PathLong) VALUES (" +
-                                                    m_iTaskID.ToString() + ", " + sSizeSUM + ", " + sYoungestFileDate + ", '" + sNameShort83 + "', '" + sPathShort83 
-                                                    + "', '" + sNameLong + "', '" + sPathLong + "')";
+                cmdInsert.CommandText = "INSERT INTO dbo.FolderRAW (TaskID, HierarchyLevel, SizeSUM, YoungestFileDate, NameShort83, PathShort83, NameLong, PathLong"
+                                                    + ", DirCountNoRecurse, FileCountNoRecurse) VALUES ("
+                                                    + m_iTaskID.ToString() + ", " + iLevel.ToString() + ", " + sSizeSUM + ", " + sYoungestFileDate + ", '"
+                                                    + sNameShort83 + "', '" + sPathShort83 + "', '"
+                                                    + sNameLong + "', '" + sPathLong + "', "
+                                                    + iDirCountNoRecurse.ToString() + ", " + iFileCountNoRecurse.ToString() + ")";
                 cmdInsert.ExecuteNonQuery();
 
                 trans1.Commit();

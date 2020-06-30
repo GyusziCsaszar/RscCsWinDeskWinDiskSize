@@ -61,7 +61,6 @@
             this.tbUser = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.tbPw = new System.Windows.Forms.TextBox();
-            this.btnCopyToSqlServer = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.tbTaskID = new System.Windows.Forms.TextBox();
             this.prsSqlSvr = new System.Windows.Forms.ProgressBar();
@@ -174,7 +173,7 @@
             // btnCopy
             // 
             this.btnCopy.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnCopy.Location = new System.Drawing.Point(14, 71);
+            this.btnCopy.Location = new System.Drawing.Point(17, 71);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(72, 45);
             this.btnCopy.TabIndex = 10;
@@ -370,9 +369,9 @@
             // btnSqlSvr
             // 
             this.btnSqlSvr.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnSqlSvr.Location = new System.Drawing.Point(92, 117);
+            this.btnSqlSvr.Location = new System.Drawing.Point(17, 117);
             this.btnSqlSvr.Name = "btnSqlSvr";
-            this.btnSqlSvr.Size = new System.Drawing.Size(72, 32);
+            this.btnSqlSvr.Size = new System.Drawing.Size(147, 32);
             this.btnSqlSvr.TabIndex = 24;
             this.btnSqlSvr.Text = "Connect to SQL Server";
             this.btnSqlSvr.UseVisualStyleBackColor = true;
@@ -460,18 +459,6 @@
             this.tbPw.Text = "";
             this.tbPw.UseSystemPasswordChar = true;
             // 
-            // btnCopyToSqlServer
-            // 
-            this.btnCopyToSqlServer.Enabled = false;
-            this.btnCopyToSqlServer.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnCopyToSqlServer.Location = new System.Drawing.Point(15, 117);
-            this.btnCopyToSqlServer.Name = "btnCopyToSqlServer";
-            this.btnCopyToSqlServer.Size = new System.Drawing.Size(72, 32);
-            this.btnCopyToSqlServer.TabIndex = 34;
-            this.btnCopyToSqlServer.Text = "Copy to SQL Server";
-            this.btnCopyToSqlServer.UseVisualStyleBackColor = true;
-            this.btnCopyToSqlServer.Click += new System.EventHandler(this.btnCopyToSqlServer_Click);
-            // 
             // label10
             // 
             this.label10.AutoSize = true;
@@ -512,7 +499,6 @@
             this.Controls.Add(this.tbTaskID);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.btnParse);
-            this.Controls.Add(this.btnCopyToSqlServer);
             this.Controls.Add(this.lbDirList);
             this.Controls.Add(this.tbPw);
             this.Controls.Add(this.label9);
@@ -587,7 +573,6 @@
         private System.Windows.Forms.TextBox tbUser;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox tbPw;
-        private System.Windows.Forms.Button btnCopyToSqlServer;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox tbTaskID;
         private System.Windows.Forms.ProgressBar prsSqlSvr;
