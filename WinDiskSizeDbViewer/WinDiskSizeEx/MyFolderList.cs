@@ -70,10 +70,13 @@ namespace WinDiskSizeEx
         public int              m_iTaskIndex;
         public MyFolderState    m_State;
 
+        public MyFolder         m_Twin;
+
         public MyFolder()
         {
             m_iTaskIndex    = -1;
             m_State         = MyFolderState.Unknown;
+            m_Twin          = null;
         }
 
         public string CountAsString

@@ -699,7 +699,7 @@ namespace WinDiskSizeEx
                              (myTaskOrig.Folders[iFldrOrig].m_sFileDateMax != myTask.Folders[iFldr].m_sFileDateMax) ) ) )
                         {
                             myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.DiffersOne;
-                            myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]);
+                            myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
 
                             lvCompare.Items[iFldrOrig].BackColor = Color.PaleTurquoise;
                             iFldrOrig++;
@@ -708,7 +708,7 @@ namespace WinDiskSizeEx
 
                             myTask.Folders[iFldr].m_State = MyFolderState.DiffersOther;
                             myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[iFldr]);
-                            myTaskRes.Folders.Add(myTask.Folders[iFldr]);
+                            //myTaskRes.Folders.Add(myTask.Folders[iFldr]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
 
                             //
 
@@ -733,9 +733,11 @@ namespace WinDiskSizeEx
                         else
                         {
                             myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.Equals;
-                            myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]);
+                            myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
 
                             myTask.Folders[iFldr].m_State = MyFolderState.Equals;
+
+                            myTaskOrig.Folders[iFldrOrig].m_Twin = myTask.Folders[iFldr];
 
                             lvCompare.Items[iFldrOrig].BackColor = Color.LightGreen;
                         }
@@ -797,15 +799,6 @@ namespace WinDiskSizeEx
                             {
                                 iCmp2 = 0; // Let it go!
                             }
-
-                            // IN QUESTION!!!
-                            /*
-                            else if (myTask.Folders[i].m_i64Size == 0)
-                            {
-                                iCmp2 = 0; // Let it go!
-                            }
-                            */
-
                             else
                             {
                                 iCmp2 = myTaskOrig.Folders[iFldrOrig].m_sPath.CompareTo(myTask.Folders[i].m_sPath);
@@ -813,25 +806,6 @@ namespace WinDiskSizeEx
 
                             if (iCmp2 == 0)
                             {
-
-                                // IN QUESTION!!!
-                                /*
-                                int iIns = iFldrOrig;
-                                ////////////////////////////////////////////////////////////////////
-                                // BUGFIX: Insert in the right place (tested with real-world sample)
-                                while (myTaskOrig.Folders[iIns].m_iLevel < (myTask.Folders[iFldr].m_iLevel - 1))
-                                {
-                                    if (iIns <= 1) break;
-                                    iIns--;
-                                }
-                                if (iIns < iFldrOrig)
-                                {
-                                    iIns++; // Correction
-                                }
-                                // BUGFIX: Insert in the right place (tested with real-world sample)
-                                ////////////////////////////////////////////////////////////////////
-                                */
-
                                 int iStartLevel = myTask.Folders[iFldr].m_iLevel;
 
                                 for (int j = iFldr; j < i; j++)
@@ -850,46 +824,37 @@ namespace WinDiskSizeEx
                                     {
                                         myTask.Folders[j].m_State = MyFolderState.MissingOther;
 
-                                        myTaskRes.Folders.Add(myTask.Folders[j]);
+                                        //myTaskRes.Folders.Add(myTask.Folders[j]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
 
-                                        myTaskOrig.Folders.Insert(/*iIns*/ iFldrOrig, myTask.Folders[j]);
+                                        myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[j]);
 
                                         //
 
-                                        lvCompare.Items.Insert(/*iIns*/ iFldrOrig, (myTask.Folders[j].m_iTaskIndex + 1).ToString());
+                                        lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[j].m_iTaskIndex + 1).ToString());
 
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].SizeAsString);
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].m_iLevel.ToString());
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].SizeAsString);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_iLevel.ToString());
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
 
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMin);
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMax);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMin);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMax);
 
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath);
 
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName83);
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath83);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName83);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath83);
 
-                                        lvCompare.Items[/*iIns*/ iFldrOrig].BackColor = Color.LightPink;
+                                        lvCompare.Items[iFldrOrig].BackColor = Color.LightPink;
 
                                         //
 
                                         iFldrOrig++;
-                                        //iIns++;
                                     }
                                     else
                                     {
                                         myTask.Folders[j].m_State = MyFolderState.MissingOther_HIDDEN;
                                     }
-
-                                    // FINE TUNE
-                                    /*
-                                    if (m_bSetting_HideChildrenOfMissingFolder)
-                                    {
-                                        break; // ADD THE MISSING PARENT FOLDER ONLY!!! // FINE TUNE!
-                                    }
-                                    */
                                 }
 
                                 iFldr = i;
@@ -906,54 +871,6 @@ namespace WinDiskSizeEx
 
                         if (!bSolved)
                         {
-
-                            /////////////////////////////////////
-                            // BUG!!! INSERTS EXISTING FOLDERS!!!
-                            {
-                                /*
-                                if (iFldr < myTask.Folders.Count - 1) /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! *
-                                {
-                                    if ( (m_bSetting_HideChildrenOfMissingFolder) &&
-                                         (lvCompare.Items[iFldrOrig - 1].BackColor == Color.LightPink) &&
-                                         (myTaskOrig.Folders[iFldrOrig - 1].m_iLevel < myTask.Folders[iFldr].m_iLevel) )
-                                    {
-                                        //NOP!!!
-                                    }
-                                    else
-                                    {
-                                        myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[iFldr]);
-
-                                        //
-
-                                        lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[iFldr].m_iTaskIndex + 1).ToString());
-
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_iLevel.ToString());
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
-
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMin);
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMax);
-
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath);
-
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName83);
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath83);
-
-                                        lvCompare.Items[iFldrOrig].BackColor = Color.LightPink;
-
-                                        //
-
-                                        iFldrOrig++;
-                                    }
-                                }
-
-                                iFldr++;
-                                */
-                            }
-                            // BUG!!! INSERTS EXISTING FOLDERS!!!
-                            /////////////////////////////////////
-
                             if (iFldrOrig < myTaskOrig.Folders.Count - 1 /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */)
                             {
                                 if (m_bSetting_HideChildrenOfMissingFolder)
@@ -961,6 +878,9 @@ namespace WinDiskSizeEx
                                     if ((lvCompare.Items[iFldrOrig - 1].BackColor == Color.Orange) &&
                                          (myTaskOrig.Folders[iFldrOrig - 1].m_iLevel < myTaskOrig.Folders[iFldrOrig].m_iLevel))
                                     {
+                                        myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.MissingOne_HIDDEN;
+                                        myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+
                                         lvCompare.Items.RemoveAt(iFldrOrig);
                                         myTaskOrig.Folders.RemoveAt(iFldrOrig);
 
@@ -968,11 +888,17 @@ namespace WinDiskSizeEx
                                     }
                                     else
                                     {
+                                        myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.MissingOne;
+                                        myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+
                                         lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
                                     }
                                 }
                                 else
                                 {
+                                    myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.MissingOne;
+                                    myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+
                                     lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
                                 }
                             }
@@ -981,16 +907,6 @@ namespace WinDiskSizeEx
 
                         }
                     }
-
-                    // IN QUESTION!!!
-                    /*
-                    else if ((iCmp < 0) && (!myTaskOrig.Folders[iFldrOrig].m_bHasChildren))
-                    {
-                        lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
-
-                        iFldrOrig++;
-                    }
-                    */
 
                     else if (iCmp < 0)
                     {
@@ -1014,17 +930,6 @@ namespace WinDiskSizeEx
                                 //iFldr++;
 
                             }
-
-                            // IN QUESTION!!!
-                            /*
-                            else if (!myTaskOrig.Folders[i].m_bHasChildren) // FINE-TUNE!!!
-                            {
-                                iCmp2 = 0; // Let it go!
-
-                                iFldr++;
-                            }
-                            */
-
                             else
                             {
                                 iCmp2 = myTaskOrig.Folders[i].m_sPath.CompareTo(myTask.Folders[iFldr].m_sPath);
@@ -1032,29 +937,36 @@ namespace WinDiskSizeEx
 
                             if (iCmp2 == 0)
                             {
+                                int iStartLevel = myTaskOrig.Folders[iFldrOrig].m_iLevel;
 
-                                if (m_bSetting_HideChildrenOfMissingFolder)
+                                for (int j = iFldrOrig; j < i; j++)
                                 {
-                                    myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.MissingOne;
-                                    lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
-
-                                    iFldrOrig++;
-
-                                    for (int j = iFldrOrig; j < i; j++)
+                                    /////////////////////////////////////////
+                                    //BUGFIX: Too many folders become hidden!
+                                    if (j > iFldrOrig && myTaskOrig.Folders[iFldrOrig].m_iLevel <= iStartLevel)
                                     {
+                                        break;
+                                    }
+                                    //BUGFIX: Too many folders become hidden!
+                                    /////////////////////////////////////////
+
+                                    if ((m_bSetting_HideChildrenOfMissingFolder == false) || (myTaskOrig.Folders[iFldrOrig].m_iLevel == iStartLevel))
+                                    {
+                                        myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.MissingOne;
+                                        lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
+
+                                        myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+
+                                        iFldrOrig++;
+                                    }
+                                    else
+                                    {
+                                        myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.MissingOne_HIDDEN;
+                                        myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+
                                         lvCompare.Items.RemoveAt(iFldrOrig);
                                         myTaskOrig.Folders.RemoveAt(iFldrOrig);
                                     }
-                                }
-                                else
-                                {
-                                    for (int j = iFldrOrig; j < i; j++)
-                                    {
-                                        myTaskOrig.Folders[j].m_State = MyFolderState.MissingOne;
-                                        lvCompare.Items[j].BackColor = Color.Orange;
-                                    }
-
-                                    iFldrOrig = i;
                                 }
 
                                 bSolved = true;
@@ -1123,8 +1035,15 @@ namespace WinDiskSizeEx
                              (lvCompare.Items[iFldrOrig - 1].BackColor == Color.LightGreen) &&  // Prior Folder is Equal
                              (myTaskOrig.Folders[iFldrOrig - 1].m_iLevel == 1 ))                // Prior Folder is in Root
                         {
-                            lvCompare.Items.RemoveAt(iFldrOrig);
+
+                            if (myTaskOrig.Folders[iFldrOrig].m_Twin != null)
+                            {
+                                myTaskOrig.Folders[iFldrOrig].m_Twin.m_State = MyFolderState.Equals_HIDDEN;
+                            }
+                            myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.Equals_HIDDEN;
+
                             myTaskOrig.Folders.RemoveAt(iFldrOrig);
+                            lvCompare.Items.RemoveAt(iFldrOrig);
                         }
                         else
                         {
@@ -1133,6 +1052,11 @@ namespace WinDiskSizeEx
                     }
 
                 }
+
+                //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+                List<MyFolder> FoldersTemp = myTaskOrig.Folders;
+                myTaskOrig.Folders = myTaskRes.Folders;
+                myTaskRes.Folders = FoldersTemp;
             }
 
             lblPrsMain.Visible = false;
