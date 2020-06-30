@@ -58,25 +58,27 @@ namespace WinDiskSizeEx
         public Int64            m_i64Size;
         public String           m_sName;
         public String           m_sPath;
-        public String           m_sFileDateMin;
-        public String           m_sFileDateMax;
+        public String           m_sFileDateTimeMin;
+        public String           m_sFileDateTimeMax;
+        public String           m_sFileDateOnlyMin;
+        public String           m_sFileDateOnlyMax;
         public String           m_sName83;
         public String           m_sPath83;
 
         public String           m_sIndent;  // UI Decoration
 
-      /*public bool             m_bHasChildren;*/ // ROLLED BACK!!!
-
         public int              m_iTaskIndex;
         public MyFolderState    m_State;
+        public bool             m_bSizeMissMatch;
 
         public MyFolder         m_Twin;
 
         public MyFolder()
         {
-            m_iTaskIndex    = -1;
-            m_State         = MyFolderState.Unknown;
-            m_Twin          = null;
+            m_iTaskIndex        = -1;
+            m_State             = MyFolderState.Unknown;
+            m_bSizeMissMatch    = false;
+            m_Twin              = null;
         }
 
         public string CountAsString

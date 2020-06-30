@@ -28,7 +28,8 @@ namespace WinDiskSizeEx
         StatusBarPanel sbPanelLevel;
 
         // Settings
-        protected bool m_bSetting_CompareFileDateMinAndMax      = false;
+        protected bool m_bSetting_CompareFileDateTime           = false;
+        protected bool m_bSetting_CompareFileDateOnly           = true;
         protected bool m_bSetting_HideChildrenOfMissingFolder   = true;
         protected bool m_bSetting_HideChildrenOfEqualFolder     = true;
 
@@ -97,8 +98,21 @@ namespace WinDiskSizeEx
         }
         */
 
+        private void FormMain_Shown(object sender, EventArgs e)
+        {
+            this.Left   = RegistryRead("Main_Left",     this.Left);
+            this.Top    = RegistryRead("Main_Top",      this.Top);
+            this.Width  = RegistryRead("Main_Width",    this.Width);
+            this.Height = RegistryRead("Main_Height",   this.Height);
+        }
+
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            RegistryWrite("Main_Left",   this.Left);
+            RegistryWrite("Main_Top",    this.Top);
+            RegistryWrite("Main_Width",  this.Width);
+            RegistryWrite("Main_Height", this.Height);
+
             int iCol;
             
             iCol = -1;
@@ -484,8 +498,10 @@ namespace WinDiskSizeEx
                     sTmp = sTmp.Insert(4, ".");
                     sTmp = sTmp.Insert(7, ".");
                     sTmp = sTmp.Insert(10, ".");
+
+                    fldrNew.m_sFileDateTimeMin  = sTmp;
+                    fldrNew.m_sFileDateOnlyMin  = sTmp.Substring(0, 10);
                 }
-                fldrNew.m_sFileDateMin  = sTmp;
 
                 sTmp = db.FieldAsString(iRow, "MaxFileDate");
                 if (sTmp.Length > 5)
@@ -493,8 +509,10 @@ namespace WinDiskSizeEx
                     sTmp = sTmp.Insert(4, ".");
                     sTmp = sTmp.Insert(7, ".");
                     sTmp = sTmp.Insert(10, ".");
+
+                    fldrNew.m_sFileDateTimeMax  = sTmp;
+                    fldrNew.m_sFileDateOnlyMax  = sTmp.Substring(0, 10);
                 }
-                fldrNew.m_sFileDateMax  = sTmp;
 
                 fldrNew.m_sPath         = db.FieldAsString(iRow, "PathLong");
                 fldrNew.m_sName83       = db.FieldAsString(iRow, "NameShort83");
@@ -543,8 +561,8 @@ namespace WinDiskSizeEx
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sIndent + fldrNew.m_sName);
 
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.CountAsString);
-                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateMin);
-                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateMax);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateTimeMin);
+                    lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sFileDateTimeMax);
 
                     lvCompare.Items[iRow].SubItems.Add(fldrNew.m_sPath);
 
@@ -630,8 +648,8 @@ namespace WinDiskSizeEx
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
 
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
-                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMin);
-                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMax);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateTimeMin);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateTimeMax);
 
                                 lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath);
 
@@ -692,14 +710,35 @@ namespace WinDiskSizeEx
 
                     if (iCmp == 0)
                     {
-                        if ( (myTaskOrig.Folders[iFldrOrig].m_sCount != myTask.Folders[iFldr].m_sCount) ||
-                             (myTaskOrig.Folders[iFldrOrig].m_sSize != myTask.Folders[iFldr].m_sSize) ||
-                             (m_bSetting_CompareFileDateMinAndMax && (
-                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateMin != myTask.Folders[iFldr].m_sFileDateMin) ||
-                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateMax != myTask.Folders[iFldr].m_sFileDateMax) ) ) )
+                        if ( (myTaskOrig.Folders[iFldrOrig].m_sCount != myTask.Folders[iFldr].m_sCount)
+                            
+                             ||
+                             
+                             (myTaskOrig.Folders[iFldrOrig].m_sSize != myTask.Folders[iFldr].m_sSize)
+                             
+                             ||
+
+                             (m_bSetting_CompareFileDateOnly && (
+                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateOnlyMin != myTask.Folders[iFldr].m_sFileDateOnlyMin) ||
+                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateOnlyMax != myTask.Folders[iFldr].m_sFileDateOnlyMax)))
+
+                             ||
+
+                             (m_bSetting_CompareFileDateTime && (
+                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateTimeMin != myTask.Folders[iFldr].m_sFileDateTimeMin) ||
+                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateTimeMax != myTask.Folders[iFldr].m_sFileDateTimeMax)))
+                           )
                         {
                             myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.DiffersOne;
                             myTaskRes.Folders.Add(myTaskOrig.Folders[iFldrOrig]); //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
+
+                            myTaskOrig.Folders[iFldrOrig].m_bSizeMissMatch = (myTaskOrig.Folders[iFldrOrig].m_sSize != myTask.Folders[iFldr].m_sSize);
+                            myTask.Folders[iFldr].m_bSizeMissMatch = myTaskOrig.Folders[iFldrOrig].m_bSizeMissMatch;
+
+                            if (myTaskOrig.Folders[iFldrOrig].m_bSizeMissMatch)
+                            {
+                                lvCompare.Items[iFldrOrig].SubItems[1].Text = myTaskOrig.Folders[iFldrOrig].m_i64Size.ToString() + " B";
+                            }
 
                             lvCompare.Items[iFldrOrig].BackColor = Color.PaleTurquoise;
                             iFldrOrig++;
@@ -714,13 +753,21 @@ namespace WinDiskSizeEx
 
                             lvCompare.Items.Insert(iFldrOrig, (myTask.Folders[iFldr].m_iTaskIndex + 1).ToString());
 
-                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                            if (myTask.Folders[iFldr].m_bSizeMissMatch)
+                            {
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_i64Size.ToString() + " B");
+                            }
+                            else
+                            {
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                            }
+
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_iLevel.ToString());
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
 
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
-                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMin);
-                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMax);
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateTimeMin);
+                            lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateTimeMax);
 
                             lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath);
 
@@ -740,6 +787,21 @@ namespace WinDiskSizeEx
                             myTaskOrig.Folders[iFldrOrig].m_Twin = myTask.Folders[iFldr];
 
                             lvCompare.Items[iFldrOrig].BackColor = Color.LightGreen;
+
+                            if (m_bSetting_HideChildrenOfEqualFolder && (iFldrOrig > 0))
+                            {
+                                if ( (myTaskOrig.Folders[iFldrOrig - 1].m_State == MyFolderState.Equals) &&
+                                     (myTaskOrig.Folders[iFldrOrig - 1].m_iLevel < myTaskOrig.Folders[iFldrOrig].m_iLevel))
+                                {
+                                    myTask.Folders[iFldr].m_State = MyFolderState.Equals_HIDDEN;
+                                    myTaskOrig.Folders[iFldrOrig].m_State = MyFolderState.Equals_HIDDEN;
+
+                                    myTaskOrig.Folders.RemoveAt(iFldrOrig);
+                                    lvCompare.Items.RemoveAt(iFldrOrig);
+
+                                    iFldrOrig--;
+                                }
+                            }
                         }
 
                         iFldrOrig++;
@@ -837,8 +899,8 @@ namespace WinDiskSizeEx
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
 
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMin);
-                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMax);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateTimeMin);
+                                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateTimeMax);
 
                                         lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath);
 
@@ -1009,6 +1071,7 @@ namespace WinDiskSizeEx
                     }
                 }
 
+                /*
                 if (m_bSetting_HideChildrenOfEqualFolder)
                 {
 
@@ -1052,6 +1115,7 @@ namespace WinDiskSizeEx
                     }
 
                 }
+                */
 
                 //ATTN: myTaskRes.Folders WILL BE THE NEW myTaskOrig.Folders at the end!!!
                 List<MyFolder> FoldersTemp = myTaskOrig.Folders;
@@ -1110,13 +1174,21 @@ namespace WinDiskSizeEx
 
                 lvCompare.Items.Add(fldr.m_iTaskIndex.ToString());
 
-                lvCompare.Items[iFldr].SubItems.Add(fldr.SizeAsString);
+                if (fldr.m_bSizeMissMatch)
+                {
+                    lvCompare.Items[iFldr].SubItems.Add(fldr.m_i64Size.ToString() + " B");
+                }
+                else
+                {
+                    lvCompare.Items[iFldr].SubItems.Add(fldr.SizeAsString);
+                }
+
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_iLevel.ToString());
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_sIndent + fldr.m_sName);
 
                 lvCompare.Items[iFldr].SubItems.Add(fldr.CountAsString);
-                lvCompare.Items[iFldr].SubItems.Add(fldr.m_sFileDateMin);
-                lvCompare.Items[iFldr].SubItems.Add(fldr.m_sFileDateMax);
+                lvCompare.Items[iFldr].SubItems.Add(fldr.m_sFileDateTimeMin);
+                lvCompare.Items[iFldr].SubItems.Add(fldr.m_sFileDateTimeMax);
 
                 lvCompare.Items[iFldr].SubItems.Add(fldr.m_sPath);
 

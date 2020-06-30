@@ -45,6 +45,7 @@
             this.lvTaskList = new System.Windows.Forms.ListView();
             this.lblTaskList = new System.Windows.Forms.Label();
             this.viewCompare = new System.Windows.Forms.TabPage();
+            this.lblDiffClrEquHnd = new System.Windows.Forms.Label();
             this.lblDiffClrMissOtherHdn = new System.Windows.Forms.Label();
             this.lblDiffClrMissOther = new System.Windows.Forms.Label();
             this.lblDiffClrMissOneHdn = new System.Windows.Forms.Label();
@@ -64,7 +65,6 @@
             this.prsMain = new System.Windows.Forms.ProgressBar();
             this.btnAdd = new System.Windows.Forms.Button();
             this.lblPrsMain = new System.Windows.Forms.Label();
-            this.lblDiffClrEquHnd = new System.Windows.Forms.Label();
             this.Views.SuspendLayout();
             this.viewMain.SuspendLayout();
             this.viewSource.SuspendLayout();
@@ -283,6 +283,18 @@
             this.viewCompare.TabIndex = 0;
             this.viewCompare.Text = "Compare";
             this.viewCompare.Enter += new System.EventHandler(this.viewAny_Enter);
+            // 
+            // lblDiffClrEquHnd
+            // 
+            this.lblDiffClrEquHnd.AutoSize = true;
+            this.lblDiffClrEquHnd.BackColor = System.Drawing.Color.Turquoise;
+            this.lblDiffClrEquHnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblDiffClrEquHnd.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblDiffClrEquHnd.Location = new System.Drawing.Point(92, 92);
+            this.lblDiffClrEquHnd.Name = "lblDiffClrEquHnd";
+            this.lblDiffClrEquHnd.Size = new System.Drawing.Size(66, 15);
+            this.lblDiffClrEquHnd.TabIndex = 12;
+            this.lblDiffClrEquHnd.Text = "Equ. HDN";
             // 
             // lblDiffClrMissOtherHdn
             // 
@@ -511,18 +523,6 @@
             this.lblPrsMain.Text = "N/A";
             this.lblPrsMain.Visible = false;
             // 
-            // lblDiffClrEquHnd
-            // 
-            this.lblDiffClrEquHnd.AutoSize = true;
-            this.lblDiffClrEquHnd.BackColor = System.Drawing.Color.Turquoise;
-            this.lblDiffClrEquHnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblDiffClrEquHnd.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lblDiffClrEquHnd.Location = new System.Drawing.Point(92, 92);
-            this.lblDiffClrEquHnd.Name = "lblDiffClrEquHnd";
-            this.lblDiffClrEquHnd.Size = new System.Drawing.Size(66, 15);
-            this.lblDiffClrEquHnd.TabIndex = 12;
-            this.lblDiffClrEquHnd.Text = "Equ. HDN";
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -541,6 +541,7 @@
             this.Name = "FormMain";
             this.Text = "Win Disk Size Ex";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
+            this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.Views.ResumeLayout(false);
             this.viewMain.ResumeLayout(false);
             this.viewMain.PerformLayout();
