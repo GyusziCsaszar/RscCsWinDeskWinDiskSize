@@ -498,6 +498,8 @@ namespace WinDiskSizeEx
 
             if (bAddingToCompare)
             {
+                MessageBox.Show("ATTN!!! NO DATE COMPARE!!!");
+
                 MyTask myTaskOrig = m_Tasks[0];
 
                 prsMain.Minimum = 0;
@@ -509,7 +511,7 @@ namespace WinDiskSizeEx
                 int iFldr = 0;
                 for (; ; )
                 {
-                    prsMain.Value = prsMain.Value + 1;
+                    prsMain.Value = Math.Min(prsMain.Maximum, prsMain.Value + 1);
                     prsMain.Update();
 
                     if (iFldrOrig >= myTaskOrig.Folders.Count && iFldr >= myTask.Folders.Count)
@@ -519,7 +521,9 @@ namespace WinDiskSizeEx
                     }
                     else if (iFldrOrig >= myTaskOrig.Folders.Count)
                     {
-                        for (int j = iFldr; j < myTask.Folders.Count; j++ )
+                        iFldrOrig--; /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */
+
+                        for (int j = iFldr; j < myTask.Folders.Count - 1 /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */; j++)
                         {
                             if (myTask.Folders[j].m_iLevel == 1)
                             {
@@ -549,12 +553,19 @@ namespace WinDiskSizeEx
                             }
                         }
 
-                        break;
+                        //break;
+                        iFldrOrig = myTaskOrig.Folders.Count - 1;
+                        iFldr = myTask.Folders.Count - 1;
                     }
                     else if (iFldr >= myTask.Folders.Count)
                     {
-                        for (int j = iFldrOrig; j < myTaskOrig.Folders.Count; j++)
+                        for (; ; )
                         {
+                            if (iFldrOrig >= myTaskOrig.Folders.Count - 1 /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */)
+                            {
+                                break;
+                            }
+
                             if (myTaskOrig.Folders[iFldrOrig].m_iLevel > 1)
                             {
                                 lvCompare.Items.RemoveAt(iFldrOrig);
@@ -562,11 +573,14 @@ namespace WinDiskSizeEx
                             }
                             else
                             {
+                                lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
                                 iFldrOrig++;
                             }
                         }
 
-                        break;
+                        //break;
+                        iFldrOrig = myTaskOrig.Folders.Count - 1;
+                        iFldr     = myTask.Folders.Count - 1;
                     }
 
                     int iCmp = myTaskOrig.Folders[iFldrOrig].m_sPath.CompareTo(myTask.Folders[iFldr].m_sPath);
@@ -574,8 +588,8 @@ namespace WinDiskSizeEx
                     if (iCmp == 0)
                     {
                         if ( (myTaskOrig.Folders[iFldrOrig].m_sCount != myTask.Folders[iFldr].m_sCount) ||
-                             (myTaskOrig.Folders[iFldrOrig].m_sSize != myTask.Folders[iFldr].m_sSize) ||
-                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateMin != myTask.Folders[iFldr].m_sFileDateMin) /* ||
+                             (myTaskOrig.Folders[iFldrOrig].m_sSize != myTask.Folders[iFldr].m_sSize) /* ||
+                             (myTaskOrig.Folders[iFldrOrig].m_sFileDateMin != myTask.Folders[iFldr].m_sFileDateMin) ||
                              (myTaskOrig.Folders[iFldrOrig].m_sFileDateMax != myTask.Folders[iFldr].m_sFileDateMax) */ )
                         {
                             iFldrOrig++;
@@ -647,7 +661,7 @@ namespace WinDiskSizeEx
                     {
                         bool bSolved = false;
 
-                        for (int i = iFldr + 1; i < myTask.Folders.Count /* - 1*/; i++)
+                        for (int i = iFldr + 1; i < myTask.Folders.Count - 1 /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */; i++)
                         {
                             int iCmp2;
 
@@ -720,8 +734,34 @@ namespace WinDiskSizeEx
 
                         if (!bSolved)
                         {
-                            MessageBox.Show("UNEXPECTED DIFFERENCE (iCmp > 0)!!!");
-                            break;
+                            if (iFldr < myTask.Folders.Count - 1) /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */
+                            {
+                                myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[iFldr]);
+
+                                //
+
+                                lvCompare.Items.Insert(iFldrOrig, m_Tasks.Count.ToString());
+
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
+
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMin);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMax);
+
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath);
+
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName83);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath83);
+
+                                lvCompare.Items[iFldrOrig].BackColor = Color.LightPink;
+
+                                //
+
+                                iFldrOrig++;
+                            }
+
+                            iFldr++;
                         }
                     }
 
@@ -739,7 +779,7 @@ namespace WinDiskSizeEx
                     {
                         bool bSolved = false;
 
-                        for (int i = iFldrOrig + 1; i < myTaskOrig.Folders.Count /* - 1*/; i++)
+                        for (int i = iFldrOrig + 1; i < myTaskOrig.Folders.Count - 1 /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */; i++)
                         {
                             int iCmp2;
 
@@ -806,8 +846,12 @@ namespace WinDiskSizeEx
 
                         if (!bSolved)
                         {
-                            MessageBox.Show("UNEXPECTED DIFFERENCE (iCmp < 0)!!!");
-                            break;
+                            if (iFldrOrig < myTaskOrig.Folders.Count - 1 /* ATTN!!! - FINAL ITEM IS ABOUT ROOT!!! */)
+                            {
+                                lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
+                            }
+
+                            iFldrOrig++;
                         }
                     }
                 }
