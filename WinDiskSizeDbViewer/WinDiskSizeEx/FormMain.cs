@@ -453,6 +453,15 @@ namespace WinDiskSizeEx
                     iLevelNext = db.FieldAsInt(iRow + 1, "TreeLevel");
                 }
 
+                fldrNew.m_bHasChildren = false;
+                if (iLevelNext >= 0)
+                {
+                    if (iLevelNext >= fldrNew.m_iLevel)
+                    {
+                        fldrNew.m_bHasChildren = true;
+                    }
+                }
+
                 sIndent = "";
                 for (int i = 0; i < fldrNew.m_iLevel; i++)
                 {
@@ -508,6 +517,57 @@ namespace WinDiskSizeEx
                         //Both list ended!!!
                         break;
                     }
+                    else if (iFldrOrig >= myTaskOrig.Folders.Count)
+                    {
+                        for (int j = iFldr; j < myTask.Folders.Count; j++ )
+                        {
+                            if (myTask.Folders[j].m_iLevel == 1)
+                            {
+                                myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[j]);
+
+                                //
+
+                                lvCompare.Items.Insert(iFldrOrig, m_Tasks.Count.ToString());
+
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].SizeAsString);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName);
+
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].CountAsString);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMin);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sFileDateMax);
+
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath);
+
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sIndent + myTask.Folders[j].m_sName83);
+                                lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[j].m_sPath83);
+
+                                lvCompare.Items[iFldrOrig].BackColor = Color.LightPink;
+
+                                //
+
+                                iFldrOrig++;
+                            }
+                        }
+
+                        break;
+                    }
+                    else if (iFldr >= myTask.Folders.Count)
+                    {
+                        for (int j = iFldrOrig; j < myTaskOrig.Folders.Count; j++)
+                        {
+                            if (myTaskOrig.Folders[iFldrOrig].m_iLevel > 1)
+                            {
+                                lvCompare.Items.RemoveAt(iFldrOrig);
+                                myTaskOrig.Folders.RemoveAt(iFldrOrig);
+                            }
+                            else
+                            {
+                                iFldrOrig++;
+                            }
+                        }
+
+                        break;
+                    }
 
                     int iCmp = myTaskOrig.Folders[iFldrOrig].m_sPath.CompareTo(myTask.Folders[iFldr].m_sPath);
 
@@ -550,30 +610,65 @@ namespace WinDiskSizeEx
                         iFldrOrig++;
                         iFldr++;
                     }
+
+                    // IN QUESTION!!!
+                    /*
+                    else if ((iCmp > 0) && (!myTask.Folders[iFldr].m_bHasChildren))
+                    {
+                        myTaskOrig.Folders.Insert(iFldrOrig, myTask.Folders[iFldr]);
+
+                        //
+
+                        lvCompare.Items.Insert(iFldrOrig, m_Tasks.Count.ToString());
+
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].SizeAsString);
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName);
+
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].CountAsString);
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMin);
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sFileDateMax);
+
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath);
+
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sIndent + myTask.Folders[iFldr].m_sName83);
+                        lvCompare.Items[iFldrOrig].SubItems.Add(myTask.Folders[iFldr].m_sPath83);
+
+                        lvCompare.Items[iFldrOrig].BackColor = Color.LightPink;
+
+                        //
+
+                        iFldrOrig++;
+
+                        iFldr++;
+                    }
+                    */
+
                     else if (iCmp > 0)
                     {
                         bool bSolved = false;
 
-                        for (int i = iFldr + 1; i < myTask.Folders.Count; i++)
+                        for (int i = iFldr + 1; i < myTask.Folders.Count /* - 1*/; i++)
                         {
                             int iCmp2;
 
-                          //if (myTaskOrig.Folders[iFldrOrig].m_iLevel != myTask.Folders[i].m_iLevel)
-                            if (myTaskOrig.Folders[iFldrOrig].m_iLevel <  myTask.Folders[i].m_iLevel)
+                            //if (myTaskOrig.Folders[iFldrOrig].m_iLevel != myTask.Folders[i].m_iLevel) // FINE-TUNE!!!
+                            if (myTaskOrig.Folders[iFldrOrig].m_iLevel < myTask.Folders[i].m_iLevel)
                             {
                                 //Compare only on the same level!!!
                                 continue;
                             }
-                            else if (myTaskOrig.Folders[iFldrOrig].m_iLevel > myTask.Folders[i].m_iLevel)
+                            else if (myTaskOrig.Folders[iFldrOrig].m_iLevel > myTask.Folders[i].m_iLevel) // FINE-TUNE!!!
                             {
                                 iCmp2 = 0; // Let it go!
                             }
 
                             // IN QUESTION!!!
+                            /*
                             else if (myTask.Folders[i].m_i64Size == 0)
                             {
                                 iCmp2 = 0; // Let it go!
                             }
+                            */
 
                             else
                             {
@@ -607,6 +702,8 @@ namespace WinDiskSizeEx
                                     //
 
                                     iFldrOrig++;
+
+                                    break; // ADD THE MISSING PARENT FOLDER ONLY!!! // FINE TUNE!
                                 }
 
                                 iFldr = i;
@@ -627,16 +724,27 @@ namespace WinDiskSizeEx
                             break;
                         }
                     }
+
+                    // IN QUESTION!!!
+                    /*
+                    else if ((iCmp < 0) && (!myTaskOrig.Folders[iFldrOrig].m_bHasChildren))
+                    {
+                        lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
+
+                        iFldrOrig++;
+                    }
+                    */
+
                     else if (iCmp < 0)
                     {
                         bool bSolved = false;
 
-                        for (int i = iFldrOrig + 1; i < myTaskOrig.Folders.Count; i++)
+                        for (int i = iFldrOrig + 1; i < myTaskOrig.Folders.Count /* - 1*/; i++)
                         {
                             int iCmp2;
 
-                          //if (myTaskOrig.Folders[i].m_iLevel != myTask.Folders[iFldr].m_iLevel) // FINE-TUNE!!!
-                            if (myTaskOrig.Folders[i].m_iLevel >  myTask.Folders[iFldr].m_iLevel)
+                            //if (myTaskOrig.Folders[i].m_iLevel != myTask.Folders[iFldr].m_iLevel) // FINE-TUNE!!!
+                            if (myTaskOrig.Folders[i].m_iLevel > myTask.Folders[iFldr].m_iLevel)
                             {
                                 //Compare only on the same level!!!
                                 continue;
@@ -649,12 +757,14 @@ namespace WinDiskSizeEx
                             }
 
                             // IN QUESTION!!!
-                            else if (myTaskOrig.Folders[i].m_i64Size == 0) // FINE-TUNE!!!
+                            /*
+                            else if (!myTaskOrig.Folders[i].m_bHasChildren) // FINE-TUNE!!!
                             {
                                 iCmp2 = 0; // Let it go!
 
                                 iFldr++;
                             }
+                            */
 
                             else
                             {
@@ -663,12 +773,26 @@ namespace WinDiskSizeEx
 
                             if (iCmp2 == 0)
                             {
+
+                                // KEEP ONLY THE MISSING PARENT FOLDER!!! // FINE-TUNE!!!
+                                /*
                                 for (int j = iFldrOrig; j < i; j++)
                                 {
                                     lvCompare.Items[j].BackColor = Color.Orange;
                                 }
 
                                 iFldrOrig = i;
+                                */
+
+                                lvCompare.Items[iFldrOrig].BackColor = Color.Orange;
+
+                                iFldrOrig++;
+
+                                for (int j = iFldrOrig; j < i; j++)
+                                {
+                                    lvCompare.Items.RemoveAt(iFldrOrig);
+                                    myTaskOrig.Folders.RemoveAt(iFldrOrig);
+                                }
 
                                 bSolved = true;
                                 break;

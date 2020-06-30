@@ -44,6 +44,7 @@ namespace WinDiskSizeEx
         public String   m_sPath83;
 
         public String   m_sIndent;  // UI Decoration
+        public bool     m_bHasChildren;
 
         public MyFolder()
         {
