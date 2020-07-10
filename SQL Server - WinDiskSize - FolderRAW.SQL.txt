@@ -1,0 +1,19 @@
+USE WinDiskSize;
+
+CREATE TABLE dbo.FolderRAW
+	(
+	ID int IDENTITY(1,1) PRIMARY KEY,
+	TaskID int NOT NULL,
+	ReportSubTaskID int NOT NULL,
+	TreeLevel int NOT NULL,
+	FileCountSelf nvarchar(50) NOT NULL,
+	FileCountSUM nvarchar(50) NOT NULL,
+	FileSizeSelf nvarchar(50) NOT NULL,
+	FileSizeSUM nvarchar(50) NOT NULL,
+	MinFileDate nvarchar(50) NULL,
+	MaxFileDate nvarchar(50) NULL,
+	NameShort83 nvarchar(255) NOT NULL,
+	PathShort83 nvarchar(255) NOT NULL,
+	NameLong nvarchar(255) NOT NULL,
+	PathLong nvarchar(255) NOT NULL
+	);

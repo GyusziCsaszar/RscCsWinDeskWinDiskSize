@@ -1,0 +1,19 @@
+USE WinDiskSize;
+
+CREATE TABLE dbo.Task
+	(
+	ID int IDENTITY(1,1) PRIMARY KEY,
+	ForReport int NOT NULL,
+	Version int NOT NULL,
+	Status int NOT NULL,
+	Program nvarchar(100) NOT NULL,
+	VersionString nvarchar(100) NOT NULL,
+	Label nvarchar(50) NULL,
+	Machine nvarchar(50) NOT NULL,
+	FolderType nvarchar(50) NULL,
+	FolderPath nvarchar(255) NULL,
+	StorageSize nvarchar(50) NULL,
+	StorageFree nvarchar(50) NULL,
+	StartDate datetime NOT NULL,
+	EndDate datetime NULL
+	);
