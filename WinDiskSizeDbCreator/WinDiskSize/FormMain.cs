@@ -16,7 +16,7 @@ namespace WinDiskSize
     public partial class FormMain : Form
     {
 
-        protected const string csAPP_TITLE = "Win Disk Size v3.02";
+        protected const string csAPP_TITLE = "Win Disk Size v3.03";
 
         protected const String csMDB_TEMPLATE = "WinDiskSize_Template.mdb";
 
@@ -33,6 +33,8 @@ namespace WinDiskSize
         StatusBarPanel sbPanelLevel;
 
         protected MyDb m_db = new MyDb();
+
+        protected string m_sStorageLabel;
 
         public FormMain()
         {
@@ -393,12 +395,12 @@ namespace WinDiskSize
                 return;
             }
 
-            string sLabel = "";
+            m_sStorageLabel = "";
             string sLabelPath = sFolderPath.Substring(0, 2) + "\\";
             sLabelPath += "WinDiskSize_LABEL.txt";
             if (System.IO.File.Exists(sLabelPath))
             {
-                sLabel = System.IO.File.ReadAllText(sLabelPath);
+                m_sStorageLabel = System.IO.File.ReadAllText(sLabelPath);
             }
             else
             {
@@ -423,7 +425,7 @@ namespace WinDiskSize
 
             if (m_db.IsReady)
             {
-                if (!m_db.BeginTask(sFolderType, sFolderPath, sLabel, sStorageSize, sStorageFree))
+                if (!m_db.BeginTask(sFolderType, sFolderPath, m_sStorageLabel, sStorageSize, sStorageFree))
                 {
                     MessageBox.Show(m_db.LastError, csAPP_TITLE);
                     return;
@@ -444,7 +446,12 @@ namespace WinDiskSize
 
             aDi.Clear();
 
-            Text = csAPP_TITLE + " - " + sFolderType + " - " + sFolderPath;
+            string sLabel = m_sStorageLabel;
+            if (sLabel.Length == 0)
+            {
+                sLabel = "[none]";
+            }
+            this.Text = csAPP_TITLE + " - " + sFolderType + ": " + sFolderPath + " - " + sLabel;
 
             String sStartFolder = sFolderPath + "\\";
 
